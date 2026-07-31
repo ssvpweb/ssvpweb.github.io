@@ -19,7 +19,7 @@
 
     body {
       background-color: #f4f6f8;
-      padding: 8px;
+      padding: 6px;
       color: #333333;
     }
 
@@ -41,6 +41,12 @@
       font-weight: 700;
     }
 
+    .header p {
+      font-size: 0.8rem;
+      opacity: 0.9;
+      margin-top: 4px;
+    }
+
     .test-list {
       background-color: white;
       border: 1px solid #dcdfe3;
@@ -58,6 +64,7 @@
       color: #003366;
       font-weight: 700;
       font-size: 0.95rem;
+      -webkit-tap-highlight-color: transparent;
     }
 
     .test-item:last-child {
@@ -70,6 +77,13 @@
       font-size: 0.9rem;
       color: #666;
     }
+
+    .breadcrumb {
+      font-size: 0.8rem;
+      color: #666;
+      margin-bottom: 8px;
+      padding: 0 4px;
+    }
   </style>
 </head>
 <body>
@@ -77,6 +91,7 @@
   <div class="container">
     <div class="header">
       <h1>Laboratório de Testes SSVP</h1>
+      <p>Selecione um arquivo de teste abaixo</p>
     </div>
 
     <div class="test-list" id="file-list">
@@ -85,47 +100,58 @@
   </div>
 
   <script>
-    // Configurações do seu repositório
     const user = 'webappssvp';
     const repo = 'webappssvp.github.io';
-    const folderPath = 'testes'; // Nome da pasta de testes
+    const baseFolder = 'testes';
 
     async function loadTestFiles() {
       const listContainer = document.getElementById('file-list');
 
       try {
-        // Consulta a API do GitHub para listar o conteúdo da pasta /testes
-        const response = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${folderPath}`);
-        
-        if (!response.ok) throw new Error('Não foi possível listar os arquivos.');
+        // Busca o conteúdo da pasta de testes
+        const response = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${baseFolder}`);
+        if (!response.ok) throw new Error('Falha ao listar o diretório');
 
-        const files = await response.json();
+        const items = await response.json();
         listContainer.innerHTML = '';
 
-        // Filtra arquivos e subpastas (ignorando o próprio index.html)
-        const validItems = files.filter(item => item.name !== 'index.html');
+        // Filtra para remover o próprio index.html
+        const validItems = items.filter(item => item.name !== 'index.html');
 
         if (validItems.length === 0) {
-          listContainer.innerHTML = '<div class="loading">Nenhum teste encontrado na pasta.</div>';
+          listContainer.innerHTML = '<div class="loading">Nenhum teste encontrado.</div>';
           return;
         }
 
-        validItems.forEach(item => {
-          const a = document.createElement('a');
-          a.className = 'test-item';
-          
-          // Se for pasta, adiciona o ícone de pasta; se for arquivo HTML, o de página
-          const isDir = item.type === 'dir';
-          const icon = isDir ? '📁' : '📄';
+        for (const item of validItems) {
+          if (item.type === 'dir') {
+            // Se for uma subpasta, busca os arquivos .html dentro dela
+            const subRes = await fetch(item.url);
+            if (subRes.ok) {
+              const subItems = await subRes.json();
+              const htmlFiles = subItems.filter(f => f.name.endsWith('.html') && f.name !== 'index.html');
 
-          a.href = item.name;
-          a.innerHTML = `<span>${icon} ${item.name}</span> <span>➔</span>`;
-          
-          listContainer.appendChild(a);
-        });
+              htmlFiles.forEach(file => {
+                const a = document.createElement('a');
+                a.className = 'test-item';
+                // Aponta diretamente para o arquivo dentro da subpasta (ex: testes/voz/teste01.html)
+                a.href = `./${item.name}/${file.name}`;
+                a.innerHTML = `<span>📄 <strong>[${item.name}]</strong> ${file.name}</span> <span>➔</span>`;
+                listContainer.appendChild(a);
+              });
+            }
+          } else if (item.name.endsWith('.html')) {
+            // Se for um arquivo HTML direto na raiz da pasta testes
+            const a = document.createElement('a');
+            a.className = 'test-item';
+            a.href = `./${item.name}`;
+            a.innerHTML = `<span>📄 ${item.name}</span> <span>➔</span>`;
+            listContainer.appendChild(a);
+          }
+        }
 
       } catch (error) {
-        listContainer.innerHTML = `<div class="loading" style="color:red;">Erro ao carregar os testes.</div>`;
+        listContainer.innerHTML = `<div class="loading" style="color:red;">Erro ao carregar lista de testes.</div>`;
       }
     }
 
