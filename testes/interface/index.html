@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Central de Testes SSVP</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Montserrat', Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f4f6f8;
+      padding: 8px;
+      color: #333333;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .header {
+      background-color: #003366;
+      color: white;
+      padding: 16px;
+      border-radius: 4px 4px 0 0;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .test-list {
+      background-color: white;
+      border: 1px solid #dcdfe3;
+      border-top: none;
+      border-radius: 0 0 4px 4px;
+    }
+
+    .test-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 12px;
+      border-bottom: 1px solid #eef2f5;
+      text-decoration: none;
+      color: #003366;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .test-item:last-child {
+      border-bottom: none;
+    }
+
+    .loading {
+      padding: 20px;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="header">
+      <h1>Laboratório de Testes SSVP</h1>
+    </div>
+
+    <div class="test-list" id="file-list">
+      <div class="loading">Carregando arquivos de teste...</div>
+    </div>
+  </div>
+
+  <script>
+    // Configurações do seu repositório
+    const user = 'webappssvp';
+    const repo = 'webappssvp.github.io';
+    const folderPath = 'testes'; // Nome da pasta de testes
+
+    async function loadTestFiles() {
+      const listContainer = document.getElementById('file-list');
+
+      try {
+        // Consulta a API do GitHub para listar o conteúdo da pasta /testes
+        const response = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${folderPath}`);
+        
+        if (!response.ok) throw new Error('Não foi possível listar os arquivos.');
+
+        const files = await response.json();
+        listContainer.innerHTML = '';
+
+        // Filtra arquivos e subpastas (ignorando o próprio index.html)
+        const validItems = files.filter(item => item.name !== 'index.html');
+
+        if (validItems.length === 0) {
+          listContainer.innerHTML = '<div class="loading">Nenhum teste encontrado na pasta.</div>';
+          return;
+        }
+
+        validItems.forEach(item => {
+          const a = document.createElement('a');
+          a.className = 'test-item';
+          
+          // Se for pasta, adiciona o ícone de pasta; se for arquivo HTML, o de página
+          const isDir = item.type === 'dir';
+          const icon = isDir ? '📁' : '📄';
+
+          a.href = item.name;
+          a.innerHTML = `<span>${icon} ${item.name}</span> <span>➔</span>`;
+          
+          listContainer.appendChild(a);
+        });
+
+      } catch (error) {
+        listContainer.innerHTML = `<div class="loading" style="color:red;">Erro ao carregar os testes.</div>`;
+      }
+    }
+
+    loadTestFiles();
+  </script>
+
+</body>
+</html>
