@@ -308,7 +308,7 @@
       
       <!-- Painel de Exibição das Metas (Ativado por comando) -->
       <div id="visit-screen">
-        <h3 style="margin-top: 15px; font-size: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">
+        <h3 style="margin-top: 15px; font-size: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;" id="metas-header">
           Metas do Assistido:
         </h3>
         <div id="metas-container"></div>
@@ -332,8 +332,10 @@
       <h2>Comandos Disponíveis para Falar:</h2>
       <ul>
         <li><code>iniciar visita para [nome]</code> (Ex: <em>"iniciar visita para maria"</em>)</li>
-        <li><code>mostrar metas</code> (Exibe as metas na tela em silêncio)</li>
-        <li><code>falar metas</code> (Lê as metas usando a síntese de voz)</li>
+        <li><code>mostrar metas</code> (Exibe as metas da visita ativa na tela)</li>
+        <li><code>falar metas</code> (Lê as metas da visita ativa em voz alta)</li>
+        <li><code>mostrar metas de [nome]</code> (Exibe as metas do assistido especificado na tela)</li>
+        <li><code>falar metas de [nome]</code> ou <code>malar metas de [nome]</code> (Lê as metas do assistido especificado)</li>
         <li><code>relatar visita</code> (Abre o formulário de relato e inicia o ditado)</li>
         <li><code>concluir visita</code> (Salva a visita e finaliza no banco local)</li>
       </ul>
@@ -489,16 +491,50 @@
       const frase = texto.toLowerCase().trim();
       setFeedback("Analisando comando...");
 
+      // Identificar metas de uma pessoa específica
+      let nomeEspecifico = null;
+      let padraoEncontrado = "";
+      if (frase.includes("metas de ")) {
+        padraoEncontrado = "metas de ";
+      } else if (frase.includes("metas do ")) {
+        padraoEncontrado = "metas do ";
+      } else if (frase.includes("metas da ")) {
+        padraoEncontrado = "metas da ";
+      }
+
+      if (padraoEncontrado) {
+        nomeEspecifico = frase.substring(frase.indexOf(padraoEncontrado) + padraoEncontrado.length).trim();
+      }
+
       // Comando: Iniciar visita
       if (frase.includes("iniciar visita para")) {
         const nomePesquisa = frase.replace("iniciar visita para", "").trim();
         executarIniciarVisita(nomePesquisa);
-      } 
-      // Comando: Falar metas
-      else if (frase === "falar metas" || frase === "falar as metas") {
+      }
+      // Comando: Metas de alguém específico
+      else if (nomeEspecifico) {
+        const assistidos = JSON.parse(localStorage.getItem("assistidos"));
+        const assistido = assistidos.find(a => 
+          a.nome.toLowerCase().includes(nomeEspecifico)
+        );
+
+        if (assistido) {
+          if (frase.includes("mostrar") || frase.includes("exibir") || frase.includes("ver")) {
+            executarMostrarMetas(assistido);
+          } else {
+            // Padrão ou se incluir falar, malar, dizer, ouvir, etc.
+            executarFalarMetas(assistido);
+          }
+        } else {
+          setFeedback(`Assistido "${nomeEspecifico}" não localizado.`, true);
+          falarTexto(`Não encontrei nenhum assistido com o nome ${nomeEspecifico}.`);
+        }
+      }
+      // Comando: Falar metas do assistido ativo
+      else if (frase === "falar metas" || frase === "falar as metas" || frase === "malar metas" || frase === "malar as metas") {
         executarFalarMetas();
       } 
-      // Comando: Mostrar metas
+      // Comando: Mostrar metas do assistido ativo
       else if (frase === "mostrar metas" || frase === "mostrar as metas") {
         executarMostrarMetas();
       } 
@@ -535,7 +571,7 @@
         document.getElementById("status-badge").className = "badge active";
         
         const info = `
-          <strong>Visita ativa:</strong> A caminho da casa de ${assistido.nome}<br>
+          <strong>Visita activa:</strong> A caminho da casa de ${assistido.nome}<br>
           <strong>Endereço:</strong> ${assistido.endereco}
         `;
         document.getElementById("info-visita-ativa").innerHTML = info;
@@ -562,16 +598,17 @@
     }
 
     // Ação: Falar Metas
-    function executarFalarMetas() {
-      if (!assistidoAtivo) {
+    function executarFalarMetas(assistidoEspecifico = null) {
+      const alvo = assistidoEspecifico || assistidoAtivo;
+      if (!alvo) {
         setFeedback("Nenhuma visita em andamento.", true);
-        falarTexto("Você precisa iniciar uma visita primeiro.");
+        falarTexto("Você precisa iniciar uma visita primeiro ou especificar o nome de um assistido.");
         return;
       }
 
-      setFeedback("Sintetizando metas em voz alta...");
-      let textoMetas = `As metas definidas para ${assistidoAtivo.nome} são: `;
-      assistidoAtivo.metas.forEach((meta, idx) => {
+      setFeedback(`Sintetizando metas de ${alvo.nome} em voz alta...`);
+      let textoMetas = `As metas definidas para ${alvo.nome} são: `;
+      alvo.metas.forEach((meta, idx) => {
         textoMetas += `Meta ${idx + 1}: ${meta}. `;
       });
 
@@ -579,19 +616,23 @@
     }
 
     // Ação: Mostrar Metas (Visual Silencioso)
-    function executarMostrarMetas() {
-      if (!assistidoAtivo) {
+    function executarMostrarMetas(assistidoEspecifico = null) {
+      const alvo = assistidoEspecifico || assistidoAtivo;
+      if (!alvo) {
         setFeedback("Nenhuma visita em andamento.", true);
-        falarTexto("Você precisa iniciar uma visita primeiro.");
+        falarTexto("Você precisa iniciar uma visita primeiro ou especificar o nome de um assistido.");
         return;
       }
 
-      setFeedback("Renderizando metas na tela.");
+      setFeedback(`Renderizando metas de ${alvo.nome} na tela.`);
+      
+      // Atualizar o título do cabeçalho de metas de acordo com a pessoa
+      document.getElementById("metas-header").innerText = `Metas de ${alvo.nome}:`;
       
       const container = document.getElementById("metas-container");
       container.innerHTML = "";
       
-      assistidoAtivo.metas.forEach((meta, idx) => {
+      alvo.metas.forEach((meta, idx) => {
         const card = document.createElement("div");
         card.className = "meta-card";
         card.innerHTML = `
@@ -602,7 +643,7 @@
       });
 
       document.getElementById("visit-screen").style.display = "block";
-      falarTexto("Exibindo as metas na tela.");
+      falarTexto(`Exibindo as metas de ${alvo.nome} na tela.`);
     }
 
     // Ação: Relatar Visita
