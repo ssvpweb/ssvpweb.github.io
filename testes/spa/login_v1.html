@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SPA - Teste de Login e Rotas (SSVP)</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f6f8; color: #333; }
+    header { background: #003366; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .container { max-width: 400px; margin: 60px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; font-weight: bold; }
+    input { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+    button { background: #0055a5; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-size: 16px; width: 100%; }
+    button:hover { background: #003366; }
+    .error { color: #d32f2f; margin-top: 10px; font-size: 14px; text-align: center; }
+    .hidden { display: none !important; }
+    .dashboard { max-width: 800px; margin: 30px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    nav { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+    nav button { width: auto; background: #eef2f5; color: #333; }
+    nav button.active { background: #0055a5; color: white; }
+    .loading { color: #666; font-style: italic; }
+  </style>
+</head>
+<body>
+
+  <!-- TELA DE LOGIN -->
+  <div id="login-screen" class="container">
+    <h2>🔐 Acesso Restrito - SSVP</h2>
+    <p>Entre com suas credenciais autorizadas para continuar.</p>
+    
+    <div class="form-group">
+      <label for="username">Usuário:</label>
+      <input type="text" id="username" placeholder="Digite seu usuário">
+    </div>
+    
+    <div class="form-group">
+      <label for="password">Senha:</label>
+      <input type="password" id="password" placeholder="Digite sua senha">
+    </div>
+    
+    <button onclick="realizarLogin()">Entrar</button>
+    <div id="error-msg" class="error"></div>
+  </div>
+
+  <!-- TELA DO PAINEL DA SPA (Protegida) -->
+  <div id="app-screen" class="dashboard hidden">
+    <header style="margin: -30px -30px 20px -30px; border-radius: 8px 8px 0 0;">
+      <span>Painel SSVP - Bem-vindo(a), <strong id="user-display"></strong>!</span>
+      <button onclick="realizarLogout()" style="width: auto; background: #d32f2f; padding: 5px 10px; font-size: 14px;">Sair</button>
+    </header>
+
+    <nav>
+      <button id="nav-home" class="active" onclick="mudarRota('home')">Início</button>
+      <button id="nav-assistidos" onclick="mudarRota('assistidos')">Assistidos (Lazy Load)</button>
+      <button id="nav-relatorios" onclick="mudarRota('relatorios')">Relatórios (Lazy Load)</button>
+    </nav>
+
+    <div id="app-content">
+      <!-- Conteúdo injetado dinamicamente via JS -->
+    </div>
+  </div>
+
+  <script>
+    // Usuários válidos configurados internamente
+    const usuariosPermitidos = ["ana", "eliana", "gilson", "luiz", "mario", "rafael"];
+
+    function realizarLogin() {
+      const user = document.getElementById('username').value.trim().toLowerCase();
+      const pass = document.getElementById('password').value;
+      const errorDiv = document.getElementById('error-msg');
+
+      if (usuariosPermitidos.includes(user) && pass === "1234") {
+        errorDiv.textContent = "";
+        localStorage.setItem('ssvp_user', user);
+        carregarApp(user);
+      } else {
+        errorDiv.textContent = "Usuário ou senha inválidos. Tente novamente.";
+      }
+    }
+
+    function carregarApp(user) {
+      document.getElementById('login-screen').classList.add('hidden');
+      document.getElementById('app-screen').classList.remove('hidden');
+      document.getElementById('user-display').textContent = user.charAt(0).toUpperCase() + user.slice(1);
+      mudarRota('home');
+    }
+
+    function realizarLogout() {
+      localStorage.removeItem('ssvp_user');
+      document.getElementById('app-screen').classList.add('hidden');
+      document.getElementById('login-screen').classList.remove('hidden');
+      document.getElementById('username').value = '';
+      document.getElementById('password').value = '';
+    }
+
+    // Simulação de Roteamento e Lazy Loading de componentes
+    function mudarRota(rota) {
+      document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
+      document.getElementById('nav-' + rota).classList.add('active');
+
+      const content = document.getElementById('app-content');
+      content.innerHTML = '<p class="loading">Carregando módulo...</p>';
+
+      setTimeout(() => {
+        if (rota === 'home') {
+          content.innerHTML = `
+            <h3>🏠 Visão Geral da Conferência</h3>
+            <p>Esta é a tela inicial da SPA. O sistema está rodando sem recarregar a página principal.</p>
+            <p>Use o menu superior para testar o carregamento sob demanda dos outros módulos.</p>
+          `;
+        } else if (rota === 'assistidos') {
+          content.innerHTML = `
+            <h3>👥 Módulo de Famílias Assistidas</h3>
+            <p>Este módulo foi carregado sob demanda (Lazy Load).</p>
+            <ul>
+              <li>Família Silva - Visita pendente</li>
+              <li>Família Santos - Visitada em 01/08</li>
+            </ul>
+          `;
+        } else if (rota === 'relatorios') {
+          content.innerHTML = `
+            <h3>📈 Relatórios e Estatísticas</h3>
+            <p>Módulo de relatórios carregado dinamicamente com sucesso.</p>
+            <p>Total de visitas no mês: <strong>14</strong></p>
+          `;
+        }
+      }, 300);
+    }
+
+    window.onload = function() {
+      const savedUser = localStorage.getItem('ssvp_user');
+      if (savedUser && usuariosPermitidos.includes(savedUser)) {
+        carregarApp(savedUser);
+      }
+    };
+  </script>
+
+</body>
+</html>
