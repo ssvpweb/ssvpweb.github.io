@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Protótipo de Comandos de Voz - SSVP</title>
+  <style>
+    :root {
+      --bg-color: #0b0f19;
+      --card-bg: #151c2c;
+      --primary-color: #6366f1;
+      --primary-hover: #4f46e5;
+      --success-color: #10b981;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --accent-color: #ec4899;
+      --font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      font-family: var(--font-family);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    header {
+      width: 100%;
+      max-width: 600px;
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    header h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 5px;
+    }
+
+    header p {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+
+    main {
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .card h2 {
+      font-size: 1.2rem;
+      margin-bottom: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 8px;
+    }
+
+    .badge {
+      background-color: var(--primary-color);
+      color: #fff;
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 99px;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+
+    .badge.active {
+      background-color: var(--accent-color);
+      animation: pulse 1.5s infinite;
+    }
+
+    /* Botão de Controle Principal */
+    .controls-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      margin: 10px 0;
+    }
+
+    .mic-btn {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background-color: var(--primary-color);
+      border: none;
+      outline: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .mic-btn:active {
+      transform: scale(0.92);
+    }
+
+    .mic-btn.listening {
+      background-color: var(--accent-color);
+      box-shadow: 0 8px 30px rgba(236, 72, 153, 0.6);
+      animation: pulse-border 1.5s infinite;
+    }
+
+    .mic-btn svg {
+      width: 40px;
+      height: 40px;
+      fill: white;
+    }
+
+    .btn-label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .mic-btn.listening + .btn-label {
+      color: var(--accent-color);
+    }
+
+    /* Console de Feedback */
+    #transcription-box {
+      font-style: italic;
+      color: var(--text-main);
+      background-color: rgba(0, 0, 0, 0.2);
+      padding: 12px;
+      border-radius: 8px;
+      min-height: 48px;
+      margin-top: 10px;
+      border-left: 3px solid var(--primary-color);
+      font-size: 1rem;
+    }
+
+    #system-status {
+      font-size: 0.9rem;
+      color: var(--success-color);
+      font-weight: 600;
+      margin-top: 8px;
+      min-height: 20px;
+    }
+
+    /* Lista de Assistidos Simulado */
+    .assistidos-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .assistido-item {
+      padding: 10px;
+      background-color: rgba(255, 255, 255, 0.03);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .assistido-item h3 {
+      font-size: 1rem;
+      margin-bottom: 2px;
+    }
+
+    .assistido-item p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* Tela de Visita Ativa */
+    #visit-screen {
+      display: none;
+    }
+
+    .meta-card {
+      background-color: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 10px;
+    }
+
+    .meta-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--primary-color);
+      margin-bottom: 5px;
+    }
+
+    .meta-desc {
+      font-size: 0.9rem;
+      color: var(--text-main);
+    }
+
+    /* Relato Formulário */
+    #relato-container {
+      display: none;
+      margin-top: 15px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 120px;
+      background-color: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: #fff;
+      padding: 10px;
+      font-family: var(--font-family);
+      font-size: 0.95rem;
+      resize: none;
+      outline: none;
+      transition: border 0.3s;
+    }
+
+    textarea:focus {
+      border-color: var(--primary-color);
+    }
+
+    /* Dicas de Comando */
+    .dicas {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .dicas ul {
+      margin-left: 20px;
+      margin-top: 5px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .dicas li code {
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 2px 5px;
+      border-radius: 4px;
+      color: var(--primary-color);
+      font-weight: bold;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.6; }
+      50% { opacity: 1; }
+      100% { opacity: 0.6; }
+    }
+
+    @keyframes pulse-border {
+      0% { box-shadow: 0 0 0 0 rgba(236, 72, 153, 0.7); }
+      70% { box-shadow: 0 0 0 15px rgba(236, 72, 153, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(236, 72, 153, 0); }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>SSVP Voz - Protótipo</h1>
+    <p>Teste em tempo real dos comandos de voz e leitura de metas</p>
+  </header>
+
+  <main>
+    <!-- Card de Ação Principal (Microfone) -->
+    <div class="card" style="text-align: center;">
+      <div class="controls-wrapper">
+        <button id="btn-mic" class="mic-btn" onclick="toggleEscuta()">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
+          </svg>
+        </button>
+        <span class="btn-label" id="btn-label">Tocar para Falar</span>
+      </div>
+
+      <div style="text-align: left; margin-top: 15px;">
+        <p style="font-size: 0.85rem; font-weight: bold; color: var(--text-muted);">Você disse:</p>
+        <div id="transcription-box">Clique no microfone acima e fale um comando...</div>
+        <div id="system-status"></div>
+      </div>
+    </div>
+
+    <!-- Card de Status do Sistema -->
+    <div class="card">
+      <h2>Status da Operação <span id="status-badge" class="badge">Aguardando</span></h2>
+      <p id="info-visita-ativa" style="font-size: 0.95rem; line-height: 1.4;">Nenhuma visita ativa no momento. Use o comando de voz para iniciar uma visita.</p>
+      
+      <!-- Painel de Exibição das Metas (Ativado por comando) -->
+      <div id="visit-screen">
+        <h3 style="margin-top: 15px; font-size: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;" id="metas-header">
+          Metas do Assistido:
+        </h3>
+        <div id="metas-container"></div>
+      </div>
+
+      <!-- Container do Relato (Ativado por "relatar visita") -->
+      <div id="relato-container">
+        <h3 style="font-size: 1rem; margin-bottom: 8px; color: var(--accent-color);">Relato da Visita (Ditando...)</h3>
+        <textarea id="txt-relato" placeholder="O relato ditado aparecerá aqui..."></textarea>
+      </div>
+    </div>
+
+    <!-- Lista de Assistidos no LocalStorage -->
+    <div class="card">
+      <h2>Assistidos Cadastrados (Banco Local)</h2>
+      <div class="assistidos-list" id="assistidos-container"></div>
+    </div>
+
+    <!-- Guia de Comandos -->
+    <div class="card dicas">
+      <h2>Comandos Disponíveis para Falar:</h2>
+      <ul>
+        <li><code>iniciar visita para [nome]</code> (Ex: <em>"iniciar visita para maria"</em>)</li>
+        <li><code>mostrar metas</code> (Exibe as metas da visita ativa na tela)</li>
+        <li><code>falar metas</code> (Lê as metas da visita ativa em voz alta)</li>
+        <li><code>mostrar metas de [nome]</code> (Exibe as metas do assistido especificado na tela)</li>
+        <li><code>falar metas de [nome]</code> ou <code>malar metas de [nome]</code> (Lê as metas do assistido especificado)</li>
+        <li><code>relatar visita</code> (Abre o formulário de relato e inicia o ditado)</li>
+        <li><code>concluir visita</code> (Salva a visita e finaliza no banco local)</li>
+      </ul>
+    </div>
+  </main>
+
+  <script>
+    // 1. Dados de Teste Iniciais
+    const assistidosIniciais = [
+      {
+        id: 1,
+        nome: "Maria das Dores",
+        endereco: "Avenida Paulista, 1000, Bela Vista, São Paulo - SP",
+        metas: [
+          "Comprar o remédio de pressão (Losartana) até sexta-feira.",
+          "Agendar consulta com o cardiologista no Posto de Saúde.",
+          "Matricular o filho caçula no curso profissionalizante."
+        ]
+      },
+      {
+        id: 2,
+        nome: "João da Silva",
+        endereco: "Rua Vergueiro, 1350, Paraíso, São Paulo - SP",
+        metas: [
+          "Concluir o tratamento de fisioterapia domiciliar.",
+          "Trocar as telhas da cozinha antes do período de chuvas.",
+          "Renovar o documento de identidade (RG)."
+        ]
+      },
+      {
+        id: 3,
+        nome: "Ana Souza",
+        endereco: "Rua Domingos de Morais, 2000, Vila Mariana, São Paulo - SP",
+        metas: [
+          "Resolver a pendência no Cadastro Único (Bolsa Família).",
+          "Entregar a documentação para o auxílio-gás."
+        ]
+      }
+    ];
+
+    // Inicialização do LocalStorage
+    if (!localStorage.getItem("assistidos")) {
+      localStorage.setItem("assistidos", JSON.stringify(assistidosIniciais));
+    }
+    if (!localStorage.getItem("visitas")) {
+      localStorage.setItem("visitas", JSON.stringify([]));
+    }
+
+    // Variáveis de Estado
+    let assistidoAtivo = null;
+    let modoDitadoRelato = false;
+    let recognition = null;
+    let rec_transcricao_completa = "";
+
+    // 2. Renderizar Assistidos na Tela
+    function renderizarAssistidos() {
+      const container = document.getElementById("assistidos-container");
+      const dados = JSON.parse(localStorage.getItem("assistidos"));
+      container.innerHTML = "";
+      
+      dados.forEach(a => {
+        const item = document.createElement("div");
+        item.className = "assistido-item";
+        item.innerHTML = `
+          <h3>${a.nome}</h3>
+          <p><strong>Endereço:</strong> ${a.endereco}</p>
+          <p><strong>Metas:</strong> ${a.metas.length} cadastradas.</p>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    // 3. Inicialização da API de Reconhecimento de Voz (SpeechRecognition)
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (SpeechRecognition) {
+      recognition = new SpeechRecognition();
+      recognition.continuous = false; // Parar de ouvir assim que parar de falar (para comandos)
+      recognition.lang = 'pt-BR';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      // Evento de início
+      recognition.onstart = () => {
+        const btn = document.getElementById("btn-mic");
+        const label = document.getElementById("btn-label");
+        btn.classList.add("listening");
+        label.innerText = modoDitadoRelato ? "Gravando Relato..." : "Ouvindo Comando...";
+        setFeedback("Microfone ativo. Fale agora.");
+      };
+
+      // Evento de erro
+      recognition.onerror = (event) => {
+        console.error("Erro no reconhecimento: ", event.error);
+        setFeedback("Erro ao ouvir: " + event.error, true);
+        pararInterfaceMic();
+      };
+
+      // Evento de fim
+      recognition.onend = () => {
+        pararInterfaceMic();
+      };
+
+      // Evento de resultado
+      recognition.onresult = (event) => {
+        const resultado = event.results[0][0].transcript;
+        document.getElementById("transcription-box").innerText = `"${resultado}"`;
+        
+        if (modoDitadoRelato) {
+          processarDitado(resultado);
+        } else {
+          processarComando(resultado);
+        }
+      };
+    } else {
+      setFeedback("Seu navegador não suporta reconhecimento de voz.", true);
+      document.getElementById("btn-mic").disabled = true;
+      document.getElementById("btn-label").innerText = "Não suportado";
+    }
+
+    function pararInterfaceMic() {
+      const btn = document.getElementById("btn-mic");
+      const label = document.getElementById("btn-label");
+      btn.classList.remove("listening");
+      label.innerText = "Tocar para Falar";
+    }
+
+    function setFeedback(msg, isError = false) {
+      const el = document.getElementById("system-status");
+      el.innerText = msg;
+      el.style.color = isError ? "var(--accent-color)" : "var(--success-color)";
+    }
+
+    // 4. Fluxo de ativação do microfone
+    function toggleEscuta() {
+      if (!recognition) return;
+      
+      // Reiniciar a escuta se já estiver ativa
+      try {
+        if (modoDitadoRelato) {
+          recognition.continuous = true; // Para ditar textos longos
+        } else {
+          recognition.continuous = false;
+        }
+        recognition.start();
+      } catch (e) {
+        recognition.stop();
+      }
+    }
+
+    // 5. Motor de Decisão de Comandos (O Parser)
+    function processarComando(texto) {
+      const frase = texto.toLowerCase().trim();
+      setFeedback("Analisando comando...");
+
+      // Identificar metas de uma pessoa específica
+      let nomeEspecifico = null;
+      let padraoEncontrado = "";
+      if (frase.includes("metas de ")) {
+        padraoEncontrado = "metas de ";
+      } else if (frase.includes("metas do ")) {
+        padraoEncontrado = "metas do ";
+      } else if (frase.includes("metas da ")) {
+        padraoEncontrado = "metas da ";
+      }
+
+      if (padraoEncontrado) {
+        nomeEspecifico = frase.substring(frase.indexOf(padraoEncontrado) + padraoEncontrado.length).trim();
+      }
+
+      // Comando: Iniciar visita
+      if (frase.includes("iniciar visita para")) {
+        const nomePesquisa = frase.replace("iniciar visita para", "").trim();
+        executarIniciarVisita(nomePesquisa);
+      }
+      // Comando: Metas de alguém específico
+      else if (nomeEspecifico) {
+        const assistidos = JSON.parse(localStorage.getItem("assistidos"));
+        const assistido = assistidos.find(a => 
+          a.nome.toLowerCase().includes(nomeEspecifico)
+        );
+
+        if (assistido) {
+          if (frase.includes("mostrar") || frase.includes("exibir") || frase.includes("ver")) {
+            executarMostrarMetas(assistido);
+          } else {
+            // Padrão ou se incluir falar, malar, dizer, ouvir, etc.
+            executarFalarMetas(assistido);
+          }
+        } else {
+          setFeedback(`Assistido "${nomeEspecifico}" não localizado.`, true);
+          falarTexto(`Não encontrei nenhum assistido com o nome ${nomeEspecifico}.`);
+        }
+      }
+      // Comando: Falar metas do assistido ativo
+      else if (frase === "falar metas" || frase === "falar as metas" || frase === "malar metas" || frase === "malar as metas") {
+        executarFalarMetas();
+      } 
+      // Comando: Mostrar metas do assistido ativo
+      else if (frase === "mostrar metas" || frase === "mostrar as metas") {
+        executarMostrarMetas();
+      } 
+      // Comando: Relatar visita
+      else if (frase.includes("relatar visita") || frase.includes("fazer relato")) {
+        executarRelatarVisita();
+      } 
+      // Comando: Concluir visita
+      else if (frase.includes("concluir visita") || frase.includes("finalizar visita")) {
+        executarConcluirVisita();
+      } 
+      else {
+        setFeedback("Comando não reconhecido. Tente novamente.", true);
+        falarTexto("Desculpe, não entendi o comando.");
+      }
+    }
+
+    // 6. Implementação das Ações
+
+    // Ação: Iniciar Visita
+    function executarIniciarVisita(nomePesquisa) {
+      const assistidos = JSON.parse(localStorage.getItem("assistidos"));
+      
+      // Busca simples por aproximação de string
+      const assistido = assistidos.find(a => 
+        a.nome.toLowerCase().includes(nomePesquisa)
+      );
+
+      if (assistido) {
+        assistidoAtivo = assistido;
+        
+        // Atualizar Interface
+        document.getElementById("status-badge").innerText = "A caminho";
+        document.getElementById("status-badge").className = "badge active";
+        
+        const info = `
+          <strong>Visita activa:</strong> A caminho da casa de ${assistido.nome}<br>
+          <strong>Endereço:</strong> ${assistido.endereco}
+        `;
+        document.getElementById("info-visita-ativa").innerHTML = info;
+
+        // Limpar telas de metas/relato anteriores
+        document.getElementById("visit-screen").style.display = "none";
+        document.getElementById("relato-container").style.display = "none";
+        modoDitadoRelato = false;
+
+        // Falar confirmação
+        falarTexto(`Iniciando rota para a casa de ${assistido.nome}.`, () => {
+          // Simular abertura do Google Maps
+          const urlMaps = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(assistido.endereco)}`;
+          setFeedback(`Redirecionando para rota do Maps...`);
+          setTimeout(() => {
+            window.open(urlMaps, '_blank');
+          }, 1000);
+        });
+
+      } else {
+        setFeedback(`Assistido "${nomePesquisa}" não localizado.`, true);
+        falarTexto(`Não encontrei nenhum assistido com o nome ${nomePesquisa}.`);
+      }
+    }
+
+    // Ação: Falar Metas
+    function executarFalarMetas(assistidoEspecifico = null) {
+      const alvo = assistidoEspecifico || assistidoAtivo;
+      if (!alvo) {
+        setFeedback("Nenhuma visita em andamento.", true);
+        falarTexto("Você precisa iniciar uma visita primeiro ou especificar o nome de um assistido.");
+        return;
+      }
+
+      setFeedback(`Sintetizando metas de ${alvo.nome} em voz alta...`);
+      let textoMetas = `As metas definidas para ${alvo.nome} são: `;
+      alvo.metas.forEach((meta, idx) => {
+        textoMetas += `Meta ${idx + 1}: ${meta}. `;
+      });
+
+      falarTexto(textoMetas);
+    }
+
+    // Ação: Mostrar Metas (Visual Silencioso)
+    function executarMostrarMetas(assistidoEspecifico = null) {
+      const alvo = assistidoEspecifico || assistidoAtivo;
+      if (!alvo) {
+        setFeedback("Nenhuma visita em andamento.", true);
+        falarTexto("Você precisa iniciar uma visita primeiro ou especificar o nome de um assistido.");
+        return;
+      }
+
+      setFeedback(`Renderizando metas de ${alvo.nome} na tela.`);
+      
+      // Atualizar o título do cabeçalho de metas de acordo com a pessoa
+      document.getElementById("metas-header").innerText = `Metas de ${alvo.nome}:`;
+      
+      const container = document.getElementById("metas-container");
+      container.innerHTML = "";
+      
+      alvo.metas.forEach((meta, idx) => {
+        const card = document.createElement("div");
+        card.className = "meta-card";
+        card.innerHTML = `
+          <div class="meta-title">Meta ${idx + 1}</div>
+          <div class="meta-desc">${meta}</div>
+        `;
+        container.appendChild(card);
+      });
+
+      document.getElementById("visit-screen").style.display = "block";
+      falarTexto(`Exibindo as metas de ${alvo.nome} na tela.`);
+    }
+
+    // Ação: Relatar Visita
+    function executarRelatarVisita() {
+      if (!assistidoAtivo) {
+        setFeedback("Nenhuma visita em andamento.", true);
+        falarTexto("Você precisa iniciar uma visita primeiro.");
+        return;
+      }
+
+      // Preparar interface de relato
+      document.getElementById("status-badge").innerText = "Em Visita / Relatando";
+      document.getElementById("relato-container").style.display = "block";
+      document.getElementById("txt-relato").value = "";
+      
+      modoDitadoRelato = true;
+      rec_transcricao_completa = "";
+
+      falarTexto("Por favor, pode falar o relato da visita após a confirmação.", () => {
+        // Ativar a escuta automaticamente para o ditado
+        setTimeout(() => {
+          toggleEscuta();
+        }, 500);
+      });
+    }
+
+    // Ação: Processar o Ditado do Relato
+    function processarDitado(textoDitado) {
+      const campo = document.getElementById("txt-relato");
+      rec_transcricao_completa += (rec_transcricao_completa ? " " : "") + textoDitado;
+      campo.value = rec_transcricao_completa;
+
+      setFeedback("Ditado em progresso. Toque no microfone para continuar ditando.");
+      // Desativar modo ditado para o próximo clique no microfone ser tratado como comando padrão
+      modoDitadoRelato = false; 
+    }
+
+    // Ação: Concluir Visita
+    function executarConcluirVisita() {
+      if (!assistidoAtivo) {
+        setFeedback("Nenhuma visita em andamento.", true);
+        falarTexto("Você não possui visita para concluir.");
+        return;
+      }
+
+      const relatoFinal = document.getElementById("txt-relato").value || "Sem relato registrado.";
+      
+      // Criar registro da visita no LocalStorage
+      const novaVisita = {
+        id_visita: gerarUUID(),
+        id_assistido: assistidoAtivo.id,
+        nome_assistido: assistidoAtivo.nome,
+        data: new Date().toLocaleDateString(),
+        relato: relatoFinal,
+        sincronizado: false
+      };
+
+      const visitasSalvas = JSON.parse(localStorage.getItem("visitas"));
+      visitasSalvas.push(novaVisita);
+      localStorage.setItem("visitas", JSON.stringify(visitasSalvas));
+
+      // Limpar estado
+      assistidoAtivo = null;
+      modoDitadoRelato = false;
+
+      // Resetar interface
+      document.getElementById("status-badge").innerText = "Aguardando";
+      document.getElementById("status-badge").className = "badge";
+      document.getElementById("info-visita-ativa").innerHTML = "Nenhuma visita ativa no momento. Use o comando de voz para iniciar.";
+      document.getElementById("visit-screen").style.display = "none";
+      document.getElementById("relato-container").style.display = "none";
+
+      falarTexto("Visita concluída com sucesso e gravada no banco de dados local.", () => {
+        setFeedback("Visita concluída e salva localmente.");
+      });
+    }
+
+    // 7. Funções de Suporte (TTS e UUID)
+    
+    // Converte texto em fala usando Web Speech API
+    function falarTexto(texto, callback) {
+      if (!window.speechSynthesis) return;
+
+      // Parar qualquer fala anterior imediatamente
+      window.speechSynthesis.cancel();
+
+      const utterance = new SpeechSynthesisUtterance(texto);
+      utterance.lang = "pt-BR";
+      utterance.rate = 1.0; // Velocidade normal
+
+      if (callback) {
+        utterance.onend = callback;
+      }
+
+      window.speechSynthesis.speak(utterance);
+    }
+
+    // Auxiliar para gerar ID único offline
+    function gerarUUID() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    }
+
+    // Inicialização da Tela
+    renderizarAssistidos();
+  </script>
+</body>
+</html>

@@ -1,0 +1,685 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* Tema Escuro (Padrão) */
+  --bg-color: #0b0f19;
+  --card-bg: #131a2c;
+  --card-border: rgba(255, 255, 255, 0.05);
+  
+  --primary-color: #3b82f6;
+  --primary-hover: #2563eb;
+  --primary-glow: rgba(59, 130, 246, 0.15);
+  
+  --success-color: #10b981;
+  --success-glow: rgba(16, 185, 129, 0.15);
+  
+  --warning-color: #f59e0b;
+  --danger-color: #ef4444;
+  --offline-color: #6b7280;
+  
+  --text-main: #f3f4f6;
+  --text-muted: #9ca3af;
+  --text-inverse: #ffffff;
+  
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --transition-smooth: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --border-radius-lg: 1rem;       /* 16px */
+  --border-radius-md: 0.625rem;   /* 10px */
+
+  /* Variáveis Dinâmicas do Ajustador UX (Modificáveis via JS) */
+  --nav-height: 5.25rem;       /* 84px (com base no font-size html de 16px) */
+  --nav-icon-size: 2.5rem;     /* 40px */
+  --nav-font-size: 1rem;       /* 16px */
+}
+
+/* Tema Claro (Invocado via classe .light-mode no body/html) */
+body.light-mode {
+  --bg-color: #f3f4f6;
+  --card-bg: #ffffff;
+  --card-border: rgba(0, 0, 0, 0.08);
+  
+  --primary-color: #2563eb;
+  --primary-hover: #1d4ed8;
+  --primary-glow: rgba(37, 99, 235, 0.08);
+  
+  --success-color: #059669;
+  --success-glow: rgba(5, 150, 105, 0.08);
+  
+  --text-main: #1f2937;
+  --text-muted: #6b7280;
+  --text-inverse: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  font-size: 16px; /* Fonte Raiz Padrão (Modificável pelo Ajustador Acessível) */
+  transition: font-size 0.15s ease-out;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  font-family: var(--font-family);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.5;
+  overflow-x: hidden;
+  padding-bottom: calc(var(--nav-height) + 0.625rem); /* Preenchimento dinâmico proporcional à barra inferior */
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* Container principal para o Wireframe */
+.container {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 1rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Cabeçalho do App Limpo com Alinhamento Simétrico de 3 Colunas (Grid) */
+header.app-header {
+  display: grid;
+  grid-template-columns: 105px 1fr 105px;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background-color: var(--card-bg);
+  border-bottom: 1px solid var(--card-border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+.page-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: -0.02em;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Botões do Cabeçalho - Ajustes e Conexão Simétricos com os 4 Cantos Arredondados (10px) */
+.btn-adjust, .connection-badge {
+  width: 105px;
+  height: 40px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px; /* Bordas arredondadas nos quatro cantos simetricamente */
+  border: 1px solid var(--card-border);
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.06);
+  color: var(--text-main);
+  padding: 6px 12px;
+}
+
+body.light-mode .btn-adjust, body.light-mode .connection-badge {
+  background-color: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.btn-adjust:active, .connection-badge:active {
+  background-color: rgba(255, 255, 255, 0.12);
+  transform: scale(0.96);
+}
+
+body.light-mode .btn-adjust:active, body.light-mode .connection-badge:active {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+/* Bolinha indicativa de status da conexão na pílula */
+.connection-badge::before {
+  content: '';
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  margin-right: 0.375rem;
+  transition: var(--transition-smooth);
+}
+
+.connection-badge.online {
+  background-color: var(--success-glow);
+  color: var(--success-color);
+  border-color: rgba(16, 185, 129, 0.2);
+}
+
+.connection-badge.online::before {
+  background-color: var(--success-color);
+  box-shadow: 0 0 8px var(--success-color);
+}
+
+.connection-badge.offline {
+  background-color: rgba(107, 114, 128, 0.1);
+  color: var(--text-muted);
+  border-color: rgba(107, 114, 128, 0.2);
+}
+
+.connection-badge.offline::before {
+  background-color: var(--offline-color);
+}
+
+/* Cards */
+.card {
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--card-border);
+  padding: 1.25rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  position: relative;
+  overflow: hidden;
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+body.light-mode .card {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.card-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Inputs, Selects, Textareas */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.form-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.form-control {
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--card-border);
+  border-radius: var(--border-radius-md);
+  color: var(--text-main);
+  padding: 0.75rem 1rem;
+  font-family: var(--font-family);
+  font-size: 0.95rem;
+  transition: var(--transition-smooth);
+  width: 100%;
+  outline: none;
+}
+
+body.light-mode .form-control {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px var(--primary-glow);
+  background-color: rgba(0, 0, 0, 0.25);
+}
+
+body.light-mode .form-control:focus {
+  background-color: #ffffff;
+}
+
+select.form-control {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239ca3af'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1.125rem;
+  padding-right: 2.5rem;
+}
+
+/* Botões */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--border-radius-md);
+  border: none;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  text-decoration: none;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: var(--text-inverse);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+}
+
+.btn-secondary {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--text-main);
+  border: 1px solid var(--card-border);
+}
+
+body.light-mode .btn-secondary {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.btn-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+body.light-mode .btn-secondary:hover {
+  background-color: rgba(0, 0, 0, 0.06);
+}
+
+.btn-danger {
+  background-color: var(--danger-color);
+  color: var(--text-inverse);
+}
+
+.btn-block {
+  width: 100%;
+}
+
+/* Barra de Navegação Acessível Inferior (50+) com Propriedades Dinâmicas */
+.nav-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--card-bg);
+  border-top: 1px solid var(--card-border);
+  padding: 0 1rem;
+  height: var(--nav-height);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  transition: height 0.15s ease-out, background-color 0.25s ease, border-color 0.25s ease;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-weight: 600;
+  transition: var(--transition-smooth);
+  flex: 1.2;
+  height: 100%;
+  padding: 0.5rem 0;
+}
+
+.nav-item svg {
+  width: var(--nav-icon-size);
+  height: var(--nav-icon-size);
+  fill: currentColor;
+  transition: width 0.15s ease-out, height 0.15s ease-out;
+}
+
+.nav-item span {
+  font-size: var(--nav-font-size);
+  transition: font-size 0.15s ease-out;
+}
+
+.nav-item.active {
+  color: var(--primary-color);
+}
+
+/* Item Central do Microfone */
+.nav-mic-item {
+  position: relative;
+  width: 4.75rem;
+  height: 4.75rem;
+  margin-top: -1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0.8;
+}
+
+.nav-mic-btn {
+  width: 3.875rem;
+  height: 3.875rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-color) 0%, #4f46e5 100%);
+  border: 4px solid var(--bg-color);
+  color: var(--text-inverse);
+  box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  padding: 0;
+  margin: 0;
+}
+
+body.light-mode .nav-mic-btn {
+  border-color: var(--bg-color);
+}
+
+.nav-mic-btn:active {
+  transform: scale(0.92);
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
+}
+
+.nav-mic-btn svg {
+  width: 1.625rem;
+  height: 1.625rem;
+  fill: currentColor;
+  display: block;
+}
+
+/* Botão de Ditado de Relato menor (Globalizado) */
+.btn-mic-relato {
+  background-color: var(--primary-color);
+  border: none;
+  color: #fff;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+  transition: var(--transition-smooth);
+  padding: 0;
+  margin: 0;
+}
+
+.btn-mic-relato.recording {
+  background-color: var(--danger-color);
+  animation: pulse-border 1.5s infinite;
+  box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+}
+
+.btn-mic-relato svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+  display: block;
+}
+
+@keyframes pulse-border {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); }
+  70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+/* Gaveta de Voz Global */
+.voice-drawer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: rgba(11, 15, 25, 0.96);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+  z-index: 1000;
+  transform: translateY(100%);
+  transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.5);
+  padding: 1rem 1.25rem 1.5rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  backdrop-filter: blur(15px);
+}
+
+body.light-mode .voice-drawer {
+  background-color: rgba(255, 255, 255, 0.98);
+  border-top-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.voice-drawer.active {
+  transform: translateY(0);
+}
+
+.drawer-handle {
+  width: 2.5rem;
+  height: 0.25rem;
+  background-color: var(--card-border);
+  border-radius: 2px;
+  margin-bottom: 0.25rem;
+}
+
+.voice-status-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  letter-spacing: -0.01em;
+}
+
+.voice-indicator-circle {
+  width: 4.375rem;
+  height: 4.375rem;
+  border-radius: 50%;
+  background-color: rgba(59, 130, 246, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-color);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  transition: var(--transition-smooth);
+}
+
+.voice-drawer.listening .voice-indicator-circle {
+  background-color: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: var(--danger-color);
+  animation: pulse-glow 1.5s infinite;
+}
+
+.voice-indicator-circle svg {
+  width: 2rem;
+  height: 2rem;
+  fill: currentColor;
+}
+
+.voice-transcript-box {
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--card-border);
+  border-radius: var(--border-radius-md);
+  padding: 0.875rem;
+  width: 100%;
+  min-height: 4.375rem;
+  max-height: 7.5rem;
+  overflow-y: auto;
+  font-size: 0.95rem;
+  color: var(--text-main);
+  text-align: center;
+  font-style: italic;
+}
+
+body.light-mode .voice-transcript-box {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.voice-commands-help {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.4;
+}
+
+.voice-commands-help code {
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 2px 4px;
+  border-radius: 4px;
+  color: var(--primary-color);
+}
+
+body.light-mode .voice-commands-help code {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+/* Painel de Ajustes de Acessibilidade e Desenvolvimento (Tuner Panel) */
+.ux-tuner-panel {
+  position: fixed;
+  top: 4rem;
+  left: 1rem;
+  background-color: rgba(19, 26, 44, 0.98);
+  border: 1px solid var(--card-border);
+  border-radius: var(--border-radius-lg);
+  padding: 1rem;
+  width: 240px;
+  z-index: 1000;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  display: none;
+  flex-direction: column;
+  gap: 0.875rem;
+  backdrop-filter: blur(15px);
+  animation: fadeIn 0.15s ease-out forwards;
+}
+
+body.light-mode .ux-tuner-panel {
+  background-color: rgba(255, 255, 255, 0.98);
+  border-color: rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.ux-tuner-panel.active {
+  display: flex;
+}
+
+.tuner-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.tuner-section h4 {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--primary-color);
+  font-weight: 700;
+  margin-bottom: 0.125rem;
+}
+
+.ux-tuner-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+body.light-mode .ux-tuner-row {
+  color: var(--text-main);
+}
+
+.ux-tuner-label {
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.ux-tuner-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ux-tuner-btn {
+  width: 1.625rem;
+  height: 1.625rem;
+  border-radius: 4px;
+  border: 1px solid var(--card-border);
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 0.95rem;
+  user-select: none;
+  transition: var(--transition-smooth);
+}
+
+body.light-mode .ux-tuner-btn {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.ux-tuner-btn:active {
+  background-color: rgba(255, 255, 255, 0.15);
+  transform: scale(0.9);
+}
+
+body.light-mode .ux-tuner-btn:active {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+.ux-tuner-value {
+  min-width: 2.75rem;
+  text-align: center;
+  font-family: monospace;
+  font-size: 0.85rem;
+  color: var(--primary-color);
+  font-weight: 700;
+}
+
+/* Utilitários */
+.text-center { text-align: center; }
+.text-muted { color: var(--text-muted); }
+.font-bold { font-weight: 600; }
+.flex-row { display: flex; flex-direction: row; gap: 0.5rem; }
+.flex-column { display: flex; flex-direction: column; gap: 0.5rem; }
+.justify-between { justify-content: space-between; }
+.align-center { align-items: center; }
+
+/* Animações e Transições */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease forwards;
+}
+
+@keyframes pulse-glow {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); transform: scale(1); }
+  70% { box-shadow: 0 0 0 12px rgba(239, 68, 68, 0); transform: scale(1.04); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); transform: scale(1); }
+}
