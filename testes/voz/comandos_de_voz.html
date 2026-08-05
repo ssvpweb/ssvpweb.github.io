@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -141,7 +142,7 @@
       color: var(--text-muted);
     }
 
-    .mic-btn.listening + .btn-label {
+    .mic-btn.listening+.btn-label {
       color: var(--accent-color);
     }
 
@@ -263,18 +264,35 @@
     }
 
     @keyframes pulse {
-      0% { opacity: 0.6; }
-      50% { opacity: 1; }
-      100% { opacity: 0.6; }
+      0% {
+        opacity: 0.6;
+      }
+
+      50% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0.6;
+      }
     }
 
     @keyframes pulse-border {
-      0% { box-shadow: 0 0 0 0 rgba(236, 72, 153, 0.7); }
-      70% { box-shadow: 0 0 0 15px rgba(236, 72, 153, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(236, 72, 153, 0); }
+      0% {
+        box-shadow: 0 0 0 0 rgba(236, 72, 153, 0.7);
+      }
+
+      70% {
+        box-shadow: 0 0 0 15px rgba(236, 72, 153, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(236, 72, 153, 0);
+      }
     }
   </style>
 </head>
+
 <body>
 
   <header>
@@ -283,12 +301,28 @@
   </header>
 
   <main>
+    <!-- Guia de Comandos (Reposicionado no Topo) -->
+    <div class="card dicas">
+      <h2>Comandos Disponíveis para Falar:</h2>
+      <ul>
+        <li><code>iniciar visita para [nome]</code> (Ex: <em>"iniciar visita para maria"</em>)</li>
+        <li><code>mostrar metas</code> (Exibe as metas da visita ativa na tela)</li>
+        <li><code>falar metas</code> (Lê as metas da visita ativa em voz alta)</li>
+        <li><code>mostrar metas de [nome]</code> (Exibe as metas do assistido especificado na tela)</li>
+        <li><code>falar metas de [nome]</code> ou <code>falar metas de [nome]</code> (Lê as metas do assistido
+          especificado)</li>
+        <li><code>relatar visita</code> (Abre o formulário de relato e inicia o ditado)</li>
+        <li><code>concluir visita</code> (Salva a visita e finaliza no banco local)</li>
+      </ul>
+    </div>
+
     <!-- Card de Ação Principal (Microfone) -->
     <div class="card" style="text-align: center;">
       <div class="controls-wrapper">
         <button id="btn-mic" class="mic-btn" onclick="toggleEscuta()">
           <svg viewBox="0 0 24 24">
-            <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
+            <path
+              d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z" />
           </svg>
         </button>
         <span class="btn-label" id="btn-label">Tocar para Falar</span>
@@ -304,11 +338,14 @@
     <!-- Card de Status do Sistema -->
     <div class="card">
       <h2>Status da Operação <span id="status-badge" class="badge">Aguardando</span></h2>
-      <p id="info-visita-ativa" style="font-size: 0.95rem; line-height: 1.4;">Nenhuma visita ativa no momento. Use o comando de voz para iniciar uma visita.</p>
-      
+      <p id="info-visita-ativa" style="font-size: 0.95rem; line-height: 1.4;">Nenhuma visita ativa no momento. Use o
+        comando de voz para iniciar uma visita.</p>
+
       <!-- Painel de Exibição das Metas (Ativado por comando) -->
       <div id="visit-screen">
-        <h3 style="margin-top: 15px; font-size: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;" id="metas-header">
+        <h3
+          style="margin-top: 15px; font-size: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;"
+          id="metas-header">
           Metas do Assistido:
         </h3>
         <div id="metas-container"></div>
@@ -325,20 +362,6 @@
     <div class="card">
       <h2>Assistidos Cadastrados (Banco Local)</h2>
       <div class="assistidos-list" id="assistidos-container"></div>
-    </div>
-
-    <!-- Guia de Comandos -->
-    <div class="card dicas">
-      <h2>Comandos Disponíveis para Falar:</h2>
-      <ul>
-        <li><code>iniciar visita para [nome]</code> (Ex: <em>"iniciar visita para maria"</em>)</li>
-        <li><code>mostrar metas</code> (Exibe as metas da visita ativa na tela)</li>
-        <li><code>falar metas</code> (Lê as metas da visita ativa em voz alta)</li>
-        <li><code>mostrar metas de [nome]</code> (Exibe as metas do assistido especificado na tela)</li>
-        <li><code>falar metas de [nome]</code> ou <code>malar metas de [nome]</code> (Lê as metas do assistido especificado)</li>
-        <li><code>relatar visita</code> (Abre o formulário de relato e inicia o ditado)</li>
-        <li><code>concluir visita</code> (Salva a visita e finaliza no banco local)</li>
-      </ul>
     </div>
   </main>
 
@@ -395,7 +418,7 @@
       const container = document.getElementById("assistidos-container");
       const dados = JSON.parse(localStorage.getItem("assistidos"));
       container.innerHTML = "";
-      
+
       dados.forEach(a => {
         const item = document.createElement("div");
         item.className = "assistido-item";
@@ -424,7 +447,7 @@
         const label = document.getElementById("btn-label");
         btn.classList.add("listening");
         label.innerText = modoDitadoRelato ? "Gravando Relato..." : "Ouvindo Comando...";
-        setFeedback("Microfone ativo. Fale agora.");
+        setFeedback("Microfone active. Fale agora.");
       };
 
       // Evento de erro
@@ -443,7 +466,7 @@
       recognition.onresult = (event) => {
         const resultado = event.results[0][0].transcript;
         document.getElementById("transcription-box").innerText = `"${resultado}"`;
-        
+
         if (modoDitadoRelato) {
           processarDitado(resultado);
         } else {
@@ -472,8 +495,7 @@
     // 4. Fluxo de ativação do microfone
     function toggleEscuta() {
       if (!recognition) return;
-      
-      // Reiniciar a escuta se já estiver ativa
+
       try {
         if (modoDitadoRelato) {
           recognition.continuous = true; // Para ditar textos longos
@@ -514,7 +536,7 @@
       // Comando: Metas de alguém específico
       else if (nomeEspecifico) {
         const assistidos = JSON.parse(localStorage.getItem("assistidos"));
-        const assistido = assistidos.find(a => 
+        const assistido = assistidos.find(a =>
           a.nome.toLowerCase().includes(nomeEspecifico)
         );
 
@@ -522,7 +544,6 @@
           if (frase.includes("mostrar") || frase.includes("exibir") || frase.includes("ver")) {
             executarMostrarMetas(assistido);
           } else {
-            // Padrão ou se incluir falar, malar, dizer, ouvir, etc.
             executarFalarMetas(assistido);
           }
         } else {
@@ -533,19 +554,19 @@
       // Comando: Falar metas do assistido ativo
       else if (frase === "falar metas" || frase === "falar as metas" || frase === "malar metas" || frase === "malar as metas") {
         executarFalarMetas();
-      } 
+      }
       // Comando: Mostrar metas do assistido ativo
       else if (frase === "mostrar metas" || frase === "mostrar as metas") {
         executarMostrarMetas();
-      } 
+      }
       // Comando: Relatar visita
       else if (frase.includes("relatar visita") || frase.includes("fazer relato")) {
         executarRelatarVisita();
-      } 
+      }
       // Comando: Concluir visita
       else if (frase.includes("concluir visita") || frase.includes("finalizar visita")) {
         executarConcluirVisita();
-      } 
+      }
       else {
         setFeedback("Comando não reconhecido. Tente novamente.", true);
         falarTexto("Desculpe, não entendi o comando.");
@@ -555,35 +576,30 @@
     // 6. Implementação das Ações
 
     // Ação: Iniciar Visita
-    function executarIniciarVisita(nomePesquisa) {
+    function ejecutarIniciarVisita(nomePesquisa) {
       const assistidos = JSON.parse(localStorage.getItem("assistidos"));
-      
-      // Busca simples por aproximação de string
-      const assistido = assistidos.find(a => 
+
+      const assistido = assistidos.find(a =>
         a.nome.toLowerCase().includes(nomePesquisa)
       );
 
       if (assistido) {
         assistidoAtivo = assistido;
-        
-        // Atualizar Interface
+
         document.getElementById("status-badge").innerText = "A caminho";
         document.getElementById("status-badge").className = "badge active";
-        
+
         const info = `
           <strong>Visita activa:</strong> A caminho da casa de ${assistido.nome}<br>
           <strong>Endereço:</strong> ${assistido.endereco}
         `;
         document.getElementById("info-visita-ativa").innerHTML = info;
 
-        // Limpar telas de metas/relato anteriores
         document.getElementById("visit-screen").style.display = "none";
         document.getElementById("relato-container").style.display = "none";
         modoDitadoRelato = false;
 
-        // Falar confirmação
         falarTexto(`Iniciando rota para a casa de ${assistido.nome}.`, () => {
-          // Simular abertura do Google Maps
           const urlMaps = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(assistido.endereco)}`;
           setFeedback(`Redirecionando para rota do Maps...`);
           setTimeout(() => {
@@ -625,13 +641,12 @@
       }
 
       setFeedback(`Renderizando metas de ${alvo.nome} na tela.`);
-      
-      // Atualizar o título do cabeçalho de metas de acordo com a pessoa
+
       document.getElementById("metas-header").innerText = `Metas de ${alvo.nome}:`;
-      
+
       const container = document.getElementById("metas-container");
       container.innerHTML = "";
-      
+
       alvo.metas.forEach((meta, idx) => {
         const card = document.createElement("div");
         card.className = "meta-card";
@@ -654,16 +669,14 @@
         return;
       }
 
-      // Preparar interface de relato
       document.getElementById("status-badge").innerText = "Em Visita / Relatando";
       document.getElementById("relato-container").style.display = "block";
       document.getElementById("txt-relato").value = "";
-      
+
       modoDitadoRelato = true;
       rec_transcricao_completa = "";
 
       falarTexto("Por favor, pode falar o relato da visita após a confirmação.", () => {
-        // Ativar a escuta automaticamente para o ditado
         setTimeout(() => {
           toggleEscuta();
         }, 500);
@@ -677,8 +690,7 @@
       campo.value = rec_transcricao_completa;
 
       setFeedback("Ditado em progresso. Toque no microfone para continuar ditando.");
-      // Desativar modo ditado para o próximo clique no microfone ser tratado como comando padrão
-      modoDitadoRelato = false; 
+      modoDitadoRelato = false;
     }
 
     // Ação: Concluir Visita
@@ -690,8 +702,7 @@
       }
 
       const relatoFinal = document.getElementById("txt-relato").value || "Sem relato registrado.";
-      
-      // Criar registro da visita no LocalStorage
+
       const novaVisita = {
         id_visita: gerarUUID(),
         id_assistido: assistidoAtivo.id,
@@ -705,11 +716,9 @@
       visitasSalvas.push(novaVisita);
       localStorage.setItem("visitas", JSON.stringify(visitasSalvas));
 
-      // Limpar estado
       assistidoAtivo = null;
       modoDitadoRelato = false;
 
-      // Resetar interface
       document.getElementById("status-badge").innerText = "Aguardando";
       document.getElementById("status-badge").className = "badge";
       document.getElementById("info-visita-ativa").innerHTML = "Nenhuma visita ativa no momento. Use o comando de voz para iniciar.";
@@ -722,17 +731,14 @@
     }
 
     // 7. Funções de Suporte (TTS e UUID)
-    
-    // Converte texto em fala usando Web Speech API
     function falarTexto(texto, callback) {
       if (!window.speechSynthesis) return;
 
-      // Parar qualquer fala anterior imediatamente
       window.speechSynthesis.cancel();
 
       const utterance = new SpeechSynthesisUtterance(texto);
       utterance.lang = "pt-BR";
-      utterance.rate = 1.0; // Velocidade normal
+      utterance.rate = 1.0;
 
       if (callback) {
         utterance.onend = callback;
@@ -741,16 +747,15 @@
       window.speechSynthesis.speak(utterance);
     }
 
-    // Auxiliar para gerar ID único offline
     function gerarUUID() {
-      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
         var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
         return v.toString(16);
       });
     }
 
-    // Inicialização da Tela
     renderizarAssistidos();
   </script>
 </body>
+
 </html>
