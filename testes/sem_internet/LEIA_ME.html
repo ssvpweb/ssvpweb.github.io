@@ -114,7 +114,7 @@
       padding: 1.5rem 1.25rem;
       border-radius: 12px;
       border: 2px dashed rgba(255, 255, 255, 0.1);
-      margin-top: 10px;
+      margin-top: 5px;
       transition: all 0.3s ease;
       text-align: center;
     }
@@ -183,6 +183,7 @@
     .status-panel.offline .network-details {
       border-left: 4px solid var(--danger-color);
       color: var(--danger-color);
+      background-color: rgba(239, 68, 68, 0.04);
     }
 
     /* Explicações e Passos */
@@ -298,10 +299,8 @@
     <div class="card">
       <span class="tech-pill">Network Information API</span>
       <h2>1. Monitoramento Inteligente de Sinal</h2>
-      <p class="desc-text">
-        O aplicativo não faz mágica: ele utiliza recursos de rede nativos do próprio navegador do celular. O sistema escuta os eventos do sistema operacional do seu celular para saber se há internet ativa e identificar o tipo da sua conexão (Wi-Fi ou Dados Móveis).
-      </p>
-
+      
+      <!-- O Painel Reativo de Conexão agora fica logo abaixo do título principal -->
       <div id="connection-status-panel" class="status-panel online">
         <span id="status-icon" class="status-icon">📶</span>
         <div class="status-info">
@@ -310,6 +309,11 @@
           <span id="network-type" class="network-details">Carregando rede...</span>
         </div>
       </div>
+
+      <!-- Texto explicativo posicionado logo abaixo do painel dinâmico -->
+      <p class="desc-text" style="margin-top: 15px;">
+        O aplicativo não faz mágica: ele utiliza recursos de rede nativos do próprio navegador do celular. O sistema escuta os eventos do sistema operacional do seu celular para saber se há internet ativa e identificar o tipo da sua conexão (Wi-Fi ou Dados Móveis).
+      </p>
     </div>
 
     <!-- 2. Banco de Dados Local -->
