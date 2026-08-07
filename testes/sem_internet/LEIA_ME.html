@@ -176,11 +176,23 @@
       color: var(--text-main);
     }
 
+    .sub-section-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fff;
+      margin-top: 15px;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
     .step-box {
       display: flex;
       flex-direction: column;
       gap: 14px;
-      margin-top: 15px;
+      margin-top: 10px;
+      margin-bottom: 15px;
     }
 
     .step-item {
@@ -321,18 +333,20 @@
       </ul>
     </div>
 
-    <!-- 3. Roteiro de Teste Prático (Modo Avião) -->
+    <!-- 3. Roteiro de Teste Prático -->
     <div class="card">
       <h2>3. Roteiro Prático: Simule no seu Celular</h2>
       <p class="desc-text">
-        Você pode validar essa tecnologia agora mesmo usando o seu celular Android ou iPhone:
+        Você pode validar essas duas tecnologias na prática agora mesmo usando o seu celular Android ou iPhone:
       </p>
 
+      <!-- ROTEIRO A: PERDA TOTAL DE REDE -->
+      <div class="sub-section-title">✈ Teste 1: Perda total de sinal (Modo Offline)</div>
       <div class="step-box">
         <div class="step-item">
           <div class="step-num">1</div>
           <div class="step-text">
-            Arraste a barra do seu Android para baixo e ative o **Modo Avião** (desligando o Wi-Fi e os Dados Móveis).
+            Arraste a barra superior do seu celular para baixo e ative o **Modo Avião** (isso desligará todas as redes do aparelho).
           </div>
         </div>
 
@@ -346,14 +360,46 @@
         <div class="step-item">
           <div class="step-num">3</div>
           <div class="step-text">
-            Acesse o aplicativo principal, registre um relato de visita completo com foto offline e veja que o app salvará a visita sem travar.
+            Acesse o aplicativo de visitas, registre um relato de visita com foto e veja que o app salvará a visita sem travar. O app mostrará um aviso amarelado de pendência local.
+          </div>
+        </div>
+      </div>
+
+      <!-- ROTEIRO B: TRANSIÇÃO DE REDE -->
+      <div class="sub-section-title">📶 Teste 2: Chaveamento de Wi-Fi para Dados Móveis (3G/4G)</div>
+      <div class="step-box">
+        <div class="step-item">
+          <div class="step-num">1</div>
+          <div class="step-text">
+            Com o Wi-Fi e os Dados Móveis ligados no celular, veja que o **Painel do Item 1** exibe <strong>ONLINE</strong> e <strong>Conectado via Wi-Fi</strong>.
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <div class="step-text">
+            Arraste a barra superior do seu celular para baixo e **toque no ícone do Wi-Fi** (símbolo de ondas/leque) para desligá-lo.
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <div class="step-text">
+            A internet do celular passará a usar a rede móvel da sua operadora (3G/4G/5G).
           </div>
         </div>
 
         <div class="step-item">
           <div class="step-num">4</div>
           <div class="step-text">
-            Desative o Modo Avião. O painel voltará a ficar verde e você poderá clicar em **Sincronizar** para enviar a visita com segurança.
+            <strong>Observe o Painel do Item 1:</strong> ele atualizará automaticamente no mesmo segundo para <strong>Conectado via Dados Móveis (3G/4G)</strong>, provando a reatividade instantânea do sistema!
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num">5</div>
+          <div class="step-text">
+            Toque no ícone do **Wi-Fi** novamente para ligá-lo. O painel se reajustará de volta para **Conectado via Wi-Fi** automaticamente em poucos segundos.
           </div>
         </div>
       </div>
@@ -421,9 +467,15 @@
       }
     }
 
-    // Escuta os eventos nativos de rede do navegador
+    // Escuta os eventos nativos de rede do navegador (Online / Offline global)
     window.addEventListener('online', atualizarPainelConexaoNativa);
     window.addEventListener('offline', atualizarPainelConexaoNativa);
+
+    // Escuta mudanças específicas no tipo de rede (ex: Wi-Fi desliga e chaveia para 3G/4G)
+    const conexao = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    if (conexao) {
+      conexao.addEventListener('change', atualizarPainelConexaoNativa);
+    }
 
     // Inicialização da verificação
     atualizarPainelConexaoNativa();
