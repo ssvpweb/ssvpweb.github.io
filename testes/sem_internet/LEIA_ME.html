@@ -300,7 +300,6 @@
       <span class="tech-pill">Network Information API</span>
       <h2>1. Monitoramento Inteligente de Sinal</h2>
       
-      <!-- O Painel Reativo de Conexão agora fica logo abaixo do título principal -->
       <div id="connection-status-panel" class="status-panel online">
         <span id="status-icon" class="status-icon">📶</span>
         <div class="status-info">
@@ -310,7 +309,6 @@
         </div>
       </div>
 
-      <!-- Texto explicativo posicionado logo abaixo do painel dinâmico -->
       <p class="desc-text" style="margin-top: 15px;">
         O aplicativo não faz mágica: ele utiliza recursos de rede nativos do próprio navegador do celular. O sistema escuta os eventos do sistema operacional do seu celular para saber se há internet ativa e identificar o tipo da sua conexão (Wi-Fi ou Dados Móveis).
       </p>
@@ -320,6 +318,23 @@
     <div class="card">
       <span class="tech-pill">Web Storage & IndexedDB</span>
       <h2>2. A "Gaveta de Armazenamento" do Navegador</h2>
+      
+      <!-- Caixa de Experimento Interativo de LocalStorage -->
+      <div style="background-color: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 16px; border-radius: 12px; margin-top: 5px; margin-bottom: 15px;">
+        <p style="font-size: 0.82rem; font-weight: 600; color: var(--text-muted); margin-bottom: 8px;">Experimento Prático de Persistência:</p>
+        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+          <input type="text" id="storage-input" placeholder="Digite uma frase para testar..." style="flex: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); padding: 8px 12px; border-radius: 6px; color: #fff; font-size: 0.88rem; outline: none;">
+          <button id="storage-btn" onclick="salvarNaMemoriaLocal()" style="background: var(--primary-color); border: none; color: white; padding: 8px 16px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: background 0.2s;">Salvar</button>
+        </div>
+        <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 4px;">Dado Salvo na Memória:</p>
+        <div id="storage-output" style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px; font-size: 0.9rem; font-weight: bold; min-height: 38px; display: flex; align-items: center; color: var(--success-color); border-left: 3px solid var(--success-color);">
+          (Nenhum dado salvo ainda)
+        </div>
+        <p style="font-size: 0.78rem; color: var(--warning-color); line-height: 1.35; margin-top: 10px; font-style: italic;">
+          👉 <strong>Faça o teste:</strong> Escreva um texto, salve e depois <strong>recarregue esta página</strong>. Se quiser, <strong>copie a URL, feche totalmente o seu navegador</strong>, abra-o novamente e cole a URL. Você verá que o seu texto continuará intacto aqui!
+        </p>
+      </div>
+
       <p class="desc-text">
         Quando você preenche um relato ou tira uma foto no Modo Offline, os dados são convertidos em texto e gravados em um **banco de dados local seguro dentro do próprio navegador** do celular (conhecido como *LocalStorage* ou *IndexedDB*).
       </p>
@@ -458,6 +473,39 @@
       }
     }
 
+    // Função para salvar texto no LocalStorage
+    function salvarNaMemoriaLocal() {
+      const input = document.getElementById("storage-input");
+      const output = document.getElementById("storage-output");
+      if (!input || !output) return;
+
+      const texto = input.value.trim();
+      if (texto === "") {
+        alert("Por favor, digite alguma frase para testar!");
+        return;
+      }
+
+      // Salva no armazenamento do celular
+      localStorage.setItem("teste_webstorage_ssvp", texto);
+      
+      // Atualiza visor
+      output.innerText = `"${texto}"`;
+      input.value = "";
+    }
+
+    // Recupera o dado ao iniciar a página
+    function carregarDadosSalvos() {
+      const output = document.getElementById("storage-output");
+      if (!output) return;
+
+      const textoSalvo = localStorage.getItem("teste_webstorage_ssvp");
+      if (textoSalvo) {
+        output.innerText = `"${textoSalvo}"`;
+      } else {
+        output.innerText = "(Nenhum dado salvo ainda)";
+      }
+    }
+
     // Escuta os eventos nativos de rede do navegador (Online / Offline global)
     window.addEventListener('online', atualizarPainelConexaoNativa);
     window.addEventListener('offline', atualizarPainelConexaoNativa);
@@ -468,8 +516,9 @@
       conexao.addEventListener('change', atualizarPainelConexaoNativa);
     }
 
-    // Inicialização da verificação
+    // Inicialização da verificação e do localStorage
     atualizarPainelConexaoNativa();
+    carregarDadosSalvos();
   </script>
 
 </body>
