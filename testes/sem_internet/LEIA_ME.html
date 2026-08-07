@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tecnologia Sem Internet: Como Funciona? - SSVP</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-color: #0b0f19;
+      --card-bg: #151c2c;
+      --primary-color: #3b82f6;
+      --success-color: #10b981;
+      --warning-color: #f59e0b;
+      --danger-color: #ef4444;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --font-family: 'Montserrat', Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      font-family: var(--font-family);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1.5rem 1rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* Cabeçalho */
+    header {
+      background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+      color: white;
+      padding: 1.75rem 1.5rem;
+      border-radius: 1rem;
+      text-align: center;
+      box-shadow: 0 8px 24px rgba(30, 58, 138, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    header h1 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      font-size: 0.9rem;
+      opacity: 0.85;
+      line-height: 1.4;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .card h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tech-pill {
+      background-color: rgba(59, 130, 246, 0.1);
+      color: var(--primary-color);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+
+    /* Testador de Conexão em Tempo Real */
+    .status-panel {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 1.25rem;
+      border-radius: 12px;
+      border: 2px dashed rgba(255, 255, 255, 0.1);
+      margin-top: 10px;
+      transition: all 0.3s ease;
+    }
+
+    .status-panel.online {
+      background-color: rgba(16, 185, 129, 0.08);
+      border-color: var(--success-color);
+    }
+
+    .status-panel.offline {
+      background-color: rgba(239, 68, 68, 0.08);
+      border-color: var(--danger-color);
+    }
+
+    .status-icon {
+      font-size: 2.2rem;
+      animation: pulse 1.5s infinite;
+    }
+
+    .status-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      width: 100%;
+    }
+
+    .status-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .status-panel.online .status-title { color: var(--success-color); }
+    .status-panel.offline .status-title { color: var(--danger-color); }
+
+    .status-desc {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.3;
+    }
+
+    .network-details {
+      font-size: 0.78rem;
+      color: var(--text-main);
+      background-color: rgba(0, 0, 0, 0.2);
+      padding: 6px 10px;
+      border-radius: 6px;
+      margin-top: 6px;
+      font-family: monospace;
+      display: inline-block;
+    }
+
+    /* Explicações e Passos */
+    .desc-text {
+      font-size: 0.88rem;
+      line-height: 1.45;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .desc-text strong {
+      color: var(--text-main);
+    }
+
+    .step-box {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 15px;
+    }
+
+    .step-item {
+      display: flex;
+      gap: 14px;
+      padding: 12px;
+      background-color: rgba(255, 255, 255, 0.02);
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      align-items: flex-start;
+    }
+
+    .step-num {
+      background-color: var(--primary-color);
+      color: white;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+
+    .step-text {
+      font-size: 0.88rem;
+      line-height: 1.4;
+    }
+
+    .step-text strong {
+      color: #fff;
+    }
+
+    /* Lista de Vantagens */
+    ul.check-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    ul.check-list li {
+      position: relative;
+      padding-left: 24px;
+      font-size: 0.88rem;
+      line-height: 1.4;
+      color: var(--text-muted);
+    }
+
+    ul.check-list li strong {
+      color: var(--text-main);
+    }
+
+    ul.check-list li::before {
+      content: '✔';
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: var(--success-color);
+      font-weight: bold;
+    }
+
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--primary-color);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.92rem;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+      transition: all 0.2s ease;
+      border: none;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .btn-action:hover, .btn-action:active {
+      background-color: #2563eb;
+      transform: translateY(-1px);
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.05); opacity: 1; }
+      100% { transform: scale(1); opacity: 0.8; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>Como Funciona o Modo Sem Internet?</h1>
+      <p>Entenda as tecnologias padrões da internet (Web Standards) que mantêm o aplicativo funcionando de forma robusta e segura no seu navegador.</p>
+    </header>
+
+    <!-- 1. Detecção de Conexão -->
+    <div class="card">
+      <span class="tech-pill">Network Information API</span>
+      <h2>1. Monitoramento Inteligente de Sinal</h2>
+      <p class="desc-text">
+        O aplicativo não faz mágica: ele utiliza recursos de rede nativos do próprio navegador do celular. O sistema escuta os eventos do sistema operacional do seu celular para saber se há internet ativa e identificar o tipo da sua conexão (Wi-Fi ou Dados Móveis).
+      </p>
+
+      <div id="connection-status-panel" class="status-panel online">
+        <span id="status-icon" class="status-icon">📶</span>
+        <div class="status-info">
+          <span id="status-title" class="status-title">ONLINE</span>
+          <span id="status-desc" class="status-desc">Conectado. Os relatos e fotos serão salvos direto na planilha do Google Sheets.</span>
+          <div>
+            <span id="network-type" class="network-details">Carregando detalhes da rede...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Banco de Dados Local -->
+    <div class="card">
+      <span class="tech-pill">Web Storage & IndexedDB</span>
+      <h2>2. A "Gaveta de Armazenamento" do Navegador</h2>
+      <p class="desc-text">
+        Quando você preenche um relato ou tira uma foto no Modo Offline, os dados são convertidos em texto e gravados em um **banco de dados local seguro dentro do próprio navegador** do celular (conhecido como *LocalStorage* ou *IndexedDB*).
+      </p>
+      
+      <ul class="check-list">
+        <li><strong>À Prova de Quedas:</strong> As informações ficam gravadas permanentemente no celular. Você pode fechar o navegador, desligar o celular ou acabar a bateria que os dados **não são perdidos**.</li>
+        <li><strong>Privacidade Absoluta:</strong> Apenas o aplicativo da SSVP no seu celular tem acesso a esta gaveta de segurança local.</li>
+        <li><strong>Limpeza Automática:</strong> Os dados locais só saem do celular quando o sinal de internet retorna e você clica em **Sincronizar** para enviá-los ao Google Sheets.</li>
+      </ul>
+    </div>
+
+    <!-- 3. Roteiro de Teste Prático (Modo Avião) -->
+    <div class="card">
+      <h2>3. Roteiro Prático: Simule no seu Celular</h2>
+      <p class="desc-text">
+        Você pode validar essa tecnologia agora mesmo usando o seu celular Android ou iPhone:
+      </p>
+
+      <div class="step-box">
+        <div class="step-item">
+          <div class="step-num">1</div>
+          <div class="step-text">
+            Arraste a barra do seu Android para baixo e ative o **Modo Avião** (desligando o Wi-Fi e os Dados Móveis).
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <div class="step-text">
+            Veja o **Painel do Item 1** acima mudar na mesma hora para vermelho: <strong>SEM INTERNET (MODO OFFLINE)</strong>.
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <div class="step-text">
+            Acesse o aplicativo principal, registre um relato de visita completo com foto offline e veja que o app salvará a visita sem travar.
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num">4</div>
+          <div class="step-text">
+            Desative o Modo Avião. O painel voltará a ficar verde e você poderá clicar em **Sincronizar** para enviar a visita com segurança.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botão de acesso ao aplicativo -->
+    <div style="margin-bottom: 10px;">
+      <a href="../index.html" class="btn-action">
+        Voltar para o Aplicativo Principal
+      </a>
+    </div>
+  </div>
+
+  <script>
+    // Monitoramento da Conexão usando Web Standards
+    function atualizarPainelConexaoNativa() {
+      const panel = document.getElementById("connection-status-panel");
+      const icon = document.getElementById("status-icon");
+      const title = document.getElementById("status-title");
+      const desc = document.getElementById("status-desc");
+      const netTypeSpan = document.getElementById("network-type");
+
+      if (!panel) return;
+
+      // 1. Detectar Online/Offline
+      const estaOnline = navigator.onLine;
+
+      // 2. Tentar detectar tipo de conexão (Wi-Fi, 4G, etc.) usando a Network Information API
+      const conexao = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+      let detalhesRede = "Rede desconhecida (API limitada)";
+
+      if (conexao) {
+        const tipo = conexao.type || "Desconhecido"; // 'wifi', 'cellular', etc.
+        const velocidade = conexao.effectiveType || ""; // '4g', '3g', etc.
+        
+        let rotuloConexao = "";
+        if (tipo === "wifi") {
+          rotuloConexao = "Conectado via Wi-Fi";
+        } else if (tipo === "cellular") {
+          rotuloConexao = `Conectado via Dados Móveis (${velocidade.toUpperCase()})`;
+        } else {
+          rotuloConexao = `Rede ativa (${velocidade.toUpperCase()})`;
+        }
+        
+        detalhesRede = rotuloConexao;
+      } else if (estaOnline) {
+        detalhesRede = "Conectado (Wi-Fi ou Rede Móvel)";
+      } else {
+        detalhesRede = "Sem conexão ativa";
+      }
+
+      // 3. Atualizar Interface Reativa
+      if (estaOnline) {
+        panel.className = "status-panel online";
+        icon.innerText = "📶";
+        title.innerText = "ONLINE";
+        desc.innerText = "Conectado à internet. Os relatos e fotos das visitas serão salvos direto na planilha do Google Sheets.";
+        netTypeSpan.innerText = detalhesRede;
+      } else {
+        panel.className = "status-panel offline";
+        icon.innerText = "✈";
+        title.innerText = "SEM INTERNET (MODO OFFLINE)";
+        desc.innerText = "Celular desconectado. As visitas registradas serão armazenadas na 'gaveta segura' do navegador.";
+        netTypeSpan.innerText = "Modo Avião Ativo / Sem Sinal";
+      }
+    }
+
+    // Escuta os eventos nativos de rede do navegador
+    window.addEventListener('online', atualizarPainelConexaoNativa);
+    window.addEventListener('offline', atualizarPainelConexaoNativa);
+
+    // Inicialização da verificação
+    atualizarPainelConexaoNativa();
+  </script>
+
+</body>
+</html>
