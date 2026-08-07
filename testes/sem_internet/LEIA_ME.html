@@ -60,14 +60,14 @@
     }
 
     header h1 {
-      font-size: 1.4rem;
+      font-size: 1.45rem;
       font-weight: 700;
       letter-spacing: -0.02em;
       margin-bottom: 6px;
     }
 
     header p {
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       opacity: 0.85;
       line-height: 1.4;
     }
@@ -81,7 +81,7 @@
     }
 
     .card h2 {
-      font-size: 1.15rem;
+      font-size: 1.18rem;
       font-weight: 700;
       margin-bottom: 12px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -153,7 +153,7 @@
     .status-panel.offline .status-title { color: var(--danger-color); }
 
     .status-desc {
-      font-size: 0.85rem;
+      font-size: 0.88rem;
       color: var(--text-muted);
       line-height: 1.4;
       max-width: 420px;
@@ -186,15 +186,43 @@
       background-color: rgba(239, 68, 68, 0.04);
     }
 
-    /* Explicações e Passos */
-    .desc-text {
-      font-size: 0.88rem;
-      line-height: 1.45;
-      color: var(--text-muted);
-      margin-bottom: 12px;
+    /* Botão de Colapso/Expansão */
+    .collapse-btn {
+      background: transparent;
+      border: none;
+      color: var(--primary-color);
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      padding: 8px 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 12px;
+      outline: none;
     }
 
-    .desc-text strong {
+    .collapse-btn:hover {
+      color: #60a5fa;
+    }
+
+    /* Área Expansível para Acessibilidade 50+ (Fonte Grande e Espaçada) */
+    .card-details {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      color: var(--text-muted);
+      font-size: 1.02rem; /* Fonte ampliada para leitura confortável */
+      line-height: 1.5;
+    }
+
+    .card-details.active {
+      margin-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding-top: 12px;
+    }
+
+    .card-details strong {
       color: var(--text-main);
     }
 
@@ -250,20 +278,20 @@
       color: #fff;
     }
 
-    /* Lista de Vantagens */
+    /* Lista de Vantagens (Fonte Confortável) */
     ul.check-list {
       list-style: none;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
       margin-top: 10px;
     }
 
     ul.check-list li {
       position: relative;
       padding-left: 24px;
-      font-size: 0.88rem;
-      line-height: 1.4;
+      font-size: 1.02rem;
+      line-height: 1.45;
       color: var(--text-muted);
     }
 
@@ -309,9 +337,15 @@
         </div>
       </div>
 
-      <p class="desc-text" style="margin-top: 15px;">
+      <!-- Botão de controle de expansão de texto explicativo -->
+      <button id="btn-toggle-1" class="collapse-btn" onclick="toggleCardText(1)">
+        Como isso funciona? ▾
+      </button>
+
+      <!-- Área expansível de explicação com fonte confortável -->
+      <div id="details-card-1" class="card-details">
         O aplicativo não faz mágica: ele utiliza recursos de rede nativos do próprio navegador do celular. O sistema escuta os eventos do sistema operacional do seu celular para saber se há internet ativa e identificar o tipo da sua conexão (Wi-Fi ou Dados Móveis).
-      </p>
+      </div>
     </div>
 
     <!-- 2. Banco de Dados Local -->
@@ -320,8 +354,8 @@
       <h2>2. A "Gaveta de Armazenamento" do Navegador</h2>
       
       <!-- Caixa de Experimento Interativo de LocalStorage -->
-      <div style="background-color: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 16px; border-radius: 12px; margin-top: 5px; margin-bottom: 15px;">
-        <p style="font-size: 0.82rem; font-weight: 600; color: var(--text-muted); margin-bottom: 8px;">Experimento Prático de Persistência:</p>
+      <div style="background-color: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 16px; border-radius: 12px; margin-top: 5px; margin-bottom: 5px;">
+        <p style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 8px;">Experimento Prático de Persistência:</p>
         <div style="display: flex; gap: 8px; margin-bottom: 12px;">
           <input type="text" id="storage-input" placeholder="Digite uma frase para testar..." style="flex: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); padding: 8px 12px; border-radius: 6px; color: #fff; font-size: 0.88rem; outline: none;">
           <button id="storage-btn" onclick="salvarNaMemoriaLocal()" style="background: var(--primary-color); border: none; color: white; padding: 8px 16px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: background 0.2s;">Salvar</button>
@@ -335,21 +369,28 @@
         </p>
       </div>
 
-      <p class="desc-text">
-        Quando você preenche um relato ou tira uma foto no Modo Offline, os dados são convertidos em texto e gravados em um **banco de dados local seguro dentro do próprio navegador** do celular (conhecido como *LocalStorage* ou *IndexedDB*).
-      </p>
-      
-      <ul class="check-list">
-        <li><strong>À Prova de Quedas:</strong> As informações ficam gravadas permanentemente no celular. Você pode fechar o navegador, desligar o celular ou acabar a bateria que os dados **não são perdidos**.</li>
-        <li><strong>Privacidade Absoluta:</strong> Apenas o aplicativo da SSVP no seu celular tem acesso a esta gaveta de segurança local.</li>
-        <li><strong>Limpeza Automática:</strong> Os dados locais só saem do celular quando o sinal de internet retorna e você clica em **Sincronizar** para enviá-los ao Google Sheets.</li>
-      </ul>
+      <!-- Botão de controle de expansão de texto explicativo -->
+      <button id="btn-toggle-2" class="collapse-btn" onclick="toggleCardText(2)">
+        Como isso funciona? ▾
+      </button>
+
+      <!-- Área expansível de explicação com fonte confortável e grande -->
+      <div id="details-card-2" class="card-details">
+        <p style="margin-bottom: 10px;">
+          Quando você preenche um relato ou tira uma foto no Modo Offline, os dados são convertidos em texto e gravados em um **banco de dados local seguro dentro do próprio navegador** do celular (conhecido como *LocalStorage* ou *IndexedDB*).
+        </p>
+        <ul class="check-list">
+          <li><strong>À Prova de Quedas:</strong> As informações ficam gravadas permanentemente no celular. Você pode fechar o navegador, desligar o celular ou acabar a bateria que os dados **não são perdidos**.</li>
+          <li><strong>Privacidade Absoluta:</strong> Apenas o aplicativo da SSVP no seu celular tem acesso a esta gaveta de segurança local.</li>
+          <li><strong>Limpeza Automática:</strong> Os dados locais só saem do celular quando o sinal de internet retorna e você clica em **Sincronizar** para enviá-los ao Google Sheets.</li>
+        </ul>
+      </div>
     </div>
 
     <!-- 3. Roteiro de Teste Prático -->
     <div class="card">
       <h2>3. Roteiro Prático: Simule no seu Celular</h2>
-      <p class="desc-text">
+      <p class="desc-text" style="font-size: 0.95rem;">
         Você pode validar essas duas tecnologias na prática agora mesmo usando o seu celular Android ou iPhone:
       </p>
 
@@ -503,6 +544,26 @@
         output.innerText = `"${textoSalvo}"`;
       } else {
         output.innerText = "(Nenhum dado salvo ainda)";
+      }
+    }
+
+    // Gerencia o abrir/fechar dinâmico com altura suave
+    function toggleCardText(cardNum) {
+      const details = document.getElementById(`details-card-${cardNum}`);
+      const btn = document.getElementById(`btn-toggle-${cardNum}`);
+      
+      if (!details || !btn) return;
+      
+      const isExpanded = details.classList.contains('active');
+      
+      if (isExpanded) {
+        details.classList.remove('active');
+        details.style.maxHeight = '0px';
+        btn.innerText = 'Como isso funciona? ▾';
+      } else {
+        details.classList.add('active');
+        details.style.maxHeight = details.scrollHeight + 'px';
+        btn.innerText = 'Ocultar explicação ▴';
       }
     }
 
