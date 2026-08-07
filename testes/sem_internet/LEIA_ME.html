@@ -104,17 +104,19 @@
       margin-bottom: 8px;
     }
 
-    /* Testador de Conexão em Tempo Real */
+    /* Testador de Conexão em Tempo Real (Destaque Ampliado) */
     .status-panel {
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 16px;
-      padding: 1.25rem;
+      gap: 12px;
+      padding: 1.5rem 1.25rem;
       border-radius: 12px;
       border: 2px dashed rgba(255, 255, 255, 0.1);
       margin-top: 10px;
       transition: all 0.3s ease;
+      text-align: center;
     }
 
     .status-panel.online {
@@ -128,40 +130,59 @@
     }
 
     .status-icon {
-      font-size: 2.2rem;
+      font-size: 2.5rem;
       animation: pulse 1.5s infinite;
+      margin-bottom: 4px;
     }
 
     .status-info {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      align-items: center;
+      gap: 8px;
       width: 100%;
     }
 
     .status-title {
-      font-size: 1.1rem;
+      font-size: 1.25rem;
       font-weight: 700;
+      letter-spacing: 0.02em;
     }
 
     .status-panel.online .status-title { color: var(--success-color); }
     .status-panel.offline .status-title { color: var(--danger-color); }
 
     .status-desc {
-      font-size: 0.82rem;
+      font-size: 0.85rem;
       color: var(--text-muted);
-      line-height: 1.3;
+      line-height: 1.4;
+      max-width: 420px;
     }
 
+    /* Tipo de Conexão - Destaque Gigante */
     .network-details {
-      font-size: 0.78rem;
-      color: var(--text-main);
-      background-color: rgba(0, 0, 0, 0.2);
-      padding: 6px 10px;
-      border-radius: 6px;
-      margin-top: 6px;
-      font-family: monospace;
-      display: inline-block;
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: #ffffff;
+      background-color: rgba(0, 0, 0, 0.3);
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-top: 10px;
+      width: 100%;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .status-panel.online .network-details {
+      border-left: 4px solid var(--success-color);
+    }
+
+    .status-panel.offline .network-details {
+      border-left: 4px solid var(--danger-color);
+      color: var(--danger-color);
     }
 
     /* Explicações e Passos */
@@ -258,34 +279,9 @@
       font-weight: bold;
     }
 
-    .btn-action {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background-color: var(--primary-color);
-      color: white;
-      padding: 12px 20px;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 0.92rem;
-      width: 100%;
-      text-align: center;
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
-      transition: all 0.2s ease;
-      border: none;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-
-    .btn-action:hover, .btn-action:active {
-      background-color: #2563eb;
-      transform: translateY(-1px);
-    }
-
     @keyframes pulse {
       0% { transform: scale(1); opacity: 0.8; }
-      50% { transform: scale(1.05); opacity: 1; }
+      50% { transform: scale(1.03); opacity: 1; }
       100% { transform: scale(1); opacity: 0.8; }
     }
   </style>
@@ -311,9 +307,7 @@
         <div class="status-info">
           <span id="status-title" class="status-title">ONLINE</span>
           <span id="status-desc" class="status-desc">Conectado. Os relatos e fotos serão salvos direto na planilha do Google Sheets.</span>
-          <div>
-            <span id="network-type" class="network-details">Carregando detalhes da rede...</span>
-          </div>
+          <span id="network-type" class="network-details">Carregando rede...</span>
         </div>
       </div>
     </div>
@@ -404,13 +398,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Botão de acesso ao aplicativo -->
-    <div style="margin-bottom: 10px;">
-      <a href="../index.html" class="btn-action">
-        Voltar para o Aplicativo Principal
-      </a>
-    </div>
   </div>
 
   <script>
@@ -439,14 +426,14 @@
         if (tipo === "wifi") {
           rotuloConexao = "Conectado via Wi-Fi";
         } else if (tipo === "cellular") {
-          rotuloConexao = `Conectado via Dados Móveis (${velocidade.toUpperCase()})`;
+          rotuloConexao = `Dados Móveis (${velocidade.toUpperCase()})`;
         } else {
           rotuloConexao = `Rede ativa (${velocidade.toUpperCase()})`;
         }
         
         detalhesRede = rotuloConexao;
       } else if (estaOnline) {
-        detalhesRede = "Conectado (Wi-Fi ou Rede Móvel)";
+        detalhesRede = "Conectado (Wi-Fi ou Dados Móveis)";
       } else {
         detalhesRede = "Sem conexão ativa";
       }
