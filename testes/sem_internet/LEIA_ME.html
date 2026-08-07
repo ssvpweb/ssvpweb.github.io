@@ -32,6 +32,8 @@
       background-color: var(--bg-color);
       color: var(--text-main);
       font-family: var(--font-family);
+      font-size: 1.15rem; /* Acessibilidade 50+: Base de fonte ampliada */
+      line-height: 1.6;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -60,51 +62,102 @@
     }
 
     header h1 {
-      font-size: 1.45rem;
+      font-size: 1.6rem;
       font-weight: 700;
       letter-spacing: -0.02em;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
 
     header p {
-      font-size: 0.95rem;
+      font-size: 1.05rem;
       opacity: 0.85;
-      line-height: 1.4;
+      line-height: 1.45;
     }
 
+    /* Cards Estilo Acordeon */
     .card {
       background-color: var(--card-bg);
       border: 1px solid rgba(255, 255, 255, 0.05);
       border-radius: 16px;
-      padding: 1.5rem;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .card h2 {
-      font-size: 1.18rem;
-      font-weight: 700;
-      margin-bottom: 12px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      padding-bottom: 8px;
+    .card:hover {
+      border-color: var(--primary-color);
+    }
+
+    /* Cabeçalhos Clicáveis */
+    .card-header {
+      padding: 1.5rem 1.75rem;
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      gap: 8px;
+      cursor: pointer;
+      user-select: none;
+      background-color: rgba(255, 255, 255, 0.01);
+      transition: background-color 0.2s ease;
+    }
+
+    .card-header:hover {
+      background-color: rgba(255, 255, 255, 0.03);
+    }
+
+    .card-header h2 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      border-bottom: none;
+      padding-bottom: 0;
+      margin-bottom: 0;
+      color: #fff;
+    }
+
+    .card-chevron {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Estado Ativo do Acordeon */
+    .card.active {
+      border-color: var(--primary-color);
+    }
+
+    .card.active .card-chevron {
+      transform: rotate(180deg);
+      color: var(--primary-color);
+    }
+
+    /* Conteúdo Ocultável */
+    .card-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      background-color: rgba(0, 0, 0, 0.15);
+      padding: 0 1.75rem; /* Sem padding vertical inicial para colapsar 100% */
+    }
+
+    .card.active .card-content {
+      padding: 0 1.75rem 1.75rem 1.75rem; /* Restabelece padding inferior quando ativo */
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
     }
 
     .tech-pill {
       background-color: rgba(59, 130, 246, 0.1);
       color: var(--primary-color);
       border: 1px solid rgba(59, 130, 246, 0.2);
-      font-size: 0.72rem;
+      font-size: 0.78rem;
       font-weight: 700;
-      padding: 2px 8px;
+      padding: 3px 10px;
       border-radius: 4px;
       text-transform: uppercase;
       display: inline-block;
-      margin-bottom: 8px;
+      margin-top: 15px;
+      margin-bottom: 10px;
     }
 
-    /* Testador de Conexão em Tempo Real (Destaque Ampliado) */
+    /* Testador de Conexão em Tempo Real */
     .status-panel {
       display: flex;
       flex-direction: column;
@@ -130,21 +183,21 @@
     }
 
     .status-icon {
-      font-size: 2.5rem;
+      font-size: 3rem;
       animation: pulse 1.5s infinite;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
 
     .status-info {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       width: 100%;
     }
 
     .status-title {
-      font-size: 1.25rem;
+      font-size: 1.4rem;
       font-weight: 700;
       letter-spacing: 0.02em;
     }
@@ -153,10 +206,10 @@
     .status-panel.offline .status-title { color: var(--danger-color); }
 
     .status-desc {
-      font-size: 0.88rem;
+      font-size: 1rem;
       color: var(--text-muted);
-      line-height: 1.4;
-      max-width: 420px;
+      line-height: 1.45;
+      max-width: 460px;
     }
 
     /* Tipo de Conexão - Destaque Gigante */
@@ -165,9 +218,9 @@
       font-weight: 700;
       color: #ffffff;
       background-color: rgba(0, 0, 0, 0.3);
-      padding: 12px 16px;
+      padding: 14px 20px;
       border-radius: 8px;
-      margin-top: 10px;
+      margin-top: 12px;
       width: 100%;
       text-align: center;
       text-transform: uppercase;
@@ -177,61 +230,33 @@
     }
 
     .status-panel.online .network-details {
-      border-left: 4px solid var(--success-color);
+      border-left: 6px solid var(--success-color);
     }
 
     .status-panel.offline .network-details {
-      border-left: 4px solid var(--danger-color);
+      border-left: 6px solid var(--danger-color);
       color: var(--danger-color);
       background-color: rgba(239, 68, 68, 0.04);
     }
 
-    /* Botão de Colapso/Expansão */
-    .collapse-btn {
-      background: transparent;
-      border: none;
-      color: var(--primary-color);
-      font-weight: 600;
-      font-size: 0.95rem;
-      cursor: pointer;
-      padding: 8px 0;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 12px;
-      outline: none;
-    }
-
-    .collapse-btn:hover {
-      color: #60a5fa;
-    }
-
-    /* Área Expansível para Acessibilidade 50+ (Fonte Grande e Espaçada) */
-    .card-details {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Explicações e Passos */
+    .desc-text {
+      font-size: 1.15rem;
+      line-height: 1.55;
       color: var(--text-muted);
-      font-size: 1.02rem; /* Fonte ampliada para leitura confortável */
-      line-height: 1.5;
+      margin-bottom: 14px;
     }
 
-    .card-details.active {
-      margin-top: 12px;
-      border-top: 1px solid rgba(255, 255, 255, 0.05);
-      padding-top: 12px;
-    }
-
-    .card-details strong {
+    .desc-text strong {
       color: var(--text-main);
     }
 
     .sub-section-title {
-      font-size: 0.95rem;
+      font-size: 1.2rem;
       font-weight: 700;
       color: #fff;
-      margin-top: 15px;
-      margin-bottom: 5px;
+      margin-top: 20px;
+      margin-bottom: 8px;
       display: flex;
       align-items: center;
       gap: 6px;
@@ -240,15 +265,15 @@
     .step-box {
       display: flex;
       flex-direction: column;
-      gap: 14px;
-      margin-top: 10px;
-      margin-bottom: 15px;
+      gap: 16px;
+      margin-top: 12px;
+      margin-bottom: 20px;
     }
 
     .step-item {
       display: flex;
-      gap: 14px;
-      padding: 12px;
+      gap: 16px;
+      padding: 14px;
       background-color: rgba(255, 255, 255, 0.02);
       border-radius: 10px;
       border: 1px solid rgba(255, 255, 255, 0.04);
@@ -258,20 +283,20 @@
     .step-num {
       background-color: var(--primary-color);
       color: white;
-      width: 26px;
-      height: 26px;
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 700;
-      font-size: 0.85rem;
+      font-size: 0.95rem;
       flex-shrink: 0;
     }
 
     .step-text {
-      font-size: 0.88rem;
-      line-height: 1.4;
+      font-size: 1.12rem;
+      line-height: 1.5;
     }
 
     .step-text strong {
@@ -283,15 +308,15 @@
       list-style: none;
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      margin-top: 10px;
+      gap: 12px;
+      margin-top: 12px;
     }
 
     ul.check-list li {
       position: relative;
-      padding-left: 24px;
-      font-size: 1.02rem;
-      line-height: 1.45;
+      padding-left: 28px;
+      font-size: 1.15rem;
+      line-height: 1.5;
       color: var(--text-muted);
     }
 
@@ -306,6 +331,22 @@
       top: 0;
       color: var(--success-color);
       font-weight: bold;
+    }
+
+    /* Inputs e Botão do Experimento */
+    #storage-input {
+      font-size: 1.05rem !important;
+      padding: 10px 14px !important;
+    }
+
+    #storage-btn {
+      font-size: 1.02rem !important;
+      padding: 10px 20px !important;
+    }
+
+    #storage-output {
+      font-size: 1.1rem !important;
+      padding: 12px !important;
     }
 
     @keyframes pulse {
@@ -323,62 +364,61 @@
       <p>Entenda as tecnologias padrões da internet (Web Standards) que mantêm o aplicativo funcionando de forma robusta e segura no seu navegador.</p>
     </header>
 
-    <!-- 1. Detecção de Conexão -->
-    <div class="card">
-      <span class="tech-pill">Network Information API</span>
-      <h2>1. Monitoramento Inteligente de Sinal</h2>
-      
-      <div id="connection-status-panel" class="status-panel online">
-        <span id="status-icon" class="status-icon">📶</span>
-        <div class="status-info">
-          <span id="status-title" class="status-title">ONLINE</span>
-          <span id="status-desc" class="status-desc">Conectado. Os relatos e fotos serão salvos direto na planilha do Google Sheets.</span>
-          <span id="network-type" class="network-details">Carregando rede...</span>
-        </div>
+    <!-- CARD 1: DETECÇÃO DE CONEXÃO -->
+    <div class="card" id="card-1">
+      <div class="card-header" onclick="toggleCard(1)">
+        <h2>1. Monitoramento Inteligente de Sinal</h2>
+        <span class="card-chevron" id="chevron-1">▼</span>
       </div>
 
-      <!-- Botão de controle de expansão de texto explicativo -->
-      <button id="btn-toggle-1" class="collapse-btn" onclick="toggleCardText(1)">
-        Como isso funciona? ▾
-      </button>
+      <div class="card-content" id="content-1">
+        <span class="tech-pill">Network Information API</span>
+        
+        <div id="connection-status-panel" class="status-panel online">
+          <span id="status-icon" class="status-icon">📶</span>
+          <div class="status-info">
+            <span id="status-title" class="status-title">ONLINE</span>
+            <span id="status-desc" class="status-desc">Conectado. Os relatos e fotos serão salvos direto na planilha do Google Sheets.</span>
+            <span id="network-type" class="network-details">Carregando rede...</span>
+          </div>
+        </div>
 
-      <!-- Área expansível de explicação com fonte confortável -->
-      <div id="details-card-1" class="card-details">
-        O aplicativo não faz mágica: ele utiliza recursos de rede nativos do próprio navegador do celular. O sistema escuta os eventos do sistema operacional do seu celular para saber se há internet ativa e identificar o tipo da sua conexão (Wi-Fi ou Dados Móveis).
+        <p class="desc-text" style="margin-top: 20px;">
+          O aplicativo não faz mágica: ele utiliza recursos de rede nativos do próprio navegador do celular. O sistema escuta os eventos do sistema operacional do seu celular para saber se há internet ativa e identificar o tipo da sua conexão (Wi-Fi ou Dados Móveis).
+        </p>
       </div>
     </div>
 
-    <!-- 2. Banco de Dados Local -->
-    <div class="card">
-      <span class="tech-pill">Web Storage & IndexedDB</span>
-      <h2>2. A "Gaveta de Armazenamento" do Navegador</h2>
-      
-      <!-- Caixa de Experimento Interativo de LocalStorage -->
-      <div style="background-color: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 16px; border-radius: 12px; margin-top: 5px; margin-bottom: 5px;">
-        <p style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 8px;">Experimento Prático de Persistência:</p>
-        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-          <input type="text" id="storage-input" placeholder="Digite uma frase para testar..." style="flex: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); padding: 8px 12px; border-radius: 6px; color: #fff; font-size: 0.88rem; outline: none;">
-          <button id="storage-btn" onclick="salvarNaMemoriaLocal()" style="background: var(--primary-color); border: none; color: white; padding: 8px 16px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: background 0.2s;">Salvar</button>
-        </div>
-        <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 4px;">Dado Salvo na Memória:</p>
-        <div id="storage-output" style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px; font-size: 0.9rem; font-weight: bold; min-height: 38px; display: flex; align-items: center; color: var(--success-color); border-left: 3px solid var(--success-color);">
-          (Nenhum dado salvo ainda)
-        </div>
-        <p style="font-size: 0.78rem; color: var(--warning-color); line-height: 1.35; margin-top: 10px; font-style: italic;">
-          👉 <strong>Faça o teste:</strong> Escreva um texto, salve e depois <strong>recarregue esta página</strong>. Se quiser, <strong>copie a URL, feche totalmente o seu navegador</strong>, abra-o novamente e cole a URL. Você verá que o seu texto continuará intacto aqui!
-        </p>
+    <!-- CARD 2: GAVETA DE ARMAZENAMENTO -->
+    <div class="card" id="card-2">
+      <div class="card-header" onclick="toggleCard(2)">
+        <h2>2. A "Gaveta" do Navegador (Armazenamento)</h2>
+        <span class="card-chevron" id="chevron-2">▼</span>
       </div>
 
-      <!-- Botão de controle de expansão de texto explicativo -->
-      <button id="btn-toggle-2" class="collapse-btn" onclick="toggleCardText(2)">
-        Como isso funciona? ▾
-      </button>
+      <div class="card-content" id="content-2">
+        <span class="tech-pill">Web Storage & IndexedDB</span>
+        
+        <!-- Caixa de Experimento Interativo de LocalStorage -->
+        <div style="background-color: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 16px; border-radius: 12px; margin-top: 15px; margin-bottom: 20px;">
+          <p style="font-size: 0.95rem; font-weight: 600; color: var(--text-muted); margin-bottom: 8px;">Experimento Prático de Persistência:</p>
+          <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+            <input type="text" id="storage-input" placeholder="Digite uma frase para testar..." style="flex: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); padding: 8px 12px; border-radius: 6px; color: #fff; font-size: 0.88rem; outline: none;">
+            <button id="storage-btn" onclick="salvarNaMemoriaLocal()" style="background: var(--primary-color); border: none; color: white; padding: 8px 16px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: background 0.2s;">Salvar</button>
+          </div>
+          <p style="font-size: 0.92rem; color: var(--text-muted); margin-bottom: 4px;">Dado Salvo na Memória:</p>
+          <div id="storage-output" style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px; font-size: 0.9rem; font-weight: bold; min-height: 38px; display: flex; align-items: center; color: var(--success-color); border-left: 3px solid var(--success-color);">
+            (Nenhum dado salvo ainda)
+          </div>
+          <p style="font-size: 0.88rem; color: var(--warning-color); line-height: 1.4; margin-top: 10px; font-style: italic;">
+            👉 <strong>Faça o teste:</strong> Escreva um texto, salve e depois <strong>recarregue esta página</strong>. Se quiser, <strong>copie a URL, feche totalmente o seu navegador</strong>, abra-o novamente e cole a URL. Você verá que o seu texto continuará intacto aqui!
+          </p>
+        </div>
 
-      <!-- Área expansível de explicação com fonte confortável e grande -->
-      <div id="details-card-2" class="card-details">
-        <p style="margin-bottom: 10px;">
+        <p class="desc-text">
           Quando você preenche um relato ou tira uma foto no Modo Offline, os dados são convertidos em texto e gravados em um **banco de dados local seguro dentro do próprio navegador** do celular (conhecido como *LocalStorage* ou *IndexedDB*).
         </p>
+        
         <ul class="check-list">
           <li><strong>À Prova de Quedas:</strong> As informações ficam gravadas permanentemente no celular. Você pode fechar o navegador, desligar o celular ou acabar a bateria que os dados **não são perdidos**.</li>
           <li><strong>Privacidade Absoluta:</strong> Apenas o aplicativo da SSVP no seu celular tem acesso a esta gaveta de segurança local.</li>
@@ -387,73 +427,79 @@
       </div>
     </div>
 
-    <!-- 3. Roteiro de Teste Prático -->
-    <div class="card">
-      <h2>3. Roteiro Prático: Simule no seu Celular</h2>
-      <p class="desc-text" style="font-size: 0.95rem;">
-        Você pode validar essas duas tecnologias na prática agora mesmo usando o seu celular Android ou iPhone:
-      </p>
-
-      <!-- ROTEIRO A: PERDA TOTAL DE REDE -->
-      <div class="sub-section-title">✈ Teste 1: Perda total de sinal (Modo Offline)</div>
-      <div class="step-box">
-        <div class="step-item">
-          <div class="step-num">1</div>
-          <div class="step-text">
-            Arraste a barra superior do seu celular para baixo e ative o **Modo Avião** (isso desligará todas as redes do aparelho).
-          </div>
-        </div>
-
-        <div class="step-item">
-          <div class="step-num">2</div>
-          <div class="step-text">
-            Veja o **Painel do Item 1** acima mudar na mesma hora para vermelho: <strong>SEM INTERNET (MODO OFFLINE)</strong>.
-          </div>
-        </div>
-
-        <div class="step-item">
-          <div class="step-num">3</div>
-          <div class="step-text">
-            Acesse o aplicativo de visitas, registre um relato de visita com foto e veja que o app salvará a visita sem travar. O app mostrará um aviso amarelado de pendência local.
-          </div>
-        </div>
+    <!-- CARD 3: ROTEIRO PRÁTICO -->
+    <div class="card" id="card-3">
+      <div class="card-header" onclick="toggleCard(3)">
+        <h2>3. Roteiro Prático: Simule no seu Celular</h2>
+        <span class="card-chevron" id="chevron-3">▼</span>
       </div>
 
-      <!-- ROTEIRO B: TRANSIÇÃO DE REDE -->
-      <div class="sub-section-title">📶 Teste 2: Chaveamento de Wi-Fi para Dados Móveis (3G/4G)</div>
-      <div class="step-box">
-        <div class="step-item">
-          <div class="step-num">1</div>
-          <div class="step-text">
-            Com o Wi-Fi e os Dados Móveis ligados no celular, veja que o **Painel do Item 1** exibe <strong>ONLINE</strong> e <strong>Conectado via Wi-Fi</strong>.
+      <div class="card-content" id="content-3">
+        <p class="desc-text" style="margin-top: 15px;">
+          Você pode validar essas duas tecnologias na prática agora mesmo usando o seu celular Android ou iPhone:
+        </p>
+
+        <!-- ROTEIRO A: PERDA TOTAL DE REDE -->
+        <div class="sub-section-title">✈ Teste 1: Perda total de sinal (Modo Offline)</div>
+        <div class="step-box">
+          <div class="step-item">
+            <div class="step-num">1</div>
+            <div class="step-text">
+              Arraste a barra superior do seu celular para baixo e ative o **Modo Avião** (isso desligará todas as redes do aparelho).
+            </div>
+          </div>
+
+          <div class="step-item">
+            <div class="step-num">2</div>
+            <div class="step-text">
+              Veja o **Painel do Item 1** mudar na mesma hora para vermelho: <strong>SEM INTERNET (MODO OFFLINE)</strong>.
+            </div>
+          </div>
+
+          <div class="step-item">
+            <div class="step-num">3</div>
+            <div class="step-text">
+              Acesse o aplicativo de visitas, registre um relato de visita com foto e veja que o app salvará a visita sem travar. O app mostrará um aviso amarelado de pendência local.
+            </div>
           </div>
         </div>
 
-        <div class="step-item">
-          <div class="step-num">2</div>
-          <div class="step-text">
-            Arraste a barra superior do seu celular para baixo e **toque no ícone do Wi-Fi** (símbolo de ondas/leque) para desligá-lo.
+        <!-- ROTEIRO B: TRANSIÇÃO DE REDE -->
+        <div class="sub-section-title">📶 Teste 2: Chaveamento de Wi-Fi para Dados Móveis (3G/4G)</div>
+        <div class="step-box">
+          <div class="step-item">
+            <div class="step-num">1</div>
+            <div class="step-text">
+              Com o Wi-Fi e os Dados Móveis ligados no celular, veja que o **Painel do Item 1** exibe <strong>ONLINE</strong> e <strong>Conectado via Wi-Fi</strong>.
+            </div>
           </div>
-        </div>
 
-        <div class="step-item">
-          <div class="step-num">3</div>
-          <div class="step-text">
-            A internet do celular passará a usar a rede móvel da sua operadora (3G/4G/5G).
+          <div class="step-item">
+            <div class="step-num">2</div>
+            <div class="step-text">
+              Arraste a barra superior do seu celular para baixo e **toque no ícone do Wi-Fi** (símbolo de ondas/leque) para desligá-lo.
+            </div>
           </div>
-        </div>
 
-        <div class="step-item">
-          <div class="step-num">4</div>
-          <div class="step-text">
-            <strong>Observe o Painel do Item 1:</strong> ele atualizará automaticamente no mesmo segundo para <strong>Conectado via Dados Móveis (3G/4G)</strong>, provando a reatividade instantânea do sistema!
+          <div class="step-item">
+            <div class="step-num">3</div>
+            <div class="step-text">
+              A internet do celular passará a usar a rede móvel da sua operadora (3G/4G/5G).
+            </div>
           </div>
-        </div>
 
-        <div class="step-item">
-          <div class="step-num">5</div>
-          <div class="step-text">
-            Toque no ícone do **Wi-Fi** novamente para ligá-lo. O painel se reajustará de volta para **Conectado via Wi-Fi** automaticamente em poucos segundos.
+          <div class="step-item">
+            <div class="step-num">4</div>
+            <div class="step-text">
+              <strong>Observe o Painel do Item 1:</strong> ele atualizará automaticamente no mesmo segundo para <strong>Conectado via Dados Móveis (3G/4G)</strong>, provando a reatividade instantânea do sistema!
+            </div>
+          </div>
+
+          <div class="step-item">
+            <div class="step-num">5</div>
+            <div class="step-text">
+              Toque no ícone do **Wi-Fi** novamente para ligá-lo. O painel se reajustará de volta para **Conectado via Wi-Fi** automaticamente em poucos segundos.
+            </div>
           </div>
         </div>
       </div>
@@ -532,6 +578,9 @@
       // Atualiza visor
       output.innerText = `"${texto}"`;
       input.value = "";
+      
+      // Ajusta a altura máxima do card ativo após o elemento ser alterado
+      reajustarAlturaCardAtivo(2);
     }
 
     // Recupera o dado ao iniciar a página
@@ -547,23 +596,36 @@
       }
     }
 
-    // Gerencia o abrir/fechar dinâmico com altura suave
-    function toggleCardText(cardNum) {
-      const details = document.getElementById(`details-card-${cardNum}`);
-      const btn = document.getElementById(`btn-toggle-${cardNum}`);
+    // Função de Acordeon dos Cards Principais
+    function toggleCard(cardNum) {
+      const card = document.getElementById(`card-${cardNum}`);
+      const content = document.getElementById(`content-${cardNum}`);
       
-      if (!details || !btn) return;
+      if (!card || !content) return;
       
-      const isExpanded = details.classList.contains('active');
+      const isExpanded = card.classList.contains('active');
       
-      if (isExpanded) {
-        details.classList.remove('active');
-        details.style.maxHeight = '0px';
-        btn.innerText = 'Como isso funciona? ▾';
-      } else {
-        details.classList.add('active');
-        details.style.maxHeight = details.scrollHeight + 'px';
-        btn.innerText = 'Ocultar explicação ▴';
+      // Recolhe todos os outros cards
+      const allCards = document.querySelectorAll('.card');
+      allCards.forEach((c) => {
+        c.classList.remove('active');
+        const cc = c.querySelector('.card-content');
+        if (cc) cc.style.maxHeight = '0px';
+      });
+      
+      // Alterna o estado do card clicado
+      if (!isExpanded) {
+        card.classList.add('active');
+        content.style.maxHeight = content.scrollHeight + 40 + 'px'; // +40 para acomodar margens de padding
+      }
+    }
+
+    // Auxiliar para reajustar a altura física se o conteúdo do card mudar enquanto aberto
+    function reajustarAlturaCardAtivo(cardNum) {
+      const card = document.getElementById(`card-${cardNum}`);
+      const content = document.getElementById(`content-${cardNum}`);
+      if (card && card.classList.contains('active') && content) {
+        content.style.maxHeight = content.scrollHeight + 40 + 'px';
       }
     }
 
@@ -574,7 +636,10 @@
     // Escuta mudanças específicas no tipo de rede (ex: Wi-Fi desliga e chaveia para 3G/4G)
     const conexao = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
     if (conexao) {
-      conexao.addEventListener('change', atualizarPainelConexaoNativa);
+      conexao.addEventListener('change', () => {
+        atualizarPainelConexaoNativa();
+        reajustarAlturaCardAtivo(1);
+      });
     }
 
     // Inicialização da verificação e do localStorage
