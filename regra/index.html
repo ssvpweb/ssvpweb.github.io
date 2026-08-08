@@ -719,7 +719,6 @@
     let ouvindoNota = false;
 
     if (SpeechRecognition) {
-      // 1. Instanciando receptor para Comandos Globais
       recComando = new SpeechRecognition();
       recComando.lang = "pt-BR";
       recComando.continuous = false;
@@ -792,23 +791,23 @@
       document.getElementById("note-text").placeholder = "Escreva uma nota de estudo...";
     }
 
+    // Gerencia microfone inferior de comandos
     function toggleEscutaComando() {
       if (!recComando) return;
       if (ouvindoComando) {
         recComando.stop();
       } else {
-        // Para qualquer ditado de nota antes de ouvir comando
         if (ouvindoNota) recNota.stop();
         recComando.start();
       }
     }
 
+    // Gerencia microfone de ditado de nota
     function toggleDitadoNota() {
       if (!recNota) return;
       if (ouvindoNota) {
         recNota.stop();
       } else {
-        // Para qualquer comando antes de ouvir nota
         if (ouvindoComando) recComando.stop();
         recNota.start();
       }
@@ -818,7 +817,6 @@
     function processarComandoRegra(texto) {
       const frase = texto.toLowerCase().trim();
       
-      // Mostrar feedback da voz no cabeçalho
       const feedBox = document.getElementById("voice-feedback");
       const feedText = document.getElementById("feedback-text");
       if (feedBox && feedText) {
@@ -850,12 +848,10 @@
       }
     }
 
-    // Função de redirecionamento de comando
     function redirecionarComando(hash, acaoFalar) {
       window.location.hash = `#${hash}`;
       
       if (acaoFalar) {
-        // Aguarda 1 segundo para carregar o conteúdo do arquivo via fetch e depois lê
         setTimeout(() => {
           falarConteudoRegraAtivo();
         }, 1000);
@@ -877,7 +873,6 @@
       window.speechSynthesis.speak(utterance);
     }
 
-    // Lê os parágrafos de conteúdo da aba ativa
     function falarConteudoRegraAtivo() {
       const container = document.getElementById("rule-text-container");
       if (!container) return;
@@ -886,7 +881,8 @@
       let textoCompleto = "";
       
       paragrafos.forEach(p => {
-        textoCompleto += p.innerText + " ";
+        // Correção de innerText para textContent para capturar os textos dos acordeons colapsados
+        textoCompleto += p.textContent + " "; 
       });
 
       if (textoCompleto.trim() === "") {
