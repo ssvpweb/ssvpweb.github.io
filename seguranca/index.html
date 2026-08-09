@@ -532,12 +532,12 @@
           O sistema da SSVP utiliza uma via de **criptografia hash de mão única (BCrypt)**. Mesmo que a planilha seja roubada, a senha original não é revelada pois o hash não pode ser descriptografado de volta em texto legível.
         </p>
 
-        <!-- Explicação Didática sobre a Nuvem do Google -->
+        <!-- Explicação Didática sobre a Nuvem do Google Drive Institucional -->
         <div style="background-color: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.15); padding: 14px; border-radius: 10px; margin-top: 15px;">
           <h4 style="font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">🌐 Segurança Baseada no Google Drive</h4>
           <p class="desc-text" style="font-size: 0.95rem; margin-bottom: 0;">
             <strong>Onde os dados ficam guardados no final?</strong><br>
-            A segurança de armazenamento das nossas visitas baseia-se na infraestrutura mundial de segurança do <strong>Google Drive / Google Workspace</strong>. Os relatos são salvos direto no seu Google Sheets e protegidos por sua conta Google pessoal. A chance de um invasor quebrar a segurança da nuvem do Google para acessar sua planilha de visitas é mínima (quase nula). O único risco real é o compartilhamento indevido de links ou o vazamento da sua senha pessoal do Google.
+            A segurança de armazenamento das nossas visitas baseia-se na infraestrutura mundial de segurança do <strong>Google Drive / Google Workspace</strong>. Os relatos são salvos direto no seu Google Sheets e protegidos pela conta Google do <strong>Conselho Central correspondente</strong>. A chance de um invasor quebrar a segurança da nuvem do Google para acessar essa planilha de visitas é mínima (quase nula). O único risco real é o compartilhamento indevido de links ou o vazamento da senha de acesso do Conselho.
           </p>
         </div>
       </div>
@@ -719,7 +719,7 @@
       // Calcula percentual correspondente na escala (máximo maxEscala m/s²)
       const pct = (limitAcc / maxEscala) * 100;
 
-      // Atualiza a posição visual das marcas pontilhadas e as etiquetas
+      // Update position of threshold dashed lines and labels
       const eixos = ["x", "y", "z"];
       eixos.forEach(eixo => {
         const marker = document.getElementById(`marker-acc-${eixo}`);
@@ -784,18 +784,18 @@
       consoleBruto.innerHTML = "Iniciando ataque hacker de força bruta...\nConectando à API de Login...\n";
       consoleBruto.scrollTop = consoleBruto.scrollHeight;
 
-      let tentativas = 0;
+      let tentatives = 0;
       let tempoInicio = Date.now();
       
       const senhasDicionarioFraco = ["123456", "admin", "senha", "deus", "123", "ssvp123"];
 
       intervalAtaque = setInterval(() => {
-        tentativas++;
+        tentatives++;
         let senhaTentada = "";
 
         if (tipoSenha === "fraca") {
-          if (tentativas <= senhasDicionarioFraco.length - 1) {
-            senhaTentada = senhasDicionarioFraco[tentativas - 1];
+          if (tentatives <= senhasDicionarioFraco.length - 1) {
+            senhaTentada = senhasDicionarioFraco[tentatives - 1];
           } else {
             senhaTentada = "123";
           }
@@ -803,9 +803,9 @@
           senhaTentada = gerarSenhaHackerSimulado();
         }
 
-        if (cooldownAtivo && tentativas >= 3) {
+        if (cooldownAtivo && tentatives >= 3) {
           clearInterval(intervalAtaque);
-          consoleBruto.innerHTML += `Tentativa #${tentativas} errada: Senha "${senhaTentada}" inválida.\n`;
+          consoleBruto.innerHTML += `Tentativa #${tentatives} errada: Senha "${senhaTentada}" inválida.\n`;
           consoleBruto.innerHTML += `⚠️ PROTEÇÃO ATIVA: 3 tentativas falhas consecutivas!\n`;
           consoleBruto.innerHTML += `🛑 SISTEMA BLOQUEOU O ENDEREÇO IP DO ATACANTE!\n`;
           consoleBruto.innerHTML += `[Cooldown] Aguarde 10 segundos para tentar novamente...\n`;
@@ -819,7 +819,7 @@
           return;
         }
 
-        consoleBruto.innerHTML += `Tentativa #${tentativas}: Testando senha "${senhaTentada}"...\n`;
+        consoleBruto.innerHTML += `Tentativa #${tentatives}: Testando senha "${senhaTentada}"...\n`;
         consoleBruto.scrollTop = consoleBruto.scrollHeight;
 
         if (tipoSenha === "fraca" && senhaTentada === "123") {
@@ -832,7 +832,7 @@
           btn.disabled = false;
         }
 
-        if (tipoSenha === "forte" && tentativas >= 20) {
+        if (tipoSenha === "forte" && tentatives >= 20) {
           clearInterval(intervalAtaque);
           consoleBruto.innerHTML += `...\n`;
           consoleBruto.innerHTML += `🛑 ATAQUE FALHOU! Tentativas esgotadas no dicionário básico.\n`;
@@ -854,8 +854,8 @@
       return res;
     }
 
-    // --- SIMULADOR DE XSS ---
-    function ejecutarXss(comProtecao) {
+    // --- SIMULADOR DE XSS (Corrigido para executarXss) ---
+    function executarXss(comProtecao) {
       const input = document.getElementById("xss-input").value;
       const output = document.getElementById("xss-output");
 
@@ -869,6 +869,15 @@
           alert("💥 Simulação de Ataque XSS:\nUm invasor conseguiu rodar um comando e ler seus cookies/relatos!");
         }
       }
+    }
+
+    function escapeHtml(text) {
+      return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
 
     // --- ACELERÔMETRO (Puxão de Bicicleta) ---
