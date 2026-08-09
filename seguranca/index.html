@@ -365,7 +365,7 @@
     .threshold-marker {
       position: absolute;
       top: 0;
-      left: 66.6%; /* O JS atualizará essa posição dinamicamente */
+      left: 60%; /* O JS atualizará essa posição dinamicamente */
       width: 2px;
       height: 100%;
       background-color: var(--danger-color);
@@ -377,7 +377,7 @@
     .threshold-marker-label {
       position: absolute;
       top: 1px;
-      left: 68%;
+      left: 62%;
       font-size: 0.68rem;
       color: var(--danger-color);
       font-weight: 700;
@@ -583,25 +583,25 @@
           </label>
         </div>
 
-        <!-- Painel de Calibração de Sensibilidade Refinado (Mínimo, Máximo e Posição do Visor) -->
+        <!-- Painel de Calibração de Sensibilidade (0.5 a 2.0 padrão) -->
         <div style="background-color: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 14px; border-radius: 10px; margin-top: 10px; margin-bottom: 15px;">
           <div style="text-align: center; margin-bottom: 6px;">
             <span style="font-size: 0.85rem; color: var(--text-muted); display: block; text-transform: uppercase;">Sensibilidade do Puxão</span>
-            <span id="txt-sensibilidade" style="font-size: 1.4rem; font-weight: 700; color: var(--primary-color);">10.0 m/s²</span>
+            <span id="txt-sensibilidade" style="font-size: 1.4rem; font-weight: 700; color: var(--primary-color);">1.2 m/s²</span>
           </div>
 
           <div style="display: flex; justify-content: center; margin-bottom: 15px;">
-            <input type="range" id="range-sensibilidade" min="5" id="range-sensibilidade" max="15" value="10" step="0.5" oninput="ajustarSensibilidade(this.value)" style="width: 100%; accent-color: var(--primary-color);">
+            <input type="range" id="range-sensibilidade" min="0.5" max="2" value="1.2" step="0.1" oninput="ajustarSensibilidade(this.value)" style="width: 100%; accent-color: var(--primary-color);">
           </div>
 
           <div style="display: flex; gap: 15px; justify-content: space-between;">
             <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
               <label for="input-sens-min" style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">Mínimo Slider (m/s²)</label>
-              <input type="number" id="input-sens-min" value="5" step="0.5" oninput="atualizarLimitesSensibilidade()" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: #fff; padding: 6px 10px; font-size: 1rem; width: 100%;">
+              <input type="number" id="input-sens-min" value="0.5" step="0.1" oninput="atualizarLimitesSensibilidade()" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: #fff; padding: 6px 10px; font-size: 1rem; width: 100%;">
             </div>
             <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
               <label for="input-sens-max" style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">Máximo Slider/Escala</label>
-              <input type="number" id="input-sens-max" value="15" step="0.5" oninput="atualizarLimitesSensibilidade()" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: #fff; padding: 6px 10px; font-size: 1rem; width: 100%;">
+              <input type="number" id="input-sens-max" value="2" step="0.1" oninput="atualizarLimitesSensibilidade()" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: #fff; padding: 6px 10px; font-size: 1rem; width: 100%;">
             </div>
           </div>
         </div>
@@ -619,7 +619,7 @@
             <div class="progress-track">
               <div class="progress-fill" id="bar-acc-x"></div>
               <div class="threshold-marker" id="marker-acc-x"></div>
-              <span class="threshold-marker-label" id="marker-label-x">LIMITE 10.0 m/s²</span>
+              <span class="threshold-marker-label" id="marker-label-x">LIMITE 1.2 m/s²</span>
             </div>
           </div>
 
@@ -632,7 +632,7 @@
             <div class="progress-track">
               <div class="progress-fill" id="bar-acc-y"></div>
               <div class="threshold-marker" id="marker-acc-y"></div>
-              <span class="threshold-marker-label" id="marker-label-y">LIMITE 10.0 m/s²</span>
+              <span class="threshold-marker-label" id="marker-label-y">LIMITE 1.2 m/s²</span>
             </div>
           </div>
 
@@ -645,7 +645,7 @@
             <div class="progress-track">
               <div class="progress-fill" id="bar-acc-z"></div>
               <div class="threshold-marker" id="marker-acc-z"></div>
-              <span class="threshold-marker-label" id="marker-label-z">LIMITE 10.0 m/s²</span>
+              <span class="threshold-marker-label" id="marker-label-z">LIMITE 1.2 m/s²</span>
             </div>
           </div>
         </div>
@@ -672,9 +672,9 @@
   </div>
 
   <script>
-    // Configurações de Escala de Acelerômetro Dinâmicos
-    let maxEscala = 15.0; // Limite máximo da barra de escala
-    let limitAcc = 10.0;  // Valor de corte do puxão
+    // Configurações de Escala de Acelerômetro Dinâmicos (Default: 0.5 a 2.0)
+    let maxEscala = 2.0;  // Limite máximo da barra de escala
+    let limitAcc = 1.2;   // Valor de corte do puxão inicial
     let sensorAtivo = false;
 
     // Gerenciador de Acordeon dos Cards Grandes
@@ -978,13 +978,14 @@
         let zVal = 0;
 
         if (tempo < 400) {
-          xVal = Math.random() * 2;
-          yVal = Math.random() * 2;
-          zVal = Math.random() * 2;
+          xVal = Math.random() * (maxEscala / 10);
+          yVal = Math.random() * (maxEscala / 10);
+          zVal = Math.random() * (maxEscala / 10);
         } else if (tempo < 600) {
-          xVal = (limitAcc + 1.5) + Math.random() * 2;
-          yVal = (limitAcc + 2.0) + Math.random() * 2;
-          zVal = (limitAcc + 1.2) + Math.random() * 2;
+          // Garante que estoure a escala simulada
+          xVal = (limitAcc + 0.2) + Math.random() * 0.2;
+          yVal = (limitAcc + 0.3) + Math.random() * 0.2;
+          zVal = (limitAcc + 0.1) + Math.random() * 0.2;
         }
 
         atualizarInterfaceAcelerometro(xVal, yVal, zVal);
