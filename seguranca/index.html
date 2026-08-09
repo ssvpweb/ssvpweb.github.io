@@ -246,6 +246,7 @@
       border: 1px solid rgba(255, 255, 255, 0.04);
       margin-top: 10px;
       margin-bottom: 10px;
+      gap: 10px;
     }
 
     .toggle-label {
@@ -345,7 +346,7 @@
     }
 
     .progress-track {
-      height: 24px;
+      height: 26px;
       background-color: rgba(255, 255, 255, 0.04);
       border-radius: 6px;
       position: relative;
@@ -357,29 +358,31 @@
       height: 100%;
       width: 0%;
       background-color: var(--success-color);
-      transition: width 0.1s ease-out, background-color 0.2s;
+      transition: width 0.08s ease-out, background-color 0.2s;
     }
 
-    /* Linha pontilhada vermelha que marca o Limite de Corte (18 m/s²) */
+    /* Linha pontilhada vermelha que marca o Limite de Corte (Threshold) */
     .threshold-marker {
       position: absolute;
       top: 0;
-      left: 72%; /* 18 m/s² de um máximo de 25 m/s² é exatamente 72% */
+      left: 66.6%; /* Limite padrão 10.0 de um máximo de 15.0 m/s² é exatamente 66.6% */
       width: 2px;
       height: 100%;
       background-color: var(--danger-color);
       border-left: 2px dashed var(--danger-color);
       z-index: 10;
+      transition: left 0.2s ease;
     }
 
     .threshold-marker-label {
       position: absolute;
-      top: -1px;
-      left: 73%;
+      top: 1px;
+      left: 68%;
       font-size: 0.68rem;
       color: var(--danger-color);
       font-weight: 700;
       z-index: 10;
+      transition: left 0.2s ease;
     }
 
     /* Overlay de Bloqueio em Vermelho ao simular roubo */
@@ -551,7 +554,7 @@
         </div>
 
         <p style="font-size: 0.95rem; font-weight: 600; color: var(--text-muted); margin-top: 15px;">Visualização no Relato da Visita:</p>
-        <div id="xss-output" style="background-color: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); padding: 12px; border-radius: 8px; font-size: 1.05rem; min-height: 48px;">
+        <div id="xss-output" style="background-color: rgba(0,0,0,0.3); border: 1px solid rgba(255, 255, 255, 0.08); padding: 12px; border-radius: 8px; font-size: 1.05rem; min-height: 48px;">
           (Aguardando teste...)
         </div>
 
@@ -569,7 +572,7 @@
       </div>
       <div class="card-content" id="content-accelerometer">
         <p class="desc-text">
-          Se o celular for arrancado da mão do vicentino em um puxão rápido (comum em assaltos de bicicleta), o acelerômetro detectará a força G incomum e fará o **logout imediato de segurança**.
+          Se o celular for arrancado da mão do vicentino em um puxão rápido (comum em assaltos de bicicleta), o acelerômetro detectará a força G de pico e fará o **logout imediato de segurança**.
         </p>
 
         <div class="toggle-row">
@@ -578,6 +581,15 @@
             <input type="checkbox" id="chk-sensor" onchange="toggleSensorFisico(this)">
             <span class="slider"></span>
           </label>
+        </div>
+
+        <!-- Ajuste de Sensibilidade (Calibração) -->
+        <div class="toggle-row">
+          <span class="toggle-label">Sensibilidade do Puxão:</span>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <input type="range" id="range-sensibilidade" min="5" max="18" value="10" step="1" oninput="ajustarSensibilidade(this.value)" style="width: 130px; accent-color: var(--primary-color);">
+            <span id="txt-sensibilidade" style="font-weight: 700; color: var(--primary-color); min-width: 65px; text-align: right;">10.0 m/s²</span>
+          </div>
         </div>
 
         <!-- Painel Visual do Acelerômetro -->
@@ -592,8 +604,8 @@
             </div>
             <div class="progress-track">
               <div class="progress-fill" id="bar-acc-x"></div>
-              <div class="threshold-marker"></div>
-              <span class="threshold-marker-label">LIMITE 18 m/s²</span>
+              <div class="threshold-marker" id="marker-acc-x"></div>
+              <span class="threshold-marker-label" id="marker-label-x">LIMITE 10 m/s²</span>
             </div>
           </div>
 
@@ -605,8 +617,8 @@
             </div>
             <div class="progress-track">
               <div class="progress-fill" id="bar-acc-y"></div>
-              <div class="threshold-marker"></div>
-              <span class="threshold-marker-label">LIMITE 18 m/s²</span>
+              <div class="threshold-marker" id="marker-acc-y"></div>
+              <span class="threshold-marker-label" id="marker-label-y">LIMITE 10 m/s²</span>
             </div>
           </div>
 
@@ -618,8 +630,8 @@
             </div>
             <div class="progress-track">
               <div class="progress-fill" id="bar-acc-z"></div>
-              <div class="threshold-marker"></div>
-              <span class="threshold-marker-label">LIMITE 18 m/s²</span>
+              <div class="threshold-marker" id="marker-acc-z"></div>
+              <span class="threshold-marker-label" id="marker-label-z">LIMITE 10 m/s²</span>
             </div>
           </div>
         </div>
@@ -629,7 +641,7 @@
         </div>
 
         <p class="desc-text" style="font-size: 0.88rem; font-style: italic; color: var(--warning-color); margin-top: 10px;">
-          👉 <strong>Faça o teste:</strong> Ative o sensor acima e dê uma sacudida rápida e forte com o seu celular na mão. Você verá as barras explodirem na zona vermelha e o bloqueio de segurança travar a tela!
+          👉 <strong>Faça o teste no celular:</strong> Ligue o "Sensor Físico" acima, ajuste o controle de sensibilidade e dê uma sacudida rápida e forte com o aparelho. O sistema travará imediatamente!
         </p>
       </div>
     </div>
@@ -646,6 +658,11 @@
   </div>
 
   <script>
+    // Configurações de Escala de Acelerômetro Otimizados
+    const MAX_ESCALA = 15.0; // Máximo m/s² exibido nas barras (torna as barras muito mais dinâmicas)
+    let limitAcc = 10.0;    // Limite padrão de corte para puxão (sensível e fácil de testar)
+    let sensorAtivo = false;
+
     // Gerenciador de Acordeon dos Cards Grandes
     function toggleCard(cardId) {
       const card = document.getElementById(`card-${cardId}`);
@@ -654,7 +671,6 @@
 
       const isExpanded = card.classList.contains('active');
 
-      // Fecha todos os outros cards
       const allCards = document.querySelectorAll('.card');
       allCards.forEach((c) => {
         c.classList.remove('active');
@@ -665,11 +681,32 @@
       if (!isExpanded) {
         card.classList.add('active');
         if (cardId === 'brute-force') {
-          content.style.maxHeight = 'none'; // console dinâmico
+          content.style.maxHeight = 'none';
         } else {
           content.style.maxHeight = content.scrollHeight + 40 + 'px';
         }
       }
+    }
+
+    // Ajusta o limite de sensibilidade e move as marcações na tela
+    function ajustarSensibilidade(valor) {
+      limitAcc = parseFloat(valor);
+      document.getElementById("txt-sensibilidade").innerText = limitAcc.toFixed(1) + " m/s²";
+
+      // Calcula percentual correspondente na escala (máximo 15.0 m/s²)
+      const pct = (limitAcc / MAX_ESCALA) * 100;
+
+      // Atualiza a posição visual das marcas pontilhadas e as etiquetas
+      const eixos = ["x", "y", "z"];
+      eixos.forEach(eixo => {
+        const marker = document.getElementById(`marker-acc-${eixo}`);
+        const label = document.getElementById(`marker-label-${eixo}`);
+        if (marker && label) {
+          marker.style.left = pct + "%";
+          label.style.left = (pct + 1.5) + "%";
+          label.innerText = `LIMITE ${limitAcc.toFixed(1)} m/s²`;
+        }
+      });
     }
 
     // --- SIMULADOR DE FORÇA BRUTA ---
@@ -682,7 +719,6 @@
 
       if (!consoleBruto || !btn) return;
 
-      // Limpar execuções antigas
       if (intervalAtaque) {
         clearInterval(intervalAtaque);
         intervalAtaque = null;
@@ -696,25 +732,21 @@
       let tempoInicio = Date.now();
       
       const senhasDicionarioFraco = ["123456", "admin", "senha", "deus", "123", "ssvp123"];
-      const senhaForte = "J_2*xV7&9k#mLq";
 
       intervalAtaque = setInterval(() => {
         tentativas++;
         let senhaTentada = "";
 
         if (tipoSenha === "fraca") {
-          // Pega aleatório ou quebra de imediato no dicionário
           if (tentativas <= senhasDicionarioFraco.length - 1) {
             senhaTentada = senhasDicionarioFraco[tentativas - 1];
           } else {
-            senhaTentada = "123"; // A senha certa
+            senhaTentada = "123";
           }
         } else {
-          // Senha Forte
           senhaTentada = gerarSenhaHackerSimulado();
         }
 
-        // Se a proteção de Cooldown estiver ativa, simular o bloqueio após 3 tentativas
         if (cooldownAtivo && tentativas >= 3) {
           clearInterval(intervalAtaque);
           consoleBruto.innerHTML += `Tentativa #${tentativas} errada: Senha "${senhaTentada}" inválida.\n`;
@@ -734,7 +766,6 @@
         consoleBruto.innerHTML += `Tentativa #${tentativas}: Testando senha "${senhaTentada}"...\n`;
         consoleBruto.scrollTop = consoleBruto.scrollHeight;
 
-        // Condição de sucesso
         if (tipoSenha === "fraca" && senhaTentada === "123") {
           clearInterval(intervalAtaque);
           let tempoGasto = ((Date.now() - tempoInicio) / 1000).toFixed(2);
@@ -745,7 +776,6 @@
           btn.disabled = false;
         }
 
-        // Limita o console simulado da senha forte a 20 tentativas para não travar o navegador
         if (tipoSenha === "forte" && tentativas >= 20) {
           clearInterval(intervalAtaque);
           consoleBruto.innerHTML += `...\n`;
@@ -769,40 +799,23 @@
     }
 
     // --- SIMULADOR DE XSS ---
-    function executarXss(comProtecao) {
+    function ejecutarXss(comProtecao) {
       const input = document.getElementById("xss-input").value;
       const output = document.getElementById("xss-output");
 
       if (!output) return;
 
       if (comProtecao) {
-        // Modo Protegido: Sanitiza transformando os caracteres especiais de HTML em entidades seguras
-        const textoSeguro = escapeHtml(input);
-        output.innerHTML = textoSeguro;
+        output.innerHTML = escapeHtml(input);
       } else {
-        // Modo Inseguro: Injeta direto no DOM
         output.innerHTML = input;
-
-        // Se o script não for executado direto por innerHTML (bloqueio do próprio navegador), simulamos um pop-up fictício
         if (input.includes("<script>")) {
           alert("💥 Simulação de Ataque XSS:\nUm invasor conseguiu rodar um comando e ler seus cookies/relatos!");
         }
       }
     }
 
-    function escapeHtml(text) {
-      return text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
-
     // --- ACELERÔMETRO (Puxão de Bicicleta) ---
-    let sensorAtivo = false;
-    const LIMIT_ACC = 18.0; // O nível de corte m/s² para detecção
-
     function toggleSensorFisico(checkbox) {
       if (checkbox.checked) {
         ativarSensorAcelerometro();
@@ -812,7 +825,6 @@
     }
 
     function ativarSensorAcelerometro() {
-      // Solicita permissão para iOS 13+ se aplicável
       if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
         DeviceMotionEvent.requestPermission()
           .then(permissionState => {
@@ -830,7 +842,6 @@
             document.getElementById("chk-sensor").checked = false;
           });
       } else {
-        // Android ou browsers sem restrição de clique
         window.addEventListener('devicemotion', handleMotion, true);
         sensorAtivo = true;
       }
@@ -845,57 +856,59 @@
     function handleMotion(event) {
       if (!sensorAtivo) return;
 
-      // Obtém aceleração descontando a gravidade para capturar apenas puxões físicos
-      let acc = event.acceleration || event.accelerationIncludingGravity;
+      // Tenta usar aceleração pura (sem gravidade). Se não disponível, usa aceleração com gravidade
+      let acc = event.acceleration;
+      let usarGravidade = false;
+      
+      if (!acc || (acc.x === null && acc.y === null && acc.z === null)) {
+        acc = event.accelerationIncludingGravity;
+        usarGravidade = true;
+      }
+
       if (!acc) return;
 
       let x = Math.abs(acc.x || 0);
       let y = Math.abs(acc.y || 0);
       let z = Math.abs(acc.z || 0);
 
-      // Desconta a gravidade terrestre se accelerationIncludingGravity for usado
-      if (event.accelerationIncludingGravity) {
+      // Desconta a gravidade se formos obrigados a usar a aceleração com gravidade inclusa
+      if (usarGravidade) {
         y = Math.max(0, y - 9.8);
       }
 
       atualizarInterfaceAcelerometro(x, y, z);
 
-      // Gatilho de Puxão Detectado
-      if (x > LIMIT_ACC || y > LIMIT_ACC || z > LIMIT_ACC) {
+      // Gatilho de Puxão Detectado (Cruza o limite configurado)
+      if (x > limitAcc || y > limitAcc || z > limitAcc) {
         acionarBloqueioDeSeguranca();
       }
     }
 
     function atualizarInterfaceAcelerometro(x, y, z) {
-      // Exibe os textos decimais
       document.getElementById("txt-acc-x").innerText = x.toFixed(1) + " m/s²";
       document.getElementById("txt-acc-y").innerText = y.toFixed(1) + " m/s²";
       document.getElementById("txt-acc-z").innerText = z.toFixed(1) + " m/s²";
 
-      // Atualiza a largura das barras de progresso (Escala: máximo 25 m/s² = 100%)
-      const maxEscala = 25.0;
-      document.getElementById("bar-acc-x").style.width = Math.min((x / maxEscala) * 100, 100) + "%";
-      document.getElementById("bar-acc-y").style.width = Math.min((y / maxEscala) * 100, 100) + "%";
-      document.getElementById("bar-acc-z").style.width = Math.min((z / maxEscala) * 100, 100) + "%";
+      // Atualiza preenchimento baseado na escala máxima otimizada de 15.0 m/s²
+      document.getElementById("bar-acc-x").style.width = Math.min((x / MAX_ESCALA) * 100, 100) + "%";
+      document.getElementById("bar-acc-y").style.width = Math.min((y / MAX_ESCALA) * 100, 100) + "%";
+      document.getElementById("bar-acc-z").style.width = Math.min((z / MAX_ESCALA) * 100, 100) + "%";
 
-      // Altera a cor das barras se cruzarem o limite pontilhado (72% de largura)
-      document.getElementById("bar-acc-x").style.backgroundColor = (x > LIMIT_ACC) ? "var(--danger-color)" : "var(--success-color)";
-      document.getElementById("bar-acc-y").style.backgroundColor = (y > LIMIT_ACC) ? "var(--danger-color)" : "var(--success-color)";
-      document.getElementById("bar-acc-z").style.backgroundColor = (z > LIMIT_ACC) ? "var(--danger-color)" : "var(--success-color)";
+      // Altera cor se cruzar o limite configurado
+      document.getElementById("bar-acc-x").style.backgroundColor = (x > limitAcc) ? "var(--danger-color)" : "var(--success-color)";
+      document.getElementById("bar-acc-y").style.backgroundColor = (y > limitAcc) ? "var(--danger-color)" : "var(--success-color)";
+      document.getElementById("bar-acc-z").style.backgroundColor = (z > limitAcc) ? "var(--danger-color)" : "var(--success-color)";
     }
 
     function resetBarrasAcelerometro() {
       atualizarInterfaceAcelerometro(0, 0, 0);
     }
 
-    // Gatilho de Logout e Bloqueio
     function acionarBloqueioDeSeguranca() {
-      // Exibe a tela vermelha de bloqueio
       document.getElementById("robbery-screen").style.display = "flex";
       desativarSensorAcelerometro();
       document.getElementById("chk-sensor").checked = false;
 
-      // Executa som ou bip nativo
       if (window.speechSynthesis) {
         window.speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance("Alerta de segurança. Celular desconectado.");
@@ -909,9 +922,8 @@
       resetBarrasAcelerometro();
     }
 
-    // Simulação do Acelerômetro no Desktop (Para quem não está no celular)
+    // Simulação do Acelerômetro no Desktop
     function simularPuxaoBicicleta() {
-      // Interrompe sensor se ativo
       desativarSensorAcelerometro();
       document.getElementById("chk-sensor").checked = false;
 
@@ -924,15 +936,14 @@
         let zVal = 0;
 
         if (tempo < 400) {
-          // Fase 1: Pequena oscilação de mão normal
           xVal = Math.random() * 2;
           yVal = Math.random() * 2;
           zVal = Math.random() * 2;
         } else if (tempo < 600) {
-          // Fase 2: O Puxão violento (Pico enorme nos sensores)
-          xVal = 19.5 + Math.random() * 3;
-          yVal = 21.0 + Math.random() * 3;
-          zVal = 18.2 + Math.random() * 3;
+          // Fase 2: O Puxão violento (Gera aceleração suficiente para estourar o limite)
+          xVal = (limitAcc + 1.5) + Math.random() * 2;
+          yVal = (limitAcc + 2.0) + Math.random() * 2;
+          zVal = (limitAcc + 1.2) + Math.random() * 2;
         }
 
         atualizarInterfaceAcelerometro(xVal, yVal, zVal);
@@ -943,6 +954,9 @@
         }
       }, 50);
     }
+
+    // Inicializa a calibração de limite na tela
+    ajustarSensibilidade(10);
   </script>
 
 </body>
