@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Segurança de Dados: Simulador Interativo - SSVP</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-color: #0b0f19;
+      --card-bg: #151c2c;
+      --primary-color: #3b82f6;
+      --primary-hover: #2563eb;
+      --success-color: #10b981;
+      --warning-color: #f59e0b;
+      --danger-color: #ef4444;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --font-family: 'Montserrat', Arial, sans-serif;
+      --font-mono: 'Share Tech Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      font-family: var(--font-family);
+      font-size: 1.15rem; /* Acessibilidade 50+ */
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1.5rem 1rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* Cabeçalho */
+    header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: white;
+      padding: 1.75rem 1.5rem;
+      border-radius: 1rem;
+      text-align: center;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    header h1 {
+      font-size: 1.55rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    header p {
+      font-size: 1rem;
+      opacity: 0.85;
+      line-height: 1.45;
+    }
+
+    /* Cards Estilo Acordeon */
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .card:hover {
+      border-color: var(--primary-color);
+    }
+
+    .card-header {
+      padding: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+      background-color: rgba(255, 255, 255, 0.01);
+      transition: background-color 0.2s ease;
+    }
+
+    .card-header:hover {
+      background-color: rgba(255, 255, 255, 0.03);
+    }
+
+    .card-header h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .card-chevron {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .card.active {
+      border-color: var(--primary-color);
+    }
+
+    .card.active .card-chevron {
+      transform: rotate(180deg);
+      color: var(--primary-color);
+    }
+
+    .card-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      background-color: rgba(0, 0, 0, 0.15);
+      padding: 0 1.5rem;
+    }
+
+    .card.active .card-content {
+      padding: 0 1.5rem 1.5rem 1.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .desc-text {
+      font-size: 1.12rem;
+      line-height: 1.55;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+
+    .desc-text strong {
+      color: #fff;
+    }
+
+    /* --- Simulador de Console Hacker --- */
+    .hacker-console {
+      background-color: #05070b;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 12px;
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      color: #10b981;
+      height: 150px;
+      overflow-y: auto;
+      margin-top: 10px;
+      margin-bottom: 12px;
+      border-left: 4px solid var(--primary-color);
+    }
+
+    /* Tabelas Virtuais de Planilha */
+    .spreadsheet-view {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      margin-bottom: 15px;
+      font-size: 0.95rem;
+    }
+
+    .spreadsheet-view th, .spreadsheet-view td {
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 8px 10px;
+      text-align: left;
+    }
+
+    .spreadsheet-view th {
+      background-color: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .spreadsheet-view td {
+      background-color: rgba(0, 0, 0, 0.2);
+    }
+
+    /* Controles e Botões */
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      background-color: var(--primary-color);
+      border: none;
+      color: white;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background-color 0.2s;
+    }
+
+    .btn:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .btn.danger {
+      background-color: var(--danger-color);
+    }
+
+    .btn.danger:hover {
+      background-color: #dc2626;
+    }
+
+    .btn.secondary {
+      background-color: #374151;
+    }
+
+    .btn.secondary:hover {
+      background-color: #4b5563;
+    }
+
+    /* Switch de Configurações */
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: rgba(255, 255, 255, 0.02);
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+
+    .toggle-label {
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+
+    /* Custom Switch */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 48px;
+      height: 24px;
+    }
+
+    .switch input { 
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #374151;
+      transition: .3s;
+      border-radius: 24px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: var(--success-color);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(24px);
+    }
+
+    /* Inputs de Teste */
+    .text-input {
+      width: 100%;
+      background-color: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: white;
+      padding: 10px 14px;
+      font-size: 1.05rem;
+      font-family: var(--font-family);
+      outline: none;
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+
+    .text-input:focus {
+      border-color: var(--primary-color);
+    }
+
+    /* --- Visualizador do Acelerômetro --- */
+    .sensor-panel {
+      background-color: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 15px;
+      margin-bottom: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .axis-container {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .axis-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .progress-track {
+      height: 24px;
+      background-color: rgba(255, 255, 255, 0.04);
+      border-radius: 6px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background-color: var(--success-color);
+      transition: width 0.1s ease-out, background-color 0.2s;
+    }
+
+    /* Linha pontilhada vermelha que marca o Limite de Corte (18 m/s²) */
+    .threshold-marker {
+      position: absolute;
+      top: 0;
+      left: 72%; /* 18 m/s² de um máximo de 25 m/s² é exatamente 72% */
+      width: 2px;
+      height: 100%;
+      background-color: var(--danger-color);
+      border-left: 2px dashed var(--danger-color);
+      z-index: 10;
+    }
+
+    .threshold-marker-label {
+      position: absolute;
+      top: -1px;
+      left: 73%;
+      font-size: 0.68rem;
+      color: var(--danger-color);
+      font-weight: 700;
+      z-index: 10;
+    }
+
+    /* Overlay de Bloqueio em Vermelho ao simular roubo */
+    .robbery-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(239, 68, 68, 0.95);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+      color: white;
+      animation: flash-red 0.5s ease;
+    }
+
+    .robbery-content h2 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 15px;
+    }
+
+    .robbery-content p {
+      font-size: 1.25rem;
+      margin-bottom: 25px;
+    }
+
+    @keyframes flash-red {
+      0% { background-color: rgba(0,0,0,0.8); }
+      100% { background-color: rgba(239, 68, 68, 0.95); }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.02); opacity: 1; }
+      100% { transform: scale(1); opacity: 0.8; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>Evidência de Segurança - SSVP</h1>
+      <p>Simuladores interativos que mostram aos vicentinos na prática como os dados e as sessões de visitas são fortemente blindados contra criminosos.</p>
+    </header>
+
+    <!-- CARD 1: FORÇA BRUTA (Login) -->
+    <div class="card active" id="card-brute-force">
+      <div class="card-header" onclick="toggleCard('brute-force')">
+        <h2>1. Simulador de Força Bruta (Login)</h2>
+        <span class="card-chevron" id="chevron-brute-force">▼</span>
+      </div>
+      <div class="card-content" id="content-brute-force" style="max-height: none;">
+        <p class="desc-text">
+          O ataque de <strong>Força Bruta</strong> ocorre quando um invasor usa um robô para testar milhares de senhas por segundo na tentativa de adivinhar o acesso.
+        </p>
+
+        <div class="toggle-row">
+          <span class="toggle-label">Senha para Testar:</span>
+          <select id="senha-seletor" class="text-input" style="width: auto; margin: 0; padding: 6px 12px;">
+            <option value="fraca">Senha Fraca ("123")</option>
+            <option value="forte">Senha Forte ("J_2*xV7&9k#mLq")</option>
+          </select>
+        </div>
+
+        <div class="toggle-row">
+          <span class="toggle-label">Ativar Proteção (Cooldown):</span>
+          <label class="switch">
+            <input type="checkbox" id="chk-cooldown">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="button-group">
+          <button id="btn-ataque-bruto" class="btn" onclick="iniciarAtaqueBruto()">Iniciar Simulação de Ataque</button>
+        </div>
+
+        <div class="hacker-console" id="console-bruto">
+          [Console aguardando simulação...]
+        </div>
+
+        <p class="desc-text" style="font-size: 0.88rem; font-style: italic; margin-top: 10px; color: var(--warning-color);">
+          👉 <strong>O que observar:</strong> A senha fraca é quebrada instantaneamente. A senha forte é impossível de decifrar. E com o Cooldown ativo, o robô do invasor é bloqueado após 3 tentativas inválidas, parando o ataque!
+        </p>
+      </div>
+    </div>
+
+    <!-- CARD 2: SENHAS CRIPTOGRAFADAS (Hash) -->
+    <div class="card" id="card-hash-passwords">
+      <div class="card-header" onclick="toggleCard('hash-passwords')">
+        <h2>2. Senhas na Planilha: Texto Puro vs. Hash</h2>
+        <span class="card-chevron" id="chevron-hash-passwords">▼</span>
+      </div>
+      <div class="card-content" id="content-hash-passwords">
+        <p class="desc-text">
+          Se um invasor mal-intencionado conseguir ler a planilha do Google Sheets, como as senhas estarão armazenadas?
+        </p>
+
+        <!-- PLANILHA A: TEXTO PURO (ERRADO) -->
+        <h3 style="font-size: 1rem; color: var(--danger-color); margin-top: 15px;">❌ Armazenamento Inseguro (Texto Puro)</h3>
+        <table class="spreadsheet-view">
+          <thead>
+            <tr>
+              <th>Vicentino</th>
+              <th>Senha na Planilha</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>José Silva</td>
+              <td style="color: var(--danger-color); font-weight: bold;">minhasenha123</td>
+            </tr>
+            <tr>
+              <td>Maria Oliveira</td>
+              <td style="color: var(--danger-color); font-weight: bold;">vicentino50</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- PLANILHA B: CRIPTOGRAFIA HASH (CORRETO) -->
+        <h3 style="font-size: 1rem; color: var(--success-color); margin-top: 15px;">✔ Armazenamento Seguro (Criptografia Hash)</h3>
+        <table class="spreadsheet-view">
+          <thead>
+            <tr>
+              <th>Vicentino</th>
+              <th>Senha na Planilha</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>José Silva</td>
+              <td style="color: var(--success-color); font-family: var(--font-mono); font-size: 0.78rem; word-break: break-all;">$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3ZJkGg</td>
+            </tr>
+            <tr>
+              <td>Maria Oliveira</td>
+              <td style="color: var(--success-color); font-family: var(--font-mono); font-size: 0.78rem; word-break: break-all;">$2y$10$h8x79J8XwQn0kLmPqRsTvU.Wi9bZcX12Ko</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p class="desc-text">
+          O sistema da SSVP utiliza uma via de **criptografia hash de mão única (BCrypt)**. Mesmo que a planilha seja roubada, a senha original não é revelada pois o hash não pode ser descriptografado de volta em texto legível.
+        </p>
+      </div>
+    </div>
+
+    <!-- CARD 3: INJEÇÃO DE CÓDIGO (XSS) -->
+    <div class="card" id="card-xss-attack">
+      <div class="card-header" onclick="toggleCard('xss-attack')">
+        <h2>3. Injeção de Código nos Relatos (XSS)</h2>
+        <span class="card-chevron" id="chevron-xss-attack">▼</span>
+      </div>
+      <div class="card-content" id="content-xss-attack">
+        <p class="desc-text">
+          O que acontece se alguém preencher um relato contendo um código de programação malicioso com a intenção de roubar o aplicativo do vicentino?
+        </p>
+
+        <p style="font-size: 0.95rem; font-weight: 600; color: var(--text-muted);">Simulação de Código Invasor no Relato:</p>
+        <textarea id="xss-input" class="text-input" style="height: 60px; font-family: var(--font-mono); font-size: 0.88rem; margin-top: 5px;">&lt;script&gt;alert("Celular Hackeado!")&lt;/script&gt;</textarea>
+
+        <div class="button-group">
+          <button class="btn danger" onclick="executarXss(false)">Testar Sem Proteção</button>
+          <button class="btn" onclick="executarXss(true)">Testar Com Proteção</button>
+        </div>
+
+        <p style="font-size: 0.95rem; font-weight: 600; color: var(--text-muted); margin-top: 15px;">Visualização no Relato da Visita:</p>
+        <div id="xss-output" style="background-color: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); padding: 12px; border-radius: 8px; font-size: 1.05rem; min-height: 48px;">
+          (Aguardando teste...)
+        </div>
+
+        <p class="desc-text" style="font-size: 0.88rem; margin-top: 12px; color: var(--text-muted);">
+          A **Sanitização de HTML** neutraliza e isola o texto. O navegador lê a entrada como texto corrido e inofensivo, impedindo a injeção do script.
+        </p>
+      </div>
+    </div>
+
+    <!-- CARD 4: ACELERÔMETRO (Puxão de Bicicleta) -->
+    <div class="card" id="card-accelerometer">
+      <div class="card-header" onclick="toggleCard('accelerometer')">
+        <h2>4. Sensor de Roubo por Acelerômetro</h2>
+        <span class="card-chevron" id="chevron-accelerometer">▼</span>
+      </div>
+      <div class="card-content" id="content-accelerometer">
+        <p class="desc-text">
+          Se o celular for arrancado da mão do vicentino em um puxão rápido (comum em assaltos de bicicleta), o acelerômetro detectará a força G incomum e fará o **logout imediato de segurança**.
+        </p>
+
+        <div class="toggle-row">
+          <span class="toggle-label">Ativar Sensor Físico (Celular):</span>
+          <label class="switch">
+            <input type="checkbox" id="chk-sensor" onchange="toggleSensorFisico(this)">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <!-- Painel Visual do Acelerômetro -->
+        <div class="sensor-panel">
+          <p style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: -5px;">Leitura da Aceleração (Força G)</p>
+          
+          <!-- EIXO X -->
+          <div class="axis-container">
+            <div class="axis-info">
+              <span>Eixo Lateral [X] (Esquerda/Direita)</span>
+              <span id="txt-acc-x">0.0 m/s²</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" id="bar-acc-x"></div>
+              <div class="threshold-marker"></div>
+              <span class="threshold-marker-label">LIMITE 18 m/s²</span>
+            </div>
+          </div>
+
+          <!-- EIXO Y -->
+          <div class="axis-container">
+            <div class="axis-info">
+              <span>Eixo Vertical [Y] (Cima/Baixo)</span>
+              <span id="txt-acc-y">0.0 m/s²</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" id="bar-acc-y"></div>
+              <div class="threshold-marker"></div>
+              <span class="threshold-marker-label">LIMITE 18 m/s²</span>
+            </div>
+          </div>
+
+          <!-- EIXO Z -->
+          <div class="axis-container">
+            <div class="axis-info">
+              <span>Eixo Profundidade [Z] (Frente/Trás)</span>
+              <span id="txt-acc-z">0.0 m/s²</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" id="bar-acc-z"></div>
+              <div class="threshold-marker"></div>
+              <span class="threshold-marker-label">LIMITE 18 m/s²</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="button-group">
+          <button class="btn danger" onclick="simularPuxaoBicicleta()">Simular Puxão de Bicicleta (PC/Teste)</button>
+        </div>
+
+        <p class="desc-text" style="font-size: 0.88rem; font-style: italic; color: var(--warning-color); margin-top: 10px;">
+          👉 <strong>Faça o teste:</strong> Ative o sensor acima e dê uma sacudida rápida e forte com o seu celular na mão. Você verá as barras explodirem na zona vermelha e o bloqueio de segurança travar a tela!
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overlay de Bloqueio em Vermelho do Roubo por Acelerômetro -->
+  <div class="robbery-overlay" id="robbery-screen">
+    <div class="robbery-content">
+      <span style="font-size: 5rem; display: block; margin-bottom: 10px; animation: pulse 1s infinite;">🚨</span>
+      <h2>Ataque Físico Detectado!</h2>
+      <p>O sensor de movimento detectou um puxão ou queda brusca do aparelho. Por motivos de segurança, os dados locais foram trancados e a sessão foi desconectada.</p>
+      <button class="btn secondary" onclick="desbloquearRobberyScreen()">Desbloquear e Voltar</button>
+    </div>
+  </div>
+
+  <script>
+    // Gerenciador de Acordeon dos Cards Grandes
+    function toggleCard(cardId) {
+      const card = document.getElementById(`card-${cardId}`);
+      const content = document.getElementById(`content-${cardId}`);
+      if (!card || !content) return;
+
+      const isExpanded = card.classList.contains('active');
+
+      // Fecha todos os outros cards
+      const allCards = document.querySelectorAll('.card');
+      allCards.forEach((c) => {
+        c.classList.remove('active');
+        const cc = c.querySelector('.card-content');
+        if (cc) cc.style.maxHeight = '0px';
+      });
+
+      if (!isExpanded) {
+        card.classList.add('active');
+        if (cardId === 'brute-force') {
+          content.style.maxHeight = 'none'; // console dinâmico
+        } else {
+          content.style.maxHeight = content.scrollHeight + 40 + 'px';
+        }
+      }
+    }
+
+    // --- SIMULADOR DE FORÇA BRUTA ---
+    let intervalAtaque = null;
+    function iniciarAtaqueBruto() {
+      const consoleBruto = document.getElementById("console-bruto");
+      const btn = document.getElementById("btn-ataque-bruto");
+      const tipoSenha = document.getElementById("senha-seletor").value;
+      const cooldownAtivo = document.getElementById("chk-cooldown").checked;
+
+      if (!consoleBruto || !btn) return;
+
+      // Limpar execuções antigas
+      if (intervalAtaque) {
+        clearInterval(intervalAtaque);
+        intervalAtaque = null;
+      }
+
+      btn.disabled = true;
+      consoleBruto.innerHTML = "Iniciando ataque hacker de força bruta...\nConectando à API de Login...\n";
+      consoleBruto.scrollTop = consoleBruto.scrollHeight;
+
+      let tentativas = 0;
+      let tempoInicio = Date.now();
+      
+      const senhasDicionarioFraco = ["123456", "admin", "senha", "deus", "123", "ssvp123"];
+      const senhaForte = "J_2*xV7&9k#mLq";
+
+      intervalAtaque = setInterval(() => {
+        tentativas++;
+        let senhaTentada = "";
+
+        if (tipoSenha === "fraca") {
+          // Pega aleatório ou quebra de imediato no dicionário
+          if (tentativas <= senhasDicionarioFraco.length - 1) {
+            senhaTentada = senhasDicionarioFraco[tentativas - 1];
+          } else {
+            senhaTentada = "123"; // A senha certa
+          }
+        } else {
+          // Senha Forte
+          senhaTentada = gerarSenhaHackerSimulado();
+        }
+
+        // Se a proteção de Cooldown estiver ativa, simular o bloqueio após 3 tentativas
+        if (cooldownAtivo && tentativas >= 3) {
+          clearInterval(intervalAtaque);
+          consoleBruto.innerHTML += `Tentativa #${tentativas} errada: Senha "${senhaTentada}" inválida.\n`;
+          consoleBruto.innerHTML += `⚠️ PROTEÇÃO ATIVA: 3 tentativas falhas consecutivas!\n`;
+          consoleBruto.innerHTML += `🛑 SISTEMA BLOQUEOU O ENDEREÇO IP DO ATACANTE!\n`;
+          consoleBruto.innerHTML += `[Cooldown] Aguarde 10 segundos para tentar novamente...\n`;
+          consoleBruto.scrollTop = consoleBruto.scrollHeight;
+          
+          setTimeout(() => {
+            btn.disabled = false;
+            consoleBruto.innerHTML += `[Sistema] IP desbloqueado. O invasor pode tentar novamente.\n`;
+            consoleBruto.scrollTop = consoleBruto.scrollHeight;
+          }, 10000);
+          return;
+        }
+
+        consoleBruto.innerHTML += `Tentativa #${tentativas}: Testando senha "${senhaTentada}"...\n`;
+        consoleBruto.scrollTop = consoleBruto.scrollHeight;
+
+        // Condição de sucesso
+        if (tipoSenha === "fraca" && senhaTentada === "123") {
+          clearInterval(intervalAtaque);
+          let tempoGasto = ((Date.now() - tempoInicio) / 1000).toFixed(2);
+          consoleBruto.innerHTML += `🎉 SUCESSO! Senha correta ("123") encontrada!\n`;
+          consoleBruto.innerHTML += `⏱ Tempo gasto do hacker: ${tempoGasto} segundos.\n`;
+          consoleBruto.innerHTML += `❌ SISTEMA INVASO! Mude suas senhas imediatamente.\n`;
+          consoleBruto.scrollTop = consoleBruto.scrollHeight;
+          btn.disabled = false;
+        }
+
+        // Limita o console simulado da senha forte a 20 tentativas para não travar o navegador
+        if (tipoSenha === "forte" && tentativas >= 20) {
+          clearInterval(intervalAtaque);
+          consoleBruto.innerHTML += `...\n`;
+          consoleBruto.innerHTML += `🛑 ATAQUE FALHOU! Tentativas esgotadas no dicionário básico.\n`;
+          consoleBruto.innerHTML += `⚙ Estimativa para quebrar "J_2*xV7&9k#mLq": 25.000 ANOS!\n`;
+          consoleBruto.innerHTML += `🛡️ SISTEMA PROTEGIDO. Senhas complexas salvam os dados.\n`;
+          consoleBruto.scrollTop = consoleBruto.scrollHeight;
+          btn.disabled = false;
+        }
+
+      }, 150);
+    }
+
+    function gerarSenhaHackerSimulado() {
+      const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#";
+      let res = "";
+      for (let i = 0; i < 8; i++) {
+        res += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return res;
+    }
+
+    // --- SIMULADOR DE XSS ---
+    function executarXss(comProtecao) {
+      const input = document.getElementById("xss-input").value;
+      const output = document.getElementById("xss-output");
+
+      if (!output) return;
+
+      if (comProtecao) {
+        // Modo Protegido: Sanitiza transformando os caracteres especiais de HTML em entidades seguras
+        const textoSeguro = escapeHtml(input);
+        output.innerHTML = textoSeguro;
+      } else {
+        // Modo Inseguro: Injeta direto no DOM
+        output.innerHTML = input;
+
+        // Se o script não for executado direto por innerHTML (bloqueio do próprio navegador), simulamos um pop-up fictício
+        if (input.includes("<script>")) {
+          alert("💥 Simulação de Ataque XSS:\nUm invasor conseguiu rodar um comando e ler seus cookies/relatos!");
+        }
+      }
+    }
+
+    function escapeHtml(text) {
+      return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    // --- ACELERÔMETRO (Puxão de Bicicleta) ---
+    let sensorAtivo = false;
+    const LIMIT_ACC = 18.0; // O nível de corte m/s² para detecção
+
+    function toggleSensorFisico(checkbox) {
+      if (checkbox.checked) {
+        ativarSensorAcelerometro();
+      } else {
+        desativarSensorAcelerometro();
+      }
+    }
+
+    function ativarSensorAcelerometro() {
+      // Solicita permissão para iOS 13+ se aplicável
+      if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+        DeviceMotionEvent.requestPermission()
+          .then(permissionState => {
+            if (permissionState === 'granted') {
+              window.addEventListener('devicemotion', handleMotion, true);
+              sensorAtivo = true;
+            } else {
+              alert("Permissão para sensor de movimento negada.");
+              document.getElementById("chk-sensor").checked = false;
+            }
+          })
+          .catch(err => {
+            console.error(err);
+            alert("Erro ao acessar os sensores do celular.");
+            document.getElementById("chk-sensor").checked = false;
+          });
+      } else {
+        // Android ou browsers sem restrição de clique
+        window.addEventListener('devicemotion', handleMotion, true);
+        sensorAtivo = true;
+      }
+    }
+
+    function desativarSensorAcelerometro() {
+      window.removeEventListener('devicemotion', handleMotion, true);
+      sensorAtivo = false;
+      resetBarrasAcelerometro();
+    }
+
+    function handleMotion(event) {
+      if (!sensorAtivo) return;
+
+      // Obtém aceleração descontando a gravidade para capturar apenas puxões físicos
+      let acc = event.acceleration || event.accelerationIncludingGravity;
+      if (!acc) return;
+
+      let x = Math.abs(acc.x || 0);
+      let y = Math.abs(acc.y || 0);
+      let z = Math.abs(acc.z || 0);
+
+      // Desconta a gravidade terrestre se accelerationIncludingGravity for usado
+      if (event.accelerationIncludingGravity) {
+        y = Math.max(0, y - 9.8);
+      }
+
+      atualizarInterfaceAcelerometro(x, y, z);
+
+      // Gatilho de Puxão Detectado
+      if (x > LIMIT_ACC || y > LIMIT_ACC || z > LIMIT_ACC) {
+        acionarBloqueioDeSeguranca();
+      }
+    }
+
+    function atualizarInterfaceAcelerometro(x, y, z) {
+      // Exibe os textos decimais
+      document.getElementById("txt-acc-x").innerText = x.toFixed(1) + " m/s²";
+      document.getElementById("txt-acc-y").innerText = y.toFixed(1) + " m/s²";
+      document.getElementById("txt-acc-z").innerText = z.toFixed(1) + " m/s²";
+
+      // Atualiza a largura das barras de progresso (Escala: máximo 25 m/s² = 100%)
+      const maxEscala = 25.0;
+      document.getElementById("bar-acc-x").style.width = Math.min((x / maxEscala) * 100, 100) + "%";
+      document.getElementById("bar-acc-y").style.width = Math.min((y / maxEscala) * 100, 100) + "%";
+      document.getElementById("bar-acc-z").style.width = Math.min((z / maxEscala) * 100, 100) + "%";
+
+      // Altera a cor das barras se cruzarem o limite pontilhado (72% de largura)
+      document.getElementById("bar-acc-x").style.backgroundColor = (x > LIMIT_ACC) ? "var(--danger-color)" : "var(--success-color)";
+      document.getElementById("bar-acc-y").style.backgroundColor = (y > LIMIT_ACC) ? "var(--danger-color)" : "var(--success-color)";
+      document.getElementById("bar-acc-z").style.backgroundColor = (z > LIMIT_ACC) ? "var(--danger-color)" : "var(--success-color)";
+    }
+
+    function resetBarrasAcelerometro() {
+      atualizarInterfaceAcelerometro(0, 0, 0);
+    }
+
+    // Gatilho de Logout e Bloqueio
+    function acionarBloqueioDeSeguranca() {
+      // Exibe a tela vermelha de bloqueio
+      document.getElementById("robbery-screen").style.display = "flex";
+      desativarSensorAcelerometro();
+      document.getElementById("chk-sensor").checked = false;
+
+      // Executa som ou bip nativo
+      if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance("Alerta de segurança. Celular desconectado.");
+        utterance.lang = "pt-BR";
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    function desbloquearRobberyScreen() {
+      document.getElementById("robbery-screen").style.display = "none";
+      resetBarrasAcelerometro();
+    }
+
+    // Simulação do Acelerômetro no Desktop (Para quem não está no celular)
+    function simularPuxaoBicicleta() {
+      // Interrompe sensor se ativo
+      desativarSensorAcelerometro();
+      document.getElementById("chk-sensor").checked = false;
+
+      let tempo = 0;
+      let simInterval = setInterval(() => {
+        tempo += 50;
+
+        let xVal = 0;
+        let yVal = 0;
+        let zVal = 0;
+
+        if (tempo < 400) {
+          // Fase 1: Pequena oscilação de mão normal
+          xVal = Math.random() * 2;
+          yVal = Math.random() * 2;
+          zVal = Math.random() * 2;
+        } else if (tempo < 600) {
+          // Fase 2: O Puxão violento (Pico enorme nos sensores)
+          xVal = 19.5 + Math.random() * 3;
+          yVal = 21.0 + Math.random() * 3;
+          zVal = 18.2 + Math.random() * 3;
+        }
+
+        atualizarInterfaceAcelerometro(xVal, yVal, zVal);
+
+        if (tempo >= 600) {
+          clearInterval(simInterval);
+          acionarBloqueioDeSeguranca();
+        }
+      }, 50);
+    }
+  </script>
+
+</body>
+</html>
