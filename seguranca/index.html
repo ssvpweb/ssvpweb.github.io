@@ -363,7 +363,7 @@
       transition: width 0.08s ease-out, background-color 0.2s;
     }
 
-    /* Linha pontilhada vermelha que marca o Limite de Corte (Threshold) */
+    /* Linha pontilhada vermelha que marca o Limite de Corte (Threshold) em 60% (15.0 / 25.0) */
     .threshold-marker {
       position: absolute;
       top: 0;
@@ -602,27 +602,13 @@
           </label>
         </div>
 
-        <!-- Painel de Calibração de Sensibilidade (0.5 a 2.0 padrão) -->
-        <div style="background-color: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 14px; border-radius: 10px; margin-top: 10px; margin-bottom: 15px;">
-          <div style="text-align: center; margin-bottom: 6px;">
-            <span style="font-size: 0.95rem; color: var(--text-muted); display: block; text-transform: uppercase;">Sensibilidade do Puxão</span>
-            <span id="txt-sensibilidade" style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color);">1.2 m/s²</span>
-          </div>
-
-          <div style="display: flex; justify-content: center; margin-bottom: 15px;">
-            <input type="range" id="range-sensibilidade" min="0.5" max="2" value="1.2" step="0.1" oninput="ajustarSensibilidade(this.value)" style="width: 100%; accent-color: var(--primary-color);">
-          </div>
-
-          <div style="display: flex; gap: 15px; justify-content: space-between;">
-            <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
-              <label for="input-sens-min" style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Mínimo Slider (m/s²)</label>
-              <input type="number" id="input-sens-min" value="0.5" step="0.1" oninput="atualizarLimitesSensibilidade()" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: #fff; padding: 8px 10px; font-size: 1.05rem; width: 100%;">
-            </div>
-            <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
-              <label for="input-sens-max" style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Máximo Slider/Escala</label>
-              <input type="number" id="input-sens-max" value="2" step="0.1" oninput="atualizarLimitesSensibilidade()" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: #fff; padding: 8px 10px; font-size: 1.05rem; width: 100%;">
-            </div>
-          </div>
+        <!-- Painel Informativo da Sensibilidade Configurada -->
+        <div style="background-color: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 14px; border-radius: 10px; margin-top: 10px; margin-bottom: 15px; text-align: center;">
+          <span style="font-size: 0.95rem; color: var(--text-muted); display: block; text-transform: uppercase;">Sensibilidade do Puxão (Pré-configurada)</span>
+          <span style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color);">15.0 m/s²</span>
+          <p style="font-size: 0.95rem; color: var(--text-muted); margin-top: 6px; line-height: 1.4;">
+            Limite calibrado para detectar puxões bruscos de assalto (acima de 1.5G) e desconsiderar a gravidade terrestre cotidiana (9.8 m/s²) ou tremores normais do uso cotidiano.
+          </p>
         </div>
 
         <!-- Painel Visual do Acelerômetro -->
@@ -638,7 +624,7 @@
             <div class="progress-track">
               <div class="progress-fill" id="bar-acc-x"></div>
               <div class="threshold-marker" id="marker-acc-x"></div>
-              <span class="threshold-marker-label" id="marker-label-x">LIMITE 1.2 m/s²</span>
+              <span class="threshold-marker-label" id="marker-label-x">LIMITE 15.0 m/s²</span>
             </div>
           </div>
 
@@ -651,7 +637,7 @@
             <div class="progress-track">
               <div class="progress-fill" id="bar-acc-y"></div>
               <div class="threshold-marker" id="marker-acc-y"></div>
-              <span class="threshold-marker-label" id="marker-label-y">LIMITE 1.2 m/s²</span>
+              <span class="threshold-marker-label" id="marker-label-y">LIMITE 15.0 m/s²</span>
             </div>
           </div>
 
@@ -664,7 +650,7 @@
             <div class="progress-track">
               <div class="progress-fill" id="bar-acc-z"></div>
               <div class="threshold-marker" id="marker-acc-z"></div>
-              <span class="threshold-marker-label" id="marker-label-z">LIMITE 1.2 m/s²</span>
+              <span class="threshold-marker-label" id="marker-label-z">LIMITE 15.0 m/s²</span>
             </div>
           </div>
         </div>
@@ -674,7 +660,7 @@
         </div>
 
         <p class="desc-text" style="font-size: 0.95rem; font-style: italic; color: var(--warning-color); margin-top: 10px;">
-          👉 <strong>Faça o teste no celular:</strong> Ligue o "Sensor Físico" acima, ajuste a calibração de limite e sacuda com o aparelho. O sistema travará imediatamente!
+          👉 <strong>Faça o teste no celular:</strong> Ligue o "Sensor Físico" acima e sacuda com o aparelho. O sistema travará imediatamente!
         </p>
       </div>
     </div>
@@ -691,9 +677,9 @@
   </div>
 
   <script>
-    // Configurações de Escala de Acelerômetro Dinâmicos (Default: 0.5 a 2.0)
-    let maxEscala = 2.0;  // Limite máximo da barra de escala
-    let limitAcc = 1.2;   // Valor de corte do puxão inicial
+    // Configurações de Escala de Acelerômetro Fixo (Limite de Segurança)
+    let maxEscala = 25.0; // Limite máximo da barra de escala
+    let limitAcc = 15.0;  // Valor de corte do puxão inicial
     let sensorAtivo = false;
 
     // Gerenciador de Acordeon dos Cards Grandes (Iniciam todos fechados)
@@ -719,60 +705,6 @@
           content.style.maxHeight = content.scrollHeight + 50 + 'px'; // Altura reajustada para suportar a div do XSS raw
         }
       }
-    }
-
-    // Ajusta o limite de sensibilidade e move as marcações na tela
-    function ajustarSensibilidade(valor) {
-      limitAcc = parseFloat(valor);
-      document.getElementById("txt-sensibilidade").innerText = limitAcc.toFixed(1) + " m/s²";
-
-      // Calcula percentual correspondente na escala (máximo maxEscala m/s²)
-      const pct = (limitAcc / maxEscala) * 100;
-
-      // Update position of threshold dashed lines and labels
-      const eixos = ["x", "y", "z"];
-      eixos.forEach(eixo => {
-        const marker = document.getElementById(`marker-acc-${eixo}`);
-        const label = document.getElementById(`marker-label-${eixo}`);
-        if (marker && label) {
-          marker.style.left = pct + "%";
-          label.style.left = (pct + 1.5) + "%";
-          label.innerText = `LIMITE ${limitAcc.toFixed(1)} m/s²`;
-        }
-      });
-    }
-
-    // Função de calibração numérica de Mínimo e Máximo do Slider/Gráfico
-    function atualizarLimitesSensibilidade() {
-      const minInput = document.getElementById("input-sens-min");
-      const maxInput = document.getElementById("input-sens-max");
-      const range = document.getElementById("range-sensibilidade");
-
-      if (!minInput || !maxInput || !range) return;
-
-      const minVal = parseFloat(minInput.value) || 0;
-      const maxVal = parseFloat(maxInput.value) || 25;
-
-      // Redefine a escala máxima global das barras
-      maxEscala = maxVal;
-
-      // Redefine as propriedades do slider
-      range.min = minVal;
-      range.max = maxVal;
-
-      // Corrige valor caso o valor atual saia do range recém-calculado
-      let currentVal = parseFloat(range.value);
-      if (currentVal > maxVal) {
-        currentVal = maxVal;
-        range.value = maxVal;
-      }
-      if (currentVal < minVal) {
-        currentVal = minVal;
-        range.value = minVal;
-      }
-
-      // Atualiza marcas e o texto
-      ajustarSensibilidade(currentVal);
     }
 
     // --- SIMULADOR DE FORÇA BRUTA ---
@@ -920,7 +852,7 @@
       }
     }
 
-    function ativarSensorAcelerometro() {
+    function activarSensorAcelerometro() {
       if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
         DeviceMotionEvent.requestPermission()
           .then(permissionState => {
@@ -1044,9 +976,6 @@
         }
       }, 50);
     }
-
-    // Inicializa a calibração
-    atualizarLimitesSensibilidade();
   </script>
 
 </body>
