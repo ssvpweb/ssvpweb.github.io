@@ -365,13 +365,13 @@
     .threshold-marker {
       position: absolute;
       top: 0;
-      left: 66.6%; /* Limite padrão 10.0 de um máximo de 15.0 m/s² é exatamente 66.6% */
+      left: 66.6%; /* O JS atualizará essa posição dinamicamente */
       width: 2px;
       height: 100%;
       background-color: var(--danger-color);
       border-left: 2px dashed var(--danger-color);
       z-index: 10;
-      transition: left 0.2s ease;
+      transition: left 0.15s ease;
     }
 
     .threshold-marker-label {
@@ -382,7 +382,7 @@
       color: var(--danger-color);
       font-weight: 700;
       z-index: 10;
-      transition: left 0.2s ease;
+      transition: left 0.15s ease;
     }
 
     /* Overlay de Bloqueio em Vermelho ao simular roubo */
@@ -583,12 +583,26 @@
           </label>
         </div>
 
-        <!-- Ajuste de Sensibilidade (Calibração) -->
-        <div class="toggle-row">
-          <span class="toggle-label">Sensibilidade do Puxão:</span>
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <input type="range" id="range-sensibilidade" min="5" max="18" value="10" step="1" oninput="ajustarSensibilidade(this.value)" style="width: 130px; accent-color: var(--primary-color);">
-            <span id="txt-sensibilidade" style="font-weight: 700; color: var(--primary-color); min-width: 65px; text-align: right;">10.0 m/s²</span>
+        <!-- Painel de Calibração de Sensibilidade Refinado (Mínimo, Máximo e Posição do Visor) -->
+        <div style="background-color: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 14px; border-radius: 10px; margin-top: 10px; margin-bottom: 15px;">
+          <div style="text-align: center; margin-bottom: 6px;">
+            <span style="font-size: 0.85rem; color: var(--text-muted); display: block; text-transform: uppercase;">Sensibilidade do Puxão</span>
+            <span id="txt-sensibilidade" style="font-size: 1.4rem; font-weight: 700; color: var(--primary-color);">10.0 m/s²</span>
+          </div>
+
+          <div style="display: flex; justify-content: center; margin-bottom: 15px;">
+            <input type="range" id="range-sensibilidade" min="5" id="range-sensibilidade" max="15" value="10" step="0.5" oninput="ajustarSensibilidade(this.value)" style="width: 100%; accent-color: var(--primary-color);">
+          </div>
+
+          <div style="display: flex; gap: 15px; justify-content: space-between;">
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
+              <label for="input-sens-min" style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">Mínimo Slider (m/s²)</label>
+              <input type="number" id="input-sens-min" value="5" step="0.5" oninput="atualizarLimitesSensibilidade()" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: #fff; padding: 6px 10px; font-size: 1rem; width: 100%;">
+            </div>
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
+              <label for="input-sens-max" style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">Máximo Slider/Escala</label>
+              <input type="number" id="input-sens-max" value="15" step="0.5" oninput="atualizarLimitesSensibilidade()" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: #fff; padding: 6px 10px; font-size: 1rem; width: 100%;">
+            </div>
           </div>
         </div>
 
@@ -605,7 +619,7 @@
             <div class="progress-track">
               <div class="progress-fill" id="bar-acc-x"></div>
               <div class="threshold-marker" id="marker-acc-x"></div>
-              <span class="threshold-marker-label" id="marker-label-x">LIMITE 10 m/s²</span>
+              <span class="threshold-marker-label" id="marker-label-x">LIMITE 10.0 m/s²</span>
             </div>
           </div>
 
@@ -618,7 +632,7 @@
             <div class="progress-track">
               <div class="progress-fill" id="bar-acc-y"></div>
               <div class="threshold-marker" id="marker-acc-y"></div>
-              <span class="threshold-marker-label" id="marker-label-y">LIMITE 10 m/s²</span>
+              <span class="threshold-marker-label" id="marker-label-y">LIMITE 10.0 m/s²</span>
             </div>
           </div>
 
@@ -631,7 +645,7 @@
             <div class="progress-track">
               <div class="progress-fill" id="bar-acc-z"></div>
               <div class="threshold-marker" id="marker-acc-z"></div>
-              <span class="threshold-marker-label" id="marker-label-z">LIMITE 10 m/s²</span>
+              <span class="threshold-marker-label" id="marker-label-z">LIMITE 10.0 m/s²</span>
             </div>
           </div>
         </div>
@@ -641,7 +655,7 @@
         </div>
 
         <p class="desc-text" style="font-size: 0.88rem; font-style: italic; color: var(--warning-color); margin-top: 10px;">
-          👉 <strong>Faça o teste no celular:</strong> Ligue o "Sensor Físico" acima, ajuste o controle de sensibilidade e dê uma sacudida rápida e forte com o aparelho. O sistema travará imediatamente!
+          👉 <strong>Faça o teste no celular:</strong> Ligue o "Sensor Físico" acima, ajuste a calibração de limite e sacuda com o aparelho. O sistema travará imediatamente!
         </p>
       </div>
     </div>
@@ -658,9 +672,9 @@
   </div>
 
   <script>
-    // Configurações de Escala de Acelerômetro Otimizados
-    const MAX_ESCALA = 15.0; // Máximo m/s² exibido nas barras (torna as barras muito mais dinâmicas)
-    let limitAcc = 10.0;    // Limite padrão de corte para puxão (sensível e fácil de testar)
+    // Configurações de Escala de Acelerômetro Dinâmicos
+    let maxEscala = 15.0; // Limite máximo da barra de escala
+    let limitAcc = 10.0;  // Valor de corte do puxão
     let sensorAtivo = false;
 
     // Gerenciador de Acordeon dos Cards Grandes
@@ -693,8 +707,8 @@
       limitAcc = parseFloat(valor);
       document.getElementById("txt-sensibilidade").innerText = limitAcc.toFixed(1) + " m/s²";
 
-      // Calcula percentual correspondente na escala (máximo 15.0 m/s²)
-      const pct = (limitAcc / MAX_ESCALA) * 100;
+      // Calcula percentual correspondente na escala (máximo maxEscala m/s²)
+      const pct = (limitAcc / maxEscala) * 100;
 
       // Atualiza a posição visual das marcas pontilhadas e as etiquetas
       const eixos = ["x", "y", "z"];
@@ -707,6 +721,39 @@
           label.innerText = `LIMITE ${limitAcc.toFixed(1)} m/s²`;
         }
       });
+    }
+
+    // Função de calibração numérica de Mínimo e Máximo do Slider/Gráfico
+    function atualizarLimitesSensibilidade() {
+      const minInput = document.getElementById("input-sens-min");
+      const maxInput = document.getElementById("input-sens-max");
+      const range = document.getElementById("range-sensibilidade");
+
+      if (!minInput || !maxInput || !range) return;
+
+      const minVal = parseFloat(minInput.value) || 0;
+      const maxVal = parseFloat(maxInput.value) || 25;
+
+      // Redefine a escala máxima global das barras
+      maxEscala = maxVal;
+
+      // Redefine as propriedades do slider
+      range.min = minVal;
+      range.max = maxVal;
+
+      // Corrige valor caso o valor atual saia do range recém-calculado
+      let currentVal = parseFloat(range.value);
+      if (currentVal > maxVal) {
+        currentVal = maxVal;
+        range.value = maxVal;
+      }
+      if (currentVal < minVal) {
+        currentVal = minVal;
+        range.value = minVal;
+      }
+
+      // Atualiza marcas e o texto
+      ajustarSensibilidade(currentVal);
     }
 
     // --- SIMULADOR DE FORÇA BRUTA ---
@@ -856,7 +903,6 @@
     function handleMotion(event) {
       if (!sensorAtivo) return;
 
-      // Tenta usar aceleração pura (sem gravidade). Se não disponível, usa aceleração com gravidade
       let acc = event.acceleration;
       let usarGravidade = false;
       
@@ -871,14 +917,12 @@
       let y = Math.abs(acc.y || 0);
       let z = Math.abs(acc.z || 0);
 
-      // Desconta a gravidade se formos obrigados a usar a aceleração com gravidade inclusa
       if (usarGravidade) {
         y = Math.max(0, y - 9.8);
       }
 
       atualizarInterfaceAcelerometro(x, y, z);
 
-      // Gatilho de Puxão Detectado (Cruza o limite configurado)
       if (x > limitAcc || y > limitAcc || z > limitAcc) {
         acionarBloqueioDeSeguranca();
       }
@@ -889,12 +933,11 @@
       document.getElementById("txt-acc-y").innerText = y.toFixed(1) + " m/s²";
       document.getElementById("txt-acc-z").innerText = z.toFixed(1) + " m/s²";
 
-      // Atualiza preenchimento baseado na escala máxima otimizada de 15.0 m/s²
-      document.getElementById("bar-acc-x").style.width = Math.min((x / MAX_ESCALA) * 100, 100) + "%";
-      document.getElementById("bar-acc-y").style.width = Math.min((y / MAX_ESCALA) * 100, 100) + "%";
-      document.getElementById("bar-acc-z").style.width = Math.min((z / MAX_ESCALA) * 100, 100) + "%";
+      // Atualiza as barras com a escala dinâmica configurada
+      document.getElementById("bar-acc-x").style.width = Math.min((x / maxEscala) * 100, 100) + "%";
+      document.getElementById("bar-acc-y").style.width = Math.min((y / maxEscala) * 100, 100) + "%";
+      document.getElementById("bar-acc-z").style.width = Math.min((z / maxEscala) * 100, 100) + "%";
 
-      // Altera cor se cruzar o limite configurado
       document.getElementById("bar-acc-x").style.backgroundColor = (x > limitAcc) ? "var(--danger-color)" : "var(--success-color)";
       document.getElementById("bar-acc-y").style.backgroundColor = (y > limitAcc) ? "var(--danger-color)" : "var(--success-color)";
       document.getElementById("bar-acc-z").style.backgroundColor = (z > limitAcc) ? "var(--danger-color)" : "var(--success-color)";
@@ -922,7 +965,6 @@
       resetBarrasAcelerometro();
     }
 
-    // Simulação do Acelerômetro no Desktop
     function simularPuxaoBicicleta() {
       desativarSensorAcelerometro();
       document.getElementById("chk-sensor").checked = false;
@@ -940,7 +982,6 @@
           yVal = Math.random() * 2;
           zVal = Math.random() * 2;
         } else if (tempo < 600) {
-          // Fase 2: O Puxão violento (Gera aceleração suficiente para estourar o limite)
           xVal = (limitAcc + 1.5) + Math.random() * 2;
           yVal = (limitAcc + 2.0) + Math.random() * 2;
           zVal = (limitAcc + 1.2) + Math.random() * 2;
@@ -955,8 +996,8 @@
       }, 50);
     }
 
-    // Inicializa a calibração de limite na tela
-    ajustarSensibilidade(10);
+    // Inicializa a calibração
+    atualizarLimitesSensibilidade();
   </script>
 
 </body>
