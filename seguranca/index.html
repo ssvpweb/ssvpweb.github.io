@@ -537,7 +537,7 @@
           <h4 style="font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">🌐 Segurança Baseada no Google Drive</h4>
           <p class="desc-text" style="font-size: 0.95rem; margin-bottom: 0;">
             <strong>Onde os dados ficam guardados no final?</strong><br>
-            A segurança de armazenamento das nossas visitas baseia-se na infraestrutura mundial de segurança do <strong>Google Drive / Google Workspace</strong>. Os relatos são salvos direto no seu Google Sheets e protegidos pela conta Google do <strong>Conselho Central correspondente</strong>. A chance de um invasor quebrar a segurança da nuvem do Google para acessar essa planilha de visitas é mínima (quase nula). O único risco real é o compartilhamento indevido de links ou o vazamento da senha de acesso do Conselho.
+            A segurança de armazenamento das nossas visitas baseia-se na infraestrutura mundial de segurança do <strong>Google Drive / Google Workspace</strong>. Os relatos são salvos direto no Google Sheets e armazenados no <strong>Google Drive do Conselho Central</strong>. A chance de um invasor quebrar a segurança da nuvem do Google para acessar essa planilha de visitas é mínima (quase nula). O único risco real é o compartilhamento indevido de links ou o vazamento da senha de acesso do Conselho.
           </p>
         </div>
       </div>
@@ -784,18 +784,18 @@
       consoleBruto.innerHTML = "Iniciando ataque hacker de força bruta...\nConectando à API de Login...\n";
       consoleBruto.scrollTop = consoleBruto.scrollHeight;
 
-      let tentatives = 0;
+      let tentativas = 0;
       let tempoInicio = Date.now();
       
       const senhasDicionarioFraco = ["123456", "admin", "senha", "deus", "123", "ssvp123"];
 
       intervalAtaque = setInterval(() => {
-        tentatives++;
+        tentativas++;
         let senhaTentada = "";
 
         if (tipoSenha === "fraca") {
-          if (tentatives <= senhasDicionarioFraco.length - 1) {
-            senhaTentada = senhasDicionarioFraco[tentatives - 1];
+          if (tentativas <= senhasDicionarioFraco.length - 1) {
+            senhaTentada = senhasDicionarioFraco[tentativas - 1];
           } else {
             senhaTentada = "123";
           }
@@ -803,9 +803,9 @@
           senhaTentada = gerarSenhaHackerSimulado();
         }
 
-        if (cooldownAtivo && tentatives >= 3) {
+        if (cooldownAtivo && tentativas >= 3) {
           clearInterval(intervalAtaque);
-          consoleBruto.innerHTML += `Tentativa #${tentatives} errada: Senha "${senhaTentada}" inválida.\n`;
+          consoleBruto.innerHTML += `Tentativa #${tentativas} errada: Senha "${senhaTentada}" inválida.\n`;
           consoleBruto.innerHTML += `⚠️ PROTEÇÃO ATIVA: 3 tentativas falhas consecutivas!\n`;
           consoleBruto.innerHTML += `🛑 SISTEMA BLOQUEOU O ENDEREÇO IP DO ATACANTE!\n`;
           consoleBruto.innerHTML += `[Cooldown] Aguarde 10 segundos para tentar novamente...\n`;
@@ -819,7 +819,7 @@
           return;
         }
 
-        consoleBruto.innerHTML += `Tentativa #${tentatives}: Testando senha "${senhaTentada}"...\n`;
+        consoleBruto.innerHTML += `Tentativa #${tentativas}: Testando senha "${senhaTentada}"...\n`;
         consoleBruto.scrollTop = consoleBruto.scrollHeight;
 
         if (tipoSenha === "fraca" && senhaTentada === "123") {
@@ -832,7 +832,7 @@
           btn.disabled = false;
         }
 
-        if (tipoSenha === "forte" && tentatives >= 20) {
+        if (tipoSenha === "forte" && tentativas >= 20) {
           clearInterval(intervalAtaque);
           consoleBruto.innerHTML += `...\n`;
           consoleBruto.innerHTML += `🛑 ATAQUE FALHOU! Tentativas esgotadas no dicionário básico.\n`;
@@ -854,7 +854,7 @@
       return res;
     }
 
-    // --- SIMULADOR DE XSS (Corrigido para executarXss) ---
+    // --- SIMULADOR DE XSS ---
     function executarXss(comProtecao) {
       const input = document.getElementById("xss-input").value;
       const output = document.getElementById("xss-output");
@@ -978,6 +978,7 @@
       }
     }
 
+    // Unblocks the screen overlay
     function desbloquearRobberyScreen() {
       document.getElementById("robbery-screen").style.display = "none";
       resetBarrasAcelerometro();
