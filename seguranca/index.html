@@ -34,8 +34,8 @@
       background-color: var(--bg-color);
       color: var(--text-main);
       font-family: var(--font-family);
-      font-size: 1.25rem; /* Acessibilidade 60+ (Aumentado de 1.15rem) */
-      line-height: 1.65;  /* Acessibilidade 60+ (Aumentado de 1.6) */
+      font-size: 1.25rem; /* Acessibilidade 60+ */
+      line-height: 1.65;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -64,14 +64,14 @@
     }
 
     header h1 {
-      font-size: 1.75rem; /* Acessibilidade 60+ (Aumentado de 1.55rem) */
+      font-size: 1.75rem; /* Acessibilidade 60+ */
       font-weight: 700;
       letter-spacing: -0.02em;
       margin-bottom: 8px;
     }
 
     header p {
-      font-size: 1.15rem; /* Acessibilidade 60+ (Aumentado de 1rem) */
+      font-size: 1.15rem; /* Acessibilidade 60+ */
       opacity: 0.85;
       line-height: 1.5;
     }
@@ -106,7 +106,7 @@
     }
 
     .card-header h2 {
-      font-size: 1.45rem; /* Acessibilidade 60+ (Aumentado de 1.3rem) */
+      font-size: 1.45rem; /* Acessibilidade 60+ */
       font-weight: 700;
       color: #fff;
       line-height: 1.35;
@@ -141,7 +141,7 @@
     }
 
     .desc-text {
-      font-size: 1.22rem; /* Acessibilidade 60+ (Aumentado de 1.12rem) */
+      font-size: 1.22rem; /* Acessibilidade 60+ */
       line-height: 1.6;
       color: var(--text-muted);
       margin-bottom: 14px;
@@ -158,7 +158,7 @@
       border-radius: 8px;
       padding: 12px;
       font-family: var(--font-mono);
-      font-size: 1.05rem; /* Acessibilidade 60+ (Aumentado de 0.95rem) */
+      font-size: 1.05rem; /* Acessibilidade 60+ */
       color: #10b981;
       height: 160px;
       overflow-y: auto;
@@ -174,7 +174,7 @@
       border-collapse: collapse;
       margin-top: 10px;
       margin-bottom: 15px;
-      font-size: 1.05rem; /* Acessibilidade 60+ (Aumentado de 0.95rem) */
+      font-size: 1.05rem; /* Acessibilidade 60+ */
     }
 
     .spreadsheet-view th, .spreadsheet-view td {
@@ -206,10 +206,10 @@
       background-color: var(--primary-color);
       border: none;
       color: white;
-      padding: 12px 22px; /* Alvo de toque maior para 60+ */
+      padding: 12px 22px; /* Alvo de toque maior */
       border-radius: 8px;
       font-weight: 700;
-      font-size: 1.1rem; /* Acessibilidade 60+ (Aumentado de 1rem) */
+      font-size: 1.1rem; /* Acessibilidade 60+ */
       cursor: pointer;
       display: inline-flex;
       align-items: center;
@@ -252,7 +252,7 @@
     }
 
     .toggle-label {
-      font-size: 1.15rem; /* Acessibilidade 60+ (Aumentado de 1.05rem) */
+      font-size: 1.15rem; /* Acessibilidade 60+ */
       font-weight: 600;
     }
 
@@ -309,7 +309,7 @@
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 8px;
       color: white;
-      padding: 12px 16px; /* Alvo de toque maior */
+      padding: 12px 16px;
       font-size: 1.15rem; /* Acessibilidade 60+ */
       font-family: var(--font-family);
       outline: none;
@@ -348,7 +348,7 @@
     }
 
     .progress-track {
-      height: 30px; /* Aumentado para melhor visibilidade */
+      height: 30px;
       background-color: rgba(255, 255, 255, 0.04);
       border-radius: 6px;
       position: relative;
@@ -380,7 +380,7 @@
       position: absolute;
       top: 3px;
       left: 62%;
-      font-size: 0.72rem; /* Acessibilidade 60+ */
+      font-size: 0.72rem;
       color: var(--danger-color);
       font-weight: 700;
       z-index: 10;
@@ -406,13 +406,13 @@
     }
 
     .robbery-content h2 {
-      font-size: 2.2rem; /* Aumentado para 60+ */
+      font-size: 2.2rem;
       font-weight: 700;
       margin-bottom: 15px;
     }
 
     .robbery-content p {
-      font-size: 1.35rem; /* Aumentado para 60+ */
+      font-size: 1.35rem;
       margin-bottom: 25px;
     }
 
@@ -565,8 +565,16 @@
         </div>
 
         <p style="font-size: 1.05rem; font-weight: 600; color: var(--text-muted); margin-top: 15px;">Visualização no Relato da Visita:</p>
-        <div id="xss-output" style="background-color: rgba(0,0,0,0.3); border: 1px solid rgba(255, 255, 255, 0.08); padding: 12px; border-radius: 8px; font-size: 1.15rem; min-height: 52px;">
+        <div id="xss-output" style="background-color: rgba(0,0,0,0.3); border: 1px solid rgba(255, 255, 255, 0.08); padding: 12px; border-radius: 8px; font-size: 1.15rem; min-height: 52px; word-break: break-all;">
           (Aguardando teste...)
+        </div>
+
+        <!-- Código de escape bruto inserido exibido abaixo para visualização 60+ -->
+        <div id="xss-raw-container" style="margin-top: 12px; display: none;">
+          <p style="font-size: 1rem; font-weight: 600; color: var(--text-muted); margin-bottom: 4px;">Código de Escape Escrito por Trás (HTML):</p>
+          <div id="xss-raw-output" style="background-color: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); padding: 12px; border-radius: 8px; font-family: var(--font-mono); font-size: 1rem; color: var(--warning-color); word-break: break-all;">
+            -
+          </div>
         </div>
 
         <p class="desc-text" style="font-size: 0.95rem; margin-top: 12px; color: var(--text-muted);">
@@ -708,7 +716,7 @@
         if (cardId === 'brute-force') {
           content.style.maxHeight = 'none';
         } else {
-          content.style.maxHeight = content.scrollHeight + 40 + 'px';
+          content.style.maxHeight = content.scrollHeight + 50 + 'px'; // Altura reajustada para suportar a div do XSS raw
         }
       }
     }
@@ -856,20 +864,41 @@
       return res;
     }
 
-    // --- SIMULADOR DE XSS ---
+    // --- SIMULADOR DE XSS (Exibição dupla: Renderizado vs. Escape de Entidades) ---
     function executarXss(comProtecao) {
       const input = document.getElementById("xss-input").value;
       const output = document.getElementById("xss-output");
+      const rawOutput = document.getElementById("xss-raw-output");
+      const container = document.getElementById("xss-raw-container");
 
-      if (!output) return;
+      if (!output || !rawOutput || !container) return;
+
+      container.style.display = "block";
 
       if (comProtecao) {
-        output.innerHTML = escapeHtml(input);
+        const textoSeguro = escapeHtml(input);
+        
+        // Exibe o relato renderizado (inofensivo, texto legível)
+        output.innerHTML = textoSeguro;
+        
+        // Exibe a string literal dos caracteres de escape gerados por baixo dos panos
+        rawOutput.textContent = textoSeguro;
       } else {
+        // Exibe o relato renderizado inseguro (que causará a injeção e pop-up)
         output.innerHTML = input;
+        
+        // Exibe a string literal sem conversão de escape (o código cru perigoso)
+        rawOutput.textContent = input;
+
         if (input.includes("<script>")) {
-          alert("💥 Simulação de Ataque XSS:\nUm invasor conseguiu rodar um comando e ler seus cookies/relatos!");
+          alert("💥 Simulação de Ataque XSS:\nUm invasor conseguiu rodar um comando e ler seus relatos!");
         }
+      }
+
+      // Ajusta a altura da sanfona dinamicamente devido à aparição da nova div
+      const cardContent = document.getElementById("content-xss-attack");
+      if (cardContent) {
+        cardContent.style.maxHeight = cardContent.scrollHeight + "px";
       }
     }
 
