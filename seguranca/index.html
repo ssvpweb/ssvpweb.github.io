@@ -34,8 +34,8 @@
       background-color: var(--bg-color);
       color: var(--text-main);
       font-family: var(--font-family);
-      font-size: 1.15rem; /* Acessibilidade 50+ */
-      line-height: 1.6;
+      font-size: 1.25rem; /* Acessibilidade 60+ (Aumentado de 1.15rem) */
+      line-height: 1.65;  /* Acessibilidade 60+ (Aumentado de 1.6) */
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -56,7 +56,7 @@
     header {
       background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
       color: white;
-      padding: 1.75rem 1.5rem;
+      padding: 2rem 1.5rem;
       border-radius: 1rem;
       text-align: center;
       box-shadow: 0 8px 24px rgba(15, 23, 42, 0.4);
@@ -64,16 +64,16 @@
     }
 
     header h1 {
-      font-size: 1.55rem;
+      font-size: 1.75rem; /* Acessibilidade 60+ (Aumentado de 1.55rem) */
       font-weight: 700;
       letter-spacing: -0.02em;
       margin-bottom: 8px;
     }
 
     header p {
-      font-size: 1rem;
+      font-size: 1.15rem; /* Acessibilidade 60+ (Aumentado de 1rem) */
       opacity: 0.85;
-      line-height: 1.45;
+      line-height: 1.5;
     }
 
     /* Cards Estilo Acordeon */
@@ -106,13 +106,14 @@
     }
 
     .card-header h2 {
-      font-size: 1.3rem;
+      font-size: 1.45rem; /* Acessibilidade 60+ (Aumentado de 1.3rem) */
       font-weight: 700;
       color: #fff;
+      line-height: 1.35;
     }
 
     .card-chevron {
-      font-size: 1.15rem;
+      font-size: 1.3rem; /* Acessibilidade 60+ */
       color: var(--text-muted);
       transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
@@ -140,8 +141,8 @@
     }
 
     .desc-text {
-      font-size: 1.12rem;
-      line-height: 1.55;
+      font-size: 1.22rem; /* Acessibilidade 60+ (Aumentado de 1.12rem) */
+      line-height: 1.6;
       color: var(--text-muted);
       margin-bottom: 14px;
     }
@@ -157,13 +158,14 @@
       border-radius: 8px;
       padding: 12px;
       font-family: var(--font-mono);
-      font-size: 0.95rem;
+      font-size: 1.05rem; /* Acessibilidade 60+ (Aumentado de 0.95rem) */
       color: #10b981;
-      height: 150px;
+      height: 160px;
       overflow-y: auto;
       margin-top: 10px;
       margin-bottom: 12px;
       border-left: 4px solid var(--primary-color);
+      line-height: 1.45;
     }
 
     /* Tabelas Virtuais de Planilha */
@@ -172,12 +174,12 @@
       border-collapse: collapse;
       margin-top: 10px;
       margin-bottom: 15px;
-      font-size: 0.95rem;
+      font-size: 1.05rem; /* Acessibilidade 60+ (Aumentado de 0.95rem) */
     }
 
     .spreadsheet-view th, .spreadsheet-view td {
       border: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 8px 10px;
+      padding: 10px 12px;
       text-align: left;
     }
 
@@ -194,7 +196,7 @@
     /* Controles e Botões */
     .button-group {
       display: flex;
-      gap: 10px;
+      gap: 12px;
       margin-top: 12px;
       margin-bottom: 10px;
       flex-wrap: wrap;
@@ -204,10 +206,10 @@
       background-color: var(--primary-color);
       border: none;
       color: white;
-      padding: 10px 18px;
+      padding: 12px 22px; /* Alvo de toque maior para 60+ */
       border-radius: 8px;
       font-weight: 700;
-      font-size: 1rem;
+      font-size: 1.1rem; /* Acessibilidade 60+ (Aumentado de 1rem) */
       cursor: pointer;
       display: inline-flex;
       align-items: center;
@@ -241,7 +243,7 @@
       justify-content: space-between;
       align-items: center;
       background-color: rgba(255, 255, 255, 0.02);
-      padding: 10px 14px;
+      padding: 12px 16px;
       border-radius: 8px;
       border: 1px solid rgba(255, 255, 255, 0.04);
       margin-top: 10px;
@@ -250,7 +252,7 @@
     }
 
     .toggle-label {
-      font-size: 1.05rem;
+      font-size: 1.15rem; /* Acessibilidade 60+ (Aumentado de 1.05rem) */
       font-weight: 600;
     }
 
@@ -258,8 +260,8 @@
     .switch {
       position: relative;
       display: inline-block;
-      width: 48px;
-      height: 24px;
+      width: 52px;
+      height: 28px;
     }
 
     .switch input { 
@@ -277,14 +279,14 @@
       bottom: 0;
       background-color: #374151;
       transition: .3s;
-      border-radius: 24px;
+      border-radius: 28px;
     }
 
     .slider:before {
       position: absolute;
       content: "";
-      height: 18px;
-      width: 18px;
+      height: 22px;
+      width: 22px;
       left: 3px;
       bottom: 3px;
       background-color: white;
@@ -307,8 +309,8 @@
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 8px;
       color: white;
-      padding: 10px 14px;
-      font-size: 1.05rem;
+      padding: 12px 16px; /* Alvo de toque maior */
+      font-size: 1.15rem; /* Acessibilidade 60+ */
       font-family: var(--font-family);
       outline: none;
       margin-top: 10px;
@@ -324,12 +326,12 @@
       background-color: rgba(0, 0, 0, 0.25);
       border: 1px solid rgba(255, 255, 255, 0.05);
       border-radius: 12px;
-      padding: 16px;
+      padding: 18px;
       margin-top: 15px;
       margin-bottom: 15px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 16px;
     }
 
     .axis-container {
@@ -341,12 +343,12 @@
     .axis-info {
       display: flex;
       justify-content: space-between;
-      font-size: 0.95rem;
+      font-size: 1.05rem; /* Acessibilidade 60+ */
       font-weight: 600;
     }
 
     .progress-track {
-      height: 26px;
+      height: 30px; /* Aumentado para melhor visibilidade */
       background-color: rgba(255, 255, 255, 0.04);
       border-radius: 6px;
       position: relative;
@@ -365,7 +367,7 @@
     .threshold-marker {
       position: absolute;
       top: 0;
-      left: 60%; /* O JS atualizará essa posição dinamicamente */
+      left: 60%;
       width: 2px;
       height: 100%;
       background-color: var(--danger-color);
@@ -376,9 +378,9 @@
 
     .threshold-marker-label {
       position: absolute;
-      top: 1px;
+      top: 3px;
       left: 62%;
-      font-size: 0.68rem;
+      font-size: 0.72rem; /* Acessibilidade 60+ */
       color: var(--danger-color);
       font-weight: 700;
       z-index: 10;
@@ -404,13 +406,13 @@
     }
 
     .robbery-content h2 {
-      font-size: 2rem;
+      font-size: 2.2rem; /* Aumentado para 60+ */
       font-weight: 700;
       margin-bottom: 15px;
     }
 
     .robbery-content p {
-      font-size: 1.25rem;
+      font-size: 1.35rem; /* Aumentado para 60+ */
       margin-bottom: 25px;
     }
 
@@ -447,7 +449,7 @@
 
         <div class="toggle-row">
           <span class="toggle-label">Senha para Testar:</span>
-          <select id="senha-seletor" class="text-input" style="width: auto; margin: 0; padding: 6px 12px;">
+          <select id="senha-seletor" class="text-input" style="width: auto; margin: 0; padding: 6px 12px; font-size: 1.1rem;">
             <option value="fraca">Senha Fraca ("123")</option>
             <option value="forte">Senha Forte ("J_2*xV7&9k#mLq")</option>
           </select>
@@ -469,7 +471,7 @@
           [Console aguardando simulação...]
         </div>
 
-        <p class="desc-text" style="font-size: 0.88rem; font-style: italic; margin-top: 10px; color: var(--warning-color);">
+        <p class="desc-text" style="font-size: 0.95rem; font-style: italic; margin-top: 10px; color: var(--warning-color);">
           👉 <strong>O que observar:</strong> A senha fraca é quebrada instantaneamente. A senha forte é impossível de decifrar. E com o Cooldown ativo, o robô do invasor é bloqueado após 3 tentativas inválidas, parando o ataque!
         </p>
       </div>
@@ -487,7 +489,7 @@
         </p>
 
         <!-- PLANILHA A: TEXTO PURO (ERRADO) -->
-        <h3 style="font-size: 1rem; color: var(--danger-color); margin-top: 15px;">❌ Armazenamento Inseguro (Texto Puro)</h3>
+        <h3 style="font-size: 1.1rem; color: var(--danger-color); margin-top: 15px;">❌ Armazenamento Inseguro (Texto Puro)</h3>
         <table class="spreadsheet-view">
           <thead>
             <tr>
@@ -508,7 +510,7 @@
         </table>
 
         <!-- PLANILHA B: CRIPTOGRAFIA HASH (CORRETO) -->
-        <h3 style="font-size: 1rem; color: var(--success-color); margin-top: 15px;">✔ Armazenamento Seguro (Criptografia Hash)</h3>
+        <h3 style="font-size: 1.1rem; color: var(--success-color); margin-top: 15px;">✔ Armazenamento Seguro (Criptografia Hash)</h3>
         <table class="spreadsheet-view">
           <thead>
             <tr>
@@ -519,11 +521,11 @@
           <tbody>
             <tr>
               <td>José Silva</td>
-              <td style="color: var(--success-color); font-family: var(--font-mono); font-size: 0.78rem; word-break: break-all;">$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3ZJkGg</td>
+              <td style="color: var(--success-color); font-family: var(--font-mono); font-size: 0.88rem; word-break: break-all;">$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3ZJkGg</td>
             </tr>
             <tr>
               <td>Maria Oliveira</td>
-              <td style="color: var(--success-color); font-family: var(--font-mono); font-size: 0.78rem; word-break: break-all;">$2y$10$h8x79J8XwQn0kLmPqRsTvU.Wi9bZcX12Ko</td>
+              <td style="color: var(--success-color); font-family: var(--font-mono); font-size: 0.88rem; word-break: break-all;">$2y$10$h8x79J8XwQn0kLmPqRsTvU.Wi9bZcX12Ko</td>
             </tr>
           </tbody>
         </table>
@@ -533,9 +535,9 @@
         </p>
 
         <!-- Explicação Didática sobre a Nuvem do Google Drive Institucional -->
-        <div style="background-color: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.15); padding: 14px; border-radius: 10px; margin-top: 15px;">
-          <h4 style="font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">🌐 Segurança Baseada no Google Drive</h4>
-          <p class="desc-text" style="font-size: 0.95rem; margin-bottom: 0;">
+        <div style="background-color: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.15); padding: 16px; border-radius: 10px; margin-top: 15px;">
+          <h4 style="font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">🌐 Segurança Baseada no Google Drive</h4>
+          <p class="desc-text" style="font-size: 1.05rem; margin-bottom: 0;">
             <strong>Onde os dados ficam guardados no final?</strong><br>
             A segurança de armazenamento das nossas visitas baseia-se na infraestrutura mundial de segurança do <strong>Google Drive / Google Workspace</strong>. Os relatos são salvos direto no Google Sheets e armazenados no <strong>Google Drive do Conselho Central</strong>. A chance de um invasor quebrar a segurança da nuvem do Google para acessar essa planilha de visitas é mínima (quase nula). O único risco real é o compartilhamento indevido de links ou o vazamento da senha de acesso do Conselho.
           </p>
@@ -554,20 +556,20 @@
           O que acontece se alguém preencher um relato contendo um código de programação malicioso com a intenção de roubar o aplicativo do vicentino?
         </p>
 
-        <p style="font-size: 0.95rem; font-weight: 600; color: var(--text-muted);">Simulação de Código Invasor no Relato:</p>
-        <textarea id="xss-input" class="text-input" style="height: 60px; font-family: var(--font-mono); font-size: 0.88rem; margin-top: 5px;">&lt;script&gt;alert("Celular Hackeado!")&lt;/script&gt;</textarea>
+        <p style="font-size: 1.05rem; font-weight: 600; color: var(--text-muted);">Simulação de Código Invasor no Relato:</p>
+        <textarea id="xss-input" class="text-input" style="height: 70px; font-family: var(--font-mono); font-size: 1rem; margin-top: 5px;">&lt;script&gt;alert("Celular Hackeado!")&lt;/script&gt;</textarea>
 
         <div class="button-group">
           <button class="btn danger" onclick="executarXss(false)">Testar Sem Proteção</button>
           <button class="btn" onclick="executarXss(true)">Testar Com Proteção</button>
         </div>
 
-        <p style="font-size: 0.95rem; font-weight: 600; color: var(--text-muted); margin-top: 15px;">Visualização no Relato da Visita:</p>
-        <div id="xss-output" style="background-color: rgba(0,0,0,0.3); border: 1px solid rgba(255, 255, 255, 0.08); padding: 12px; border-radius: 8px; font-size: 1.05rem; min-height: 48px;">
+        <p style="font-size: 1.05rem; font-weight: 600; color: var(--text-muted); margin-top: 15px;">Visualização no Relato da Visita:</p>
+        <div id="xss-output" style="background-color: rgba(0,0,0,0.3); border: 1px solid rgba(255, 255, 255, 0.08); padding: 12px; border-radius: 8px; font-size: 1.15rem; min-height: 52px;">
           (Aguardando teste...)
         </div>
 
-        <p class="desc-text" style="font-size: 0.88rem; margin-top: 12px; color: var(--text-muted);">
+        <p class="desc-text" style="font-size: 0.95rem; margin-top: 12px; color: var(--text-muted);">
           A **Sanitização de HTML** neutraliza e isola o texto. O navegador lê a entrada como texto corrido e inofensivo, impedindo a injeção do script.
         </p>
       </div>
@@ -595,8 +597,8 @@
         <!-- Painel de Calibração de Sensibilidade (0.5 a 2.0 padrão) -->
         <div style="background-color: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 14px; border-radius: 10px; margin-top: 10px; margin-bottom: 15px;">
           <div style="text-align: center; margin-bottom: 6px;">
-            <span style="font-size: 0.85rem; color: var(--text-muted); display: block; text-transform: uppercase;">Sensibilidade do Puxão</span>
-            <span id="txt-sensibilidade" style="font-size: 1.4rem; font-weight: 700; color: var(--primary-color);">1.2 m/s²</span>
+            <span style="font-size: 0.95rem; color: var(--text-muted); display: block; text-transform: uppercase;">Sensibilidade do Puxão</span>
+            <span id="txt-sensibilidade" style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color);">1.2 m/s²</span>
           </div>
 
           <div style="display: flex; justify-content: center; margin-bottom: 15px;">
@@ -605,19 +607,19 @@
 
           <div style="display: flex; gap: 15px; justify-content: space-between;">
             <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
-              <label for="input-sens-min" style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">Mínimo Slider (m/s²)</label>
-              <input type="number" id="input-sens-min" value="0.5" step="0.1" oninput="atualizarLimitesSensibilidade()" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: #fff; padding: 6px 10px; font-size: 1rem; width: 100%;">
+              <label for="input-sens-min" style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Mínimo Slider (m/s²)</label>
+              <input type="number" id="input-sens-min" value="0.5" step="0.1" oninput="atualizarLimitesSensibilidade()" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: #fff; padding: 8px 10px; font-size: 1.05rem; width: 100%;">
             </div>
             <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
-              <label for="input-sens-max" style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">Máximo Slider/Escala</label>
-              <input type="number" id="input-sens-max" value="2" step="0.1" oninput="atualizarLimitesSensibilidade()" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: #fff; padding: 6px 10px; font-size: 1rem; width: 100%;">
+              <label for="input-sens-max" style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Máximo Slider/Escala</label>
+              <input type="number" id="input-sens-max" value="2" step="0.1" oninput="atualizarLimitesSensibilidade()" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: #fff; padding: 8px 10px; font-size: 1.05rem; width: 100%;">
             </div>
           </div>
         </div>
 
         <!-- Painel Visual do Acelerômetro -->
         <div class="sensor-panel">
-          <p style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: -5px;">Leitura da Aceleração (Força G)</p>
+          <p style="font-size: 0.9rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: -5px;">Leitura da Aceleração (Força G)</p>
           
           <!-- EIXO X -->
           <div class="axis-container">
@@ -663,7 +665,7 @@
           <button class="btn danger" onclick="simularPuxaoBicicleta()">Simular Puxão de Bicicleta (PC/Teste)</button>
         </div>
 
-        <p class="desc-text" style="font-size: 0.88rem; font-style: italic; color: var(--warning-color); margin-top: 10px;">
+        <p class="desc-text" style="font-size: 0.95rem; font-style: italic; color: var(--warning-color); margin-top: 10px;">
           👉 <strong>Faça o teste no celular:</strong> Ligue o "Sensor Físico" acima, ajuste a calibração de limite e sacuda com o aparelho. O sistema travará imediatamente!
         </p>
       </div>
@@ -978,7 +980,6 @@
       }
     }
 
-    // Unblocks the screen overlay
     function desbloquearRobberyScreen() {
       document.getElementById("robbery-screen").style.display = "none";
       resetBarrasAcelerometro();
