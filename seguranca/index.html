@@ -435,13 +435,13 @@
     </header>
 
     <!-- CARD 1: FORÇA BRUTA (Login) -->
-    <div class="card active" id="card-brute-force">
+    <div class="card" id="card-brute-force">
       <div class="card-header" onclick="toggleCard('brute-force')">
         <h2>1. Simulador de Força Bruta (Login)</h2>
         <span class="card-chevron" id="chevron-brute-force">▼</span>
       </div>
-      <div class="card-content" id="content-brute-force" style="max-height: none;">
-        <p class="desc-text">
+      <div class="card-content" id="content-brute-force">
+        <p class="desc-text" style="margin-top: 15px;">
           O ataque de <strong>Força Bruta</strong> ocorre quando um invasor usa um robô para testar milhares de senhas por segundo na tentativa de adivinhar o acesso.
         </p>
 
@@ -482,7 +482,7 @@
         <span class="card-chevron" id="chevron-hash-passwords">▼</span>
       </div>
       <div class="card-content" id="content-hash-passwords">
-        <p class="desc-text">
+        <p class="desc-text" style="margin-top: 15px;">
           Se um invasor mal-intencionado conseguir ler a planilha do Google Sheets, como as senhas estarão armazenadas?
         </p>
 
@@ -528,9 +528,18 @@
           </tbody>
         </table>
 
-        <p class="desc-text">
+        <p class="desc-text" style="margin-bottom: 15px;">
           O sistema da SSVP utiliza uma via de **criptografia hash de mão única (BCrypt)**. Mesmo que a planilha seja roubada, a senha original não é revelada pois o hash não pode ser descriptografado de volta em texto legível.
         </p>
+
+        <!-- Explicação Didática sobre a Nuvem do Google -->
+        <div style="background-color: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.15); padding: 14px; border-radius: 10px; margin-top: 15px;">
+          <h4 style="font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">🌐 Segurança Baseada no Google Drive</h4>
+          <p class="desc-text" style="font-size: 0.95rem; margin-bottom: 0;">
+            <strong>Onde os dados ficam guardados no final?</strong><br>
+            A segurança de armazenamento das nossas visitas baseia-se na infraestrutura mundial de segurança do <strong>Google Drive / Google Workspace</strong>. Os relatos são salvos direto no seu Google Sheets e protegidos por sua conta Google pessoal. A chance de um invasor quebrar a segurança da nuvem do Google para acessar sua planilha de visitas é mínima (quase nula). O único risco real é o compartilhamento indevido de links ou o vazamento da sua senha pessoal do Google.
+          </p>
+        </div>
       </div>
     </div>
 
@@ -541,7 +550,7 @@
         <span class="card-chevron" id="chevron-xss-attack">▼</span>
       </div>
       <div class="card-content" id="content-xss-attack">
-        <p class="desc-text">
+        <p class="desc-text" style="margin-top: 15px;">
           O que acontece se alguém preencher um relato contendo um código de programação malicioso com a intenção de roubar o aplicativo do vicentino?
         </p>
 
@@ -571,7 +580,7 @@
         <span class="card-chevron" id="chevron-accelerometer">▼</span>
       </div>
       <div class="card-content" id="content-accelerometer">
-        <p class="desc-text">
+        <p class="desc-text" style="margin-top: 15px;">
           Se o celular for arrancado da mão do vicentino em um puxão rápido (comum em assaltos de bicicleta), o acelerômetro detectará a força G de pico e fará o **logout imediato de segurança**.
         </p>
 
@@ -677,7 +686,7 @@
     let limitAcc = 1.2;   // Valor de corte do puxão inicial
     let sensorAtivo = false;
 
-    // Gerenciador de Acordeon dos Cards Grandes
+    // Gerenciador de Acordeon dos Cards Grandes (Iniciam todos fechados)
     function toggleCard(cardId) {
       const card = document.getElementById(`card-${cardId}`);
       const content = document.getElementById(`content-${cardId}`);
@@ -982,7 +991,6 @@
           yVal = Math.random() * (maxEscala / 10);
           zVal = Math.random() * (maxEscala / 10);
         } else if (tempo < 600) {
-          // Garante que estoure a escala simulada
           xVal = (limitAcc + 0.2) + Math.random() * 0.2;
           yVal = (limitAcc + 0.3) + Math.random() * 0.2;
           zVal = (limitAcc + 0.1) + Math.random() * 0.2;
