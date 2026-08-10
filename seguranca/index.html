@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Medidas de Segurança SSVP - v1.2.1</title>
+  <title>Medidas de Segurança SSVP - v1.2.2</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -432,7 +432,7 @@
 
   <div class="container">
     <header>
-      <h1>Medidas de Segurança SSVP - v1.2.1</h1>
+      <h1>Medidas de Segurança SSVP - v1.2.2</h1>
       <p>Simuladores interativos que mostram aos vicentinos na prática como os dados e as sessões de visitas são fortemente blindados contra criminosos.</p>
     </header>
 
@@ -695,6 +695,10 @@
     let gravity = { x: 0, y: 0, z: 0 };
     let gravityInicializada = false;
     let debugContador = 0;
+    
+    // Contador de estabilização inicial para ignorar ruído de partida no Android (calibração)
+    let eventosCalibracao = 0;
+    const TOTAL_EVENTOS_CALIBRACAO = 15;
 
     // Gerenciador de Acordeon dos Cards Grandes (Iniciam todos fechados)
     function toggleCard(cardId) {
@@ -888,6 +892,8 @@
     }
 
     function ativarSensorAcelerometro() {
+      eventosCalibracao = 0; // Zera a contagem de calibração ao ligar
+      
       if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
         DeviceMotionEvent.requestPermission()
           .then(permissionState => {
@@ -915,6 +921,7 @@
       sensorAtivo = false;
       gravityInicializada = false; // Reseta o filtro para a próxima ativação
       debugContador = 0;
+      eventosCalibracao = 0;
       document.getElementById("debug-info").innerText = "Sensor desativado.";
       resetBarrasAcelerometro();
     }
@@ -972,17 +979,29 @@
         x = Math.abs(rawX - gravity.x);
         y = Math.abs(rawY - gravity.y);
         z = Math.abs(rawZ - gravity.z);
-        
-        debugMsg += `Aceleração linear calculada (Filtro Passa-Alta):<br>`;
-        debugMsg += `- X: ${x.toFixed(3)} m/s²<br>`;
-        debugMsg += `- Y: ${y.toFixed(3)} m/s²<br>`;
-        debugMsg += `- Z: ${z.toFixed(3)} m/s²`;
       } else {
         // Dispositivo possui suporte nativo à aceleração linear (sem gravidade)
         x = Math.abs(rawX);
         y = Math.abs(rawY);
         z = Math.abs(rawZ);
-        
+      }
+
+      // UX de calibração: Ignora os primeiros N eventos iniciais para deixar a gravidade se estabilizar
+      if (eventosCalibracao < TOTAL_EVENTOS_CALIBRACAO) {
+        eventosCalibracao++;
+        debugMsg += `<br><span style="color: var(--warning-color); font-weight: bold;">⏳ Estabilizando e calibrando sensor (${eventosCalibracao}/${TOTAL_EVENTOS_CALIBRACAO})...</span>`;
+        document.getElementById("debug-info").innerHTML = debugMsg;
+        atualizarInterfaceAcelerometro(0, 0, 0); // Mantém as barras zeradas durante o transiente inicial
+        return;
+      }
+
+      // Impressão dos valores após estabilização
+      if (usarFiltro) {
+        debugMsg += `Aceleração linear calculada (Filtro Passa-Alta):<br>`;
+        debugMsg += `- X: ${x.toFixed(3)} m/s²<br>`;
+        debugMsg += `- Y: ${y.toFixed(3)} m/s²<br>`;
+        debugMsg += `- Z: ${z.toFixed(3)} m/s²`;
+      } else {
         debugMsg += `Aceleração linear nativa:<br>`;
         debugMsg += `- X: ${x.toFixed(3)} m/s²<br>`;
         debugMsg += `- Y: ${y.toFixed(3)} m/s²<br>`;
@@ -993,6 +1012,7 @@
 
       atualizarInterfaceAcelerometro(x, y, z);
 
+      // Só avalia o bloqueio se o sensor já saiu do período de estabilização inicial
       if (x > limitAcc || y > limitAcc || z > limitAcc) {
         acionarBloqueioDeSeguranca();
       }
@@ -1028,6 +1048,10 @@
         utterance.lang = "pt-BR";
         window.speechSynthesis.speak(utterance);
       }
+    }
+
+    function robberyScreenAberta() {
+      return document.getElementById("robbery-screen").style.display === "flex";
     }
 
     function desbloquearRobberyScreen() {
