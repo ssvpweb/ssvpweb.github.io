@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Medidas de Segurança SSVP - v1.1.0</title>
+  <title>Medidas de Segurança SSVP - v1.2.0</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -363,7 +363,7 @@
       transition: width 0.08s ease-out, background-color 0.2s;
     }
 
-    /* Linha pontilhada vermelha que marca o Limite de Corte (Threshold) em 60% (15.0 / 25.0) */
+    /* Linha pontilhada vermelha que marca o Limite de Corte (Threshold) */
     .threshold-marker {
       position: absolute;
       top: 0;
@@ -432,7 +432,7 @@
 
   <div class="container">
     <header>
-      <h1>Medidas de Segurança SSVP - v1.1.0</h1>
+      <h1>Medidas de Segurança SSVP - v1.2.0</h1>
       <p>Simuladores interativos que mostram aos vicentinos na prática como os dados e as sessões de visitas são fortemente blindados contra criminosos.</p>
     </header>
 
@@ -602,13 +602,16 @@
           </label>
         </div>
 
-        <!-- Painel Informativo da Sensibilidade Configurada -->
-        <div style="background-color: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 14px; border-radius: 10px; margin-top: 10px; margin-bottom: 15px; text-align: center;">
-          <span style="font-size: 0.95rem; color: var(--text-muted); display: block; text-transform: uppercase;">Sensibilidade do Puxão (Pré-configurada)</span>
-          <span style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color);">15.0 m/s²</span>
-          <p style="font-size: 0.95rem; color: var(--text-muted); margin-top: 6px; line-height: 1.4;">
-            Limite calibrado para detectar puxões bruscos de assalto (acima de 1.5G) e desconsiderar a gravidade terrestre cotidiana (9.8 m/s²) ou tremores normais do uso cotidiano.
-          </p>
+        <!-- Painel de Calibração de Sensibilidade (0.25 a 2.0 padrão) -->
+        <div style="background-color: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 14px; border-radius: 10px; margin-top: 10px; margin-bottom: 15px;">
+          <div style="text-align: center; margin-bottom: 6px;">
+            <span style="font-size: 0.95rem; color: var(--text-muted); display: block; text-transform: uppercase;">Sensibilidade do Puxão</span>
+            <span id="txt-sensibilidade" style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color);">1.20 m/s²</span>
+          </div>
+
+          <div style="display: flex; justify-content: center;">
+            <input type="range" id="range-sensibilidade" min="0.25" max="2" value="1.2" step="0.05" oninput="ajustarSensibilidade(this.value)" style="width: 100%; accent-color: var(--primary-color);">
+          </div>
         </div>
 
         <!-- Painel Visual do Acelerômetro -->
@@ -624,7 +627,7 @@
             <div class="progress-track">
               <div class="progress-fill" id="bar-acc-x"></div>
               <div class="threshold-marker" id="marker-acc-x"></div>
-              <span class="threshold-marker-label" id="marker-label-x">LIMITE 15.0 m/s²</span>
+              <span class="threshold-marker-label" id="marker-label-x">LIMITE 1.20 m/s²</span>
             </div>
           </div>
 
@@ -637,7 +640,7 @@
             <div class="progress-track">
               <div class="progress-fill" id="bar-acc-y"></div>
               <div class="threshold-marker" id="marker-acc-y"></div>
-              <span class="threshold-marker-label" id="marker-label-y">LIMITE 15.0 m/s²</span>
+              <span class="threshold-marker-label" id="marker-label-y">LIMITE 1.20 m/s²</span>
             </div>
           </div>
 
@@ -650,7 +653,7 @@
             <div class="progress-track">
               <div class="progress-fill" id="bar-acc-z"></div>
               <div class="threshold-marker" id="marker-acc-z"></div>
-              <span class="threshold-marker-label" id="marker-label-z">LIMITE 15.0 m/s²</span>
+              <span class="threshold-marker-label" id="marker-label-z">LIMITE 1.20 m/s²</span>
             </div>
           </div>
         </div>
@@ -678,9 +681,13 @@
 
   <script>
     // Configurações de Escala de Acelerômetro Fixo (Limite de Segurança)
-    let maxEscala = 25.0; // Limite máximo da barra de escala
-    let limitAcc = 15.0;  // Valor de corte do puxão inicial
+    let maxEscala = 2.0; // Limite máximo da barra de escala
+    let limitAcc = 1.2;  // Valor de corte do puxão inicial
     let sensorAtivo = false;
+
+    // Filtro de Gravidade para evitar picos e bloqueios imediatos em repouso
+    let gravity = { x: 0, y: 0, z: 0 };
+    let gravityInicializada = false;
 
     // Gerenciador de Acordeon dos Cards Grandes (Iniciam todos fechados)
     function toggleCard(cardId) {
@@ -705,6 +712,27 @@
           content.style.maxHeight = content.scrollHeight + 50 + 'px'; // Altura reajustada para suportar a div do XSS raw
         }
       }
+    }
+
+    // Ajusta o limite de sensibilidade e move as marcações na tela
+    function ajustarSensibilidade(valor) {
+      limitAcc = parseFloat(valor);
+      document.getElementById("txt-sensibilidade").innerText = limitAcc.toFixed(2) + " m/s²";
+
+      // Calcula percentual correspondente na escala (máximo maxEscala m/s²)
+      const pct = (limitAcc / maxEscala) * 100;
+
+      // Update position of threshold dashed lines and labels
+      const eixos = ["x", "y", "z"];
+      eixos.forEach(eixo => {
+        const marker = document.getElementById(`marker-acc-${eixo}`);
+        const label = document.getElementById(`marker-label-${eixo}`);
+        if (marker && label) {
+          marker.style.left = pct + "%";
+          label.style.left = (pct + 1.5) + "%";
+          label.innerText = `LIMITE ${limitAcc.toFixed(2)} m/s²`;
+        }
+      });
     }
 
     // --- SIMULADOR DE FORÇA BRUTA ---
@@ -878,6 +906,7 @@
     function desativarSensorAcelerometro() {
       window.removeEventListener('devicemotion', handleMotion, true);
       sensorAtivo = false;
+      gravityInicializada = false; // Reseta o filtro para a próxima ativação
       resetBarrasAcelerometro();
     }
 
@@ -885,21 +914,47 @@
       if (!sensorAtivo) return;
 
       let acc = event.acceleration;
-      let usarGravidade = false;
+      let usarFiltro = false;
       
       if (!acc || (acc.x === null && acc.y === null && acc.z === null)) {
         acc = event.accelerationIncludingGravity;
-        usarGravidade = true;
+        usarFiltro = true;
       }
 
       if (!acc) return;
 
-      let x = Math.abs(acc.x || 0);
-      let y = Math.abs(acc.y || 0);
-      let z = Math.abs(acc.z || 0);
+      let rawX = acc.x || 0;
+      let rawY = acc.y || 0;
+      let rawZ = acc.z || 0;
 
-      if (usarGravidade) {
-        y = Math.max(0, y - 9.8);
+      let x = 0;
+      let y = 0;
+      let z = 0;
+
+      if (usarFiltro) {
+        // Inicializa a gravidade na primeira leitura para evitar picos falsos por desalinhamento inicial
+        if (!gravityInicializada) {
+          gravity.x = rawX;
+          gravity.y = rawY;
+          gravity.z = rawZ;
+          gravityInicializada = true;
+        }
+
+        // Filtro passa-baixa para isolar a gravidade estática
+        const alpha = 0.8;
+        gravity.x = alpha * gravity.x + (1 - alpha) * rawX;
+        gravity.y = alpha * gravity.y + (1 - alpha) * rawY;
+        gravity.z = alpha * gravity.z + (1 - alpha) * rawZ;
+
+        // Filtro passa-alta para obter a aceleração linear (removendo a gravidade)
+        x = Math.abs(rawX - gravity.x);
+        y = Math.abs(rawY - gravity.y);
+        z = Math.abs(rawZ - gravity.z);
+      } else {
+        // Dispositivo possui suporte nativo à aceleração linear (sem gravidade)
+        x = Math.abs(rawX);
+        y = Math.abs(rawY);
+        z = Math.abs(rawZ);
       }
 
       atualizarInterfaceAcelerometro(x, y, z);
@@ -910,9 +965,9 @@
     }
 
     function atualizarInterfaceAcelerometro(x, y, z) {
-      document.getElementById("txt-acc-x").innerText = x.toFixed(1) + " m/s²";
-      document.getElementById("txt-acc-y").innerText = y.toFixed(1) + " m/s²";
-      document.getElementById("txt-acc-z").innerText = z.toFixed(1) + " m/s²";
+      document.getElementById("txt-acc-x").innerText = x.toFixed(2) + " m/s²";
+      document.getElementById("txt-acc-y").innerText = y.toFixed(2) + " m/s²";
+      document.getElementById("txt-acc-z").innerText = z.toFixed(2) + " m/s²";
 
       // Atualiza as barras com a escala dinâmica configurada
       document.getElementById("bar-acc-x").style.width = Math.min((x / maxEscala) * 100, 100) + "%";
@@ -976,6 +1031,9 @@
         }
       }, 50);
     }
+
+    // Inicializa a sensibilidade padrão como 1.20 m/s²
+    ajustarSensibilidade(1.20);
   </script>
 
 </body>
