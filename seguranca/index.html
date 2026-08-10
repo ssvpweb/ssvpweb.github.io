@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Medidas de Segurança SSVP - v1.2.2</title>
+  <title>Medidas de Segurança SSVP - v1.2.3</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -466,7 +466,7 @@
 
   <div class="container">
     <header>
-      <h1>Medidas de Segurança SSVP - v1.2.2</h1>
+      <h1>Medidas de Segurança SSVP - v1.2.3</h1>
       <p>Simuladores interativos que mostram aos vicentinos na prática como os dados e as sessões de visitas são
         fortemente blindados contra criminosos.</p>
     </header>
@@ -487,7 +487,7 @@
           <span class="toggle-label">Senha para Testar:</span>
           <select id="senha-seletor" class="text-input"
             style="width: auto; margin: 0; padding: 6px 12px; font-size: 1.1rem;">
-            <option value="fraca">Senha Fraca ("123")</option>
+            <option value="fraca">Senha Fraca ("12345")</option>
             <option value="forte">Senha Forte ("J_2*xV7&9k#mLq")</option>
           </select>
         </div>
@@ -843,17 +843,19 @@
       let tentativas = 0;
       let tempoInicio = Date.now();
 
-      const senhasDicionarioFraco = ["123456", "admin", "senha", "deus", "123", "ssvp123"];
+      const senhasDicionarioFraco = [
+        "123456", "admin", "senha", "deus", "123", "ssvp123",
+        "1234", "password", "iloveyou", "jesus", "vicentino",
+        "mudar123", "usuario", "qwerty", "102030", "12345"
+      ];
 
       intervalAtaque = setInterval(() => {
         tentativas++;
         let senhaTentada = "";
 
         if (tipoSenha === "fraca") {
-          if (tentativas <= senhasDicionarioFraco.length - 1) {
+          if (tentativas <= senhasDicionarioFraco.length) {
             senhaTentada = senhasDicionarioFraco[tentativas - 1];
-          } else {
-            senhaTentada = "123";
           }
         } else {
           senhaTentada = gerarSenhaHackerSimulado();
@@ -878,17 +880,17 @@
         consoleBruto.innerHTML += `Tentativa #${tentativas}: Testando senha "${senhaTentada}"...\n`;
         consoleBruto.scrollTop = consoleBruto.scrollHeight;
 
-        if (tipoSenha === "fraca" && senhaTentada === "123") {
+        if (tipoSenha === "fraca" && senhaTentada === "12345") {
           clearInterval(intervalAtaque);
           let tempoGasto = ((Date.now() - tempoInicio) / 1000).toFixed(2);
-          consoleBruto.innerHTML += `🎉 SUCESSO! Senha correta ("123") encontrada!\n`;
+          consoleBruto.innerHTML += `🎉 SUCESSO! Senha correta ("12345") encontrada!\n`;
           consoleBruto.innerHTML += `⏱ Tempo gasto do hacker: ${tempoGasto} segundos.\n`;
           consoleBruto.innerHTML += `❌ SISTEMA INVASO! Mude suas senhas imediatamente.\n`;
           consoleBruto.scrollTop = consoleBruto.scrollHeight;
           btn.disabled = false;
         }
 
-        if (tipoSenha === "forte" && tentativas >= 20) {
+        if (tipoSenha === "forte" && tentativas >= senhasDicionarioFraco.length) {
           clearInterval(intervalAtaque);
           consoleBruto.innerHTML += `...\n`;
           consoleBruto.innerHTML += `🛑 ATAQUE FALHOU! Tentativas esgotadas no dicionário básico.\n`;
