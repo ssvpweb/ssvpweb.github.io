@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Medidas de Segurança SSVP - v1.2.0</title>
+  <title>Medidas de Segurança SSVP - v1.2.1</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -432,7 +432,7 @@
 
   <div class="container">
     <header>
-      <h1>Medidas de Segurança SSVP - v1.2.0</h1>
+      <h1>Medidas de Segurança SSVP - v1.2.1</h1>
       <p>Simuladores interativos que mostram aos vicentinos na prática como os dados e as sessões de visitas são fortemente blindados contra criminosos.</p>
     </header>
 
@@ -658,6 +658,12 @@
           </div>
         </div>
 
+        <!-- Painel de Diagnóstico Temporário -->
+        <div id="debug-panel" style="background-color: rgba(0, 0, 0, 0.4); border: 1px dashed var(--warning-color); padding: 12px; border-radius: 8px; margin-top: 15px; font-family: var(--font-mono); font-size: 0.95rem;">
+          <p style="color: var(--warning-color); font-weight: 700; margin-bottom: 5px;">🛠️ PAINEL DE DEPURAÇÃO DO SENSOR</p>
+          <div id="debug-info" style="line-height: 1.5; color: #fff;">Aguardando ativação e leituras do sensor...</div>
+        </div>
+
         <div class="button-group">
           <button class="btn danger" onclick="simularPuxaoBicicleta()">Simular Puxão de Bicicleta (PC/Teste)</button>
         </div>
@@ -688,6 +694,7 @@
     // Filtro de Gravidade para evitar picos e bloqueios imediatos em repouso
     let gravity = { x: 0, y: 0, z: 0 };
     let gravityInicializada = false;
+    let debugContador = 0;
 
     // Gerenciador de Acordeon dos Cards Grandes (Iniciam todos fechados)
     function toggleCard(cardId) {
@@ -709,7 +716,7 @@
         if (cardId === 'brute-force') {
           content.style.maxHeight = 'none';
         } else {
-          content.style.maxHeight = content.scrollHeight + 50 + 'px'; // Altura reajustada para suportar a div do XSS raw
+          content.style.maxHeight = content.scrollHeight + 80 + 'px'; // Reajustado para suportar o debug panel
         }
       }
     }
@@ -880,7 +887,7 @@
       }
     }
 
-    function activarSensorAcelerometro() {
+    function ativarSensorAcelerometro() {
       if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
         DeviceMotionEvent.requestPermission()
           .then(permissionState => {
@@ -907,6 +914,8 @@
       window.removeEventListener('devicemotion', handleMotion, true);
       sensorAtivo = false;
       gravityInicializada = false; // Reseta o filtro para a próxima ativação
+      debugContador = 0;
+      document.getElementById("debug-info").innerText = "Sensor desativado.";
       resetBarrasAcelerometro();
     }
 
@@ -921,11 +930,24 @@
         usarFiltro = true;
       }
 
-      if (!acc) return;
+      if (!acc) {
+        debugContador++;
+        document.getElementById("debug-info").innerHTML = `Eventos recebidos: ${debugContador}<br>Erro: Objeto de aceleração veio nulo do navegador.`;
+        return;
+      }
 
       let rawX = acc.x || 0;
       let rawY = acc.y || 0;
       let rawZ = acc.z || 0;
+
+      // Código de depuração visual
+      debugContador++;
+      let debugMsg = `Eventos recebidos: ${debugContador}<br>`;
+      debugMsg += `Tipo Aceleração Usada: ${usarFiltro ? "Com Gravidade (IncludingGravity)" : "Linear Pura (Nativa)"}<br>`;
+      debugMsg += `Valores crus do sensor:<br>`;
+      debugMsg += `- X: ${(acc.x !== null ? acc.x.toFixed(3) : "null")} m/s²<br>`;
+      debugMsg += `- Y: ${(acc.y !== null ? acc.y.toFixed(3) : "null")} m/s²<br>`;
+      debugMsg += `- Z: ${(acc.z !== null ? acc.z.toFixed(3) : "null")} m/s²<br>`;
 
       let x = 0;
       let y = 0;
@@ -950,12 +972,24 @@
         x = Math.abs(rawX - gravity.x);
         y = Math.abs(rawY - gravity.y);
         z = Math.abs(rawZ - gravity.z);
+        
+        debugMsg += `Aceleração linear calculada (Filtro Passa-Alta):<br>`;
+        debugMsg += `- X: ${x.toFixed(3)} m/s²<br>`;
+        debugMsg += `- Y: ${y.toFixed(3)} m/s²<br>`;
+        debugMsg += `- Z: ${z.toFixed(3)} m/s²`;
       } else {
         // Dispositivo possui suporte nativo à aceleração linear (sem gravidade)
         x = Math.abs(rawX);
         y = Math.abs(rawY);
         z = Math.abs(rawZ);
+        
+        debugMsg += `Aceleração linear nativa:<br>`;
+        debugMsg += `- X: ${x.toFixed(3)} m/s²<br>`;
+        debugMsg += `- Y: ${y.toFixed(3)} m/s²<br>`;
+        debugMsg += `- Z: ${z.toFixed(3)} m/s²`;
       }
+
+      document.getElementById("debug-info").innerHTML = debugMsg;
 
       atualizarInterfaceAcelerometro(x, y, z);
 
