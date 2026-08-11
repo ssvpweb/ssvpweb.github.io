@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Painel de Segurança SSVP - Google Login v1.0.0</title>
+  <title>Painel de Segurança SSVP - Google Login v1.1.0</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -249,6 +249,32 @@
       overflow-y: auto;
     }
 
+    /* Botão de Logout Moderno */
+    .btn-logout {
+      background-color: rgba(239, 68, 68, 0.08);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      color: var(--danger-color);
+      padding: 11px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 600;
+      transition: all 0.25s ease;
+      width: 100%;
+      text-align: center;
+      margin-top: 15px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-logout:hover {
+      background-color: var(--danger-color);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+    }
+
     /* Painel de Instruções */
     .instruction-card {
       background: rgba(255, 255, 255, 0.02);
@@ -296,7 +322,7 @@
   <div class="container">
 
     <header>
-      <h1>Webapp SSVP - Google Login v1.0.0</h1>
+      <h1>Webapp SSVP - Google Login v1.1.0</h1>
       <p>Demonstrador de Autenticação Segura com Conta Google</p>
     </header>
 
@@ -304,7 +330,7 @@
       <div class="app-logo">🛡️</div>
       <div class="card-title">Área do Vicentino</div>
 
-      <!-- Configuração de Login do Google (Insira seu Client ID real no atributo data-client_id) -->
+      <!-- Configuração de Login do Google (ID do cliente OAuth do projeto webappssvp) -->
       <div id="g_id_onload" data-client_id="828671781872-1bp6jpmm3jj8rm2gjhjk72jennob4da1.apps.googleusercontent.com"
         data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_prompt="false">
       </div>
@@ -316,8 +342,7 @@
         </div>
       </div>
 
-      <button class="sim-button" onclick="simularLoginLocal()">💻 Simular Login Local (Sem Client ID / Teste
-        Offline)</button>
+      <button class="sim-button" onclick="simularLoginLocal()">💻 Simular Login Local (Sem Client ID / Teste Offline)</button>
 
       <!-- Painel de Exibição dos Dados do Usuário Logado -->
       <div class="profile-panel" id="user-profile">
@@ -332,6 +357,9 @@
           style="font-size: 0.85rem; font-weight: bold; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase;">
           Token JWT Decodificado (Payload):</p>
         <div class="token-box" id="token-data">-</div>
+        
+        <!-- Botão de Desconexão (Logout) -->
+        <button class="btn-logout" onclick="efetuarLogout()">🚪 Sair da Conta (Logout)</button>
       </div>
 
     </div>
@@ -382,7 +410,7 @@
     }
 
     /**
-     * ATUALIZA A INTERFACE COM OS DADOS DO VICENTINO
+     * ATUALIZA A INTERFACE COM OS DADOS DO VICENTINO E OCULTA BOTÕES DE LOGIN
      */
     function exibirPerfilVicentino(dados) {
       const profilePanel = document.getElementById("user-profile");
@@ -391,12 +419,42 @@
       const userEmail = document.getElementById("user-email");
       const tokenData = document.getElementById("token-data");
 
+      // Atualiza os dados
       userImg.src = dados.picture || "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y";
       userName.innerText = dados.name;
       userEmail.innerText = dados.email;
       tokenData.textContent = dados.rawJson;
 
+      // Exibe o painel de perfil
       profilePanel.style.display = "block";
+
+      // Oculta o botão de login do Google e o de simulação
+      document.querySelector(".google-btn-wrapper").style.display = "none";
+      document.querySelector(".sim-button").style.display = "none";
+    }
+
+    /**
+     * EFETUA O LOGOUT DA CONTA GOOGLE E RESTAURA A TELA ORIGINAL
+     */
+    function efetuarLogout() {
+      // 1. Oculta o painel do perfil
+      document.getElementById("user-profile").style.display = "none";
+
+      // 2. Reseta campos do DOM
+      document.getElementById("user-img").src = "";
+      document.getElementById("user-name").innerText = "-";
+      document.getElementById("user-email").innerText = "-";
+      document.getElementById("token-data").textContent = "-";
+
+      // 3. Exibe novamente os botões de Login e Simulação
+      document.querySelector(".google-btn-wrapper").style.display = "flex";
+      document.querySelector(".sim-button").style.display = "block";
+
+      // 4. Desabilita a seleção automática no Google Accounts (revoga sessão local)
+      if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
+        google.accounts.id.disableAutoSelect();
+        console.log("Sessão do Google revogada localmente.");
+      }
     }
 
     /**
