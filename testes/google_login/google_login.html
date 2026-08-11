@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Painel de Segurança SSVP - Google Login v1.1.0</title>
+  <title>Painel de Segurança SSVP - Google Login v1.2.0</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -162,27 +162,6 @@
       margin-top: 5px;
     }
 
-    /* Botão de Simulação Local (UX de Desenvolvimento) */
-    .sim-button {
-      background-color: rgba(255, 255, 255, 0.04);
-      border: 1px dashed rgba(255, 255, 255, 0.15);
-      color: var(--text-muted);
-      padding: 10px 18px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      font-weight: 600;
-      transition: all 0.25s ease;
-      width: 100%;
-      text-align: center;
-    }
-
-    .sim-button:hover {
-      background-color: rgba(59, 130, 246, 0.1);
-      border-color: var(--primary-color);
-      color: #fff;
-    }
-
     /* Painel de Resultados Autenticados */
     .profile-panel {
       display: none;
@@ -274,46 +253,6 @@
       color: #fff;
       box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
     }
-
-    /* Painel de Instruções */
-    .instruction-card {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 16px;
-      padding: 1.5rem;
-    }
-
-    .instruction-card h3 {
-      font-family: var(--font-title);
-      font-size: 1.1rem;
-      color: var(--warning-color);
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .instruction-card ol {
-      padding-left: 1.2rem;
-      font-size: 0.95rem;
-      color: var(--text-muted);
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .instruction-card li strong {
-      color: #fff;
-    }
-
-    .instruction-card code {
-      background-color: rgba(0, 0, 0, 0.4);
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-family: var(--font-mono);
-      font-size: 0.85rem;
-      color: var(--warning-color);
-    }
   </style>
 </head>
 
@@ -322,7 +261,7 @@
   <div class="container">
 
     <header>
-      <h1>Webapp SSVP - Google Login v1.1.0</h1>
+      <h1>Webapp SSVP - Google Login v1.2.0</h1>
       <p>Demonstrador de Autenticação Segura com Conta Google</p>
     </header>
 
@@ -342,8 +281,6 @@
         </div>
       </div>
 
-      <button class="sim-button" onclick="simularLoginLocal()">💻 Simular Login Local (Sem Client ID / Teste Offline)</button>
-
       <!-- Painel de Exibição dos Dados do Usuário Logado -->
       <div class="profile-panel" id="user-profile">
         <div class="profile-header">
@@ -357,25 +294,11 @@
           style="font-size: 0.85rem; font-weight: bold; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase;">
           Token JWT Decodificado (Payload):</p>
         <div class="token-box" id="token-data">-</div>
-        
+
         <!-- Botão de Desconexão (Logout) -->
         <button class="btn-logout" onclick="efetuarLogout()">🚪 Sair da Conta (Logout)</button>
       </div>
 
-    </div>
-
-    <!-- Instruções para Ativação Real no GitHub Pages -->
-    <div class="instruction-card">
-      <h3>🚀 Como colocar em produção no GitHub Pages:</h3>
-      <ol>
-        <li>Acesse o <strong>Google Cloud Console</strong> e crie um projeto de teste.</li>
-        <li>Em <strong>Credenciais</strong>, crie um <strong>ID do cliente OAuth</strong> (Web Application).</li>
-        <li>Em <strong>Origens JavaScript Autorizadas</strong>, adicione o endereço do seu site:
-          <code>https://webappssvp.github.io</code>.</li>
-        <li>Substitua o <code>data-client_id</code> na tag <code>#g_id_onload</code> deste arquivo pelo seu ID real
-          gerado.</li>
-        <li>Faça o <strong>commit e push</strong> deste arquivo para o GitHub para testar em tempo real no ar!</li>
-      </ol>
     </div>
 
   </div>
@@ -428,9 +351,8 @@
       // Exibe o painel de perfil
       profilePanel.style.display = "block";
 
-      // Oculta o botão de login do Google e o de simulação
+      // Oculta o botão de login do Google
       document.querySelector(".google-btn-wrapper").style.display = "none";
-      document.querySelector(".sim-button").style.display = "none";
     }
 
     /**
@@ -446,42 +368,14 @@
       document.getElementById("user-email").innerText = "-";
       document.getElementById("token-data").textContent = "-";
 
-      // 3. Exibe novamente os botões de Login e Simulação
+      // 3. Exibe novamente o botão de Login
       document.querySelector(".google-btn-wrapper").style.display = "flex";
-      document.querySelector(".sim-button").style.display = "block";
 
       // 4. Desabilita a seleção automática no Google Accounts (revoga sessão local)
       if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
         google.accounts.id.disableAutoSelect();
         console.log("Sessão do Google revogada localmente.");
       }
-    }
-
-    /**
-     * SIMULA UM LOGIN COMPLETO (Para testes sem internet ou locais no navegador)
-     */
-    function simularLoginLocal() {
-      exibirPerfilVicentino({
-        name: "José da Silva (Vicentino Simulado)",
-        email: "jose.silva@conselhocentral.org.br",
-        picture: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200",
-        rawJson: JSON.stringify({
-          iss: "https://accounts.google.com",
-          nbf: 1691762400,
-          aud: "828671781872-1bp6jpmm3jj8rm2gjhjk72jennob4da1.apps.googleusercontent.com",
-          sub: "123456789012345678901",
-          email: "jose.silva@conselhocentral.org.br",
-          email_verified: true,
-          azp: "webappssvp.github.io",
-          name: "José da Silva (Vicentino Simulado)",
-          picture: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200",
-          given_name: "José",
-          family_name: "Silva",
-          iat: 1691762741,
-          exp: 1691766341,
-          jti: "mocked-token-for-local-development-only"
-        }, null, 2)
-      });
     }
   </script>
 
