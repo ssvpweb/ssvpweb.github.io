@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel de Segurança SSVP - Google Login v1.0.0</title>
-  
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=Share+Tech+Mono&display=swap"
+    rel="stylesheet">
 
   <!-- Biblioteca Oficial do Google Identity Services (GIS) -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -57,8 +60,15 @@
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     /* Cabeçalho */
@@ -111,8 +121,13 @@
     }
 
     @keyframes scanLine {
-      0% { left: -100%; }
-      100% { left: 100%; }
+      0% {
+        left: -100%;
+      }
+
+      100% {
+        left: 100%;
+      }
     }
 
     .app-logo {
@@ -121,8 +136,15 @@
     }
 
     @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-8px);
+      }
     }
 
     .card-title {
@@ -173,8 +195,15 @@
     }
 
     @keyframes expandIn {
-      from { opacity: 0; transform: scale(0.95); }
-      to { opacity: 1; transform: scale(1); }
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
     }
 
     .profile-header {
@@ -261,10 +290,11 @@
     }
   </style>
 </head>
+
 <body>
 
   <div class="container">
-    
+
     <header>
       <h1>Webapp SSVP - Google Login v1.0.0</h1>
       <p>Demonstrador de Autenticação Segura com Conta Google</p>
@@ -275,28 +305,19 @@
       <div class="card-title">Área do Vicentino</div>
 
       <!-- Configuração de Login do Google (Insira seu Client ID real no atributo data-client_id) -->
-      <div id="g_id_onload"
-           data-client_id="828671781872-1bp6jpmm3jj8rm2gjhjk72jennob4da1.apps.googleusercontent.com" 
-           data-context="signin"
-           data-ux_mode="popup"
-           data-callback="handleCredentialResponse"
-           data-auto_prompt="false">
+      <div id="g_id_onload" data-client_id="828671781872-1bp6jpmm3jj8rm2gjhjk72jennob4da1.apps.googleusercontent.com"
+        data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_prompt="false">
       </div>
 
       <!-- Renderização do Botão Oficial do Google -->
       <div class="google-btn-wrapper">
-        <div class="g_id_signin"
-             data-type="standard"
-             data-shape="rectangular"
-             data-theme="filled_blue"
-             data-text="signin_with"
-             data-size="large"
-             data-logo_alignment="left"
-             data-width="320">
+        <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="filled_blue"
+          data-text="signin_with" data-size="large" data-logo_alignment="left" data-width="320">
         </div>
       </div>
 
-      <button class="sim-button" onclick="simularLoginLocal()">💻 Simular Login Local (Sem Client ID / Teste Offline)</button>
+      <button class="sim-button" onclick="simularLoginLocal()">💻 Simular Login Local (Sem Client ID / Teste
+        Offline)</button>
 
       <!-- Painel de Exibição dos Dados do Usuário Logado -->
       <div class="profile-panel" id="user-profile">
@@ -307,7 +328,9 @@
             <div id="user-email" class="profile-email">-</div>
           </div>
         </div>
-        <p style="font-size: 0.85rem; font-weight: bold; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase;">Token JWT Decodificado (Payload):</p>
+        <p
+          style="font-size: 0.85rem; font-weight: bold; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase;">
+          Token JWT Decodificado (Payload):</p>
         <div class="token-box" id="token-data">-</div>
       </div>
 
@@ -319,8 +342,10 @@
       <ol>
         <li>Acesse o <strong>Google Cloud Console</strong> e crie um projeto de teste.</li>
         <li>Em <strong>Credenciais</strong>, crie um <strong>ID do cliente OAuth</strong> (Web Application).</li>
-        <li>Em <strong>Origens JavaScript Autorizadas</strong>, adicione o endereço do seu site: <code>https://webappssvp.github.io</code>.</li>
-        <li>Substitua o <code>data-client_id</code> na tag <code>#g_id_onload</code> deste arquivo pelo seu ID real gerado.</li>
+        <li>Em <strong>Origens JavaScript Autorizadas</strong>, adicione o endereço do seu site:
+          <code>https://webappssvp.github.io</code>.</li>
+        <li>Substitua o <code>data-client_id</code> na tag <code>#g_id_onload</code> deste arquivo pelo seu ID real
+          gerado.</li>
         <li>Faça o <strong>commit e push</strong> deste arquivo para o GitHub para testar em tempo real no ar!</li>
       </ol>
     </div>
@@ -349,7 +374,7 @@
     function decodeJwtResponse(token) {
       let base64Url = token.split('.')[1];
       let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      let jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+      let jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function (c) {
         return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
       }).join(''));
 
@@ -403,4 +428,5 @@
   </script>
 
 </body>
+
 </html>
