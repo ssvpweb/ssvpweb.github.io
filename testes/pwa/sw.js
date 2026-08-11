@@ -5,6 +5,8 @@ const ASSETS = [
   'icon.png'
 ];
 
+let alarmeTimeout = null;
+
 // Instalação do Service Worker e cache dos recursos básicos
 self.addEventListener('install', (e) => {
   e.waitUntil(
@@ -38,4 +40,51 @@ self.addEventListener('fetch', (e) => {
       return cachedResponse || fetch(e.request);
     })
   );
+});
+
+// ----------------------------------------------------
+// GERENCIADOR DE MENSAGENS E ALERTAS EM SEGUNDO PLANO
+// ----------------------------------------------------
+self.addEventListener('message', (event) => {
+  const data = event.data;
+
+  if (data.action === 'agendar_alarme') {
+    // Cancela qualquer alarme anterior agendado
+    if (alarmeTimeout) {
+      clearTimeout(alarmeTimeout);
+      alarmeTimeout = null;
+    }
+
+    const tempoMs = data.tempoMs;
+    const totalSegundos = data.totalSegundos;
+
+    // Agenda o temporizador no contexto isolado do Service Worker
+    alarmeTimeout = setTimeout(() => {
+      // Quando expirar, dispara a notificação de sistema (mesmo se o app estiver fechado)
+      self.registration.showNotification("Alarme PWA SSVP", {
+        body: "O temporizador do seu alarme de testes expirou!",
+        icon: "icon.png",
+        vibrate: [300, 100, 300, 100, 300], // Vibração ritmada
+        tag: "alarme-ssvp-tag",
+        renotify: true
+      });
+
+      // Envia uma mensagem para os clientes abertos tocando o som de bip local
+      self.clients.matchAll().then((clients) => {
+        clients.forEach((client) => {
+          client.postMessage({ action: 'alarme_disparado_sw' });
+        });
+      });
+
+      alarmeTimeout = null;
+    }, tempoMs);
+
+    console.log(`[SW] Notificação agendada para ocorrer em ${tempoMs}ms.`);
+  } else if (data.action === 'cancelar_alarme') {
+    if (alarmeTimeout) {
+      clearTimeout(alarmeTimeout);
+      alarmeTimeout = null;
+      console.log("[SW] Alarme em segundo plano cancelado.");
+    }
+  }
 });

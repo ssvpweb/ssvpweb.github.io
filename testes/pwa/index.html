@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PWA Testador de Alarmes v1.0.0</title>
+  <title>PWA Testador de Alarmes v1.1.0</title>
 
   <!-- Manifesto do PWA -->
   <link rel="manifest" href="manifest.json">
@@ -263,8 +263,8 @@
   <div class="container">
 
     <header>
-      <h1>PWA Alarme SSVP v1.0.0</h1>
-      <p>Testador de Temporização e Sons em Segundo Plano</p>
+      <h1>PWA Alarme SSVP v1.1.0</h1>
+      <p>Testador de Temporização e Notificações com App Fechado</p>
     </header>
 
     <div class="pwa-card">
@@ -303,19 +303,36 @@
 
   <script>
     // ----------------------------------------------------
-    // REGISTRO DO SERVICE WORKER
+    // REGISTRO DO SERVICE WORKER E CARREGAMENTO
     // ----------------------------------------------------
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('sw.js')
-          .then(reg => console.log('Service Worker registrado!', reg))
+          .then(reg => {
+            console.log('Service Worker registrado!', reg);
+            
+            // Tenta recuperar alarme persistente assim que o SW estiver pronto
+            navigator.serviceWorker.ready.then(() => {
+              recuperarAlarmePersistente();
+            });
+          })
           .catch(err => console.error('Falha ao registrar Service Worker:', err));
+      });
+
+      // Escuta notificações enviadas de volta pelo Service Worker
+      navigator.serviceWorker.addEventListener('message', (event) => {
+        if (event.data.action === 'alarme_disparado_sw') {
+          // Se a página estiver aberta, garante que toca o bip sonoro local
+          tocarBipAlerta();
+        }
       });
     }
 
-    // Solicitando permissão para Web Notifications
+    // Solicitando permissão de notificações do sistema
     if ('Notification' in window) {
-      Notification.requestPermission();
+      Notification.requestPermission().then(permission => {
+        console.log(`Permissão de notificações: ${permission}`);
+      });
     }
 
     // ----------------------------------------------------
@@ -325,19 +342,14 @@
     const btnInstall = document.getElementById('btn-install');
 
     window.addEventListener('beforeinstallprompt', (e) => {
-      // Impede o Chrome de mostrar o banner automático
       e.preventDefault();
-      // Guarda o evento para disparar depois
       deferredPrompt = e;
-      // Mostra o botão de instalação premium
       btnInstall.style.display = 'block';
     });
 
     btnInstall.addEventListener('click', () => {
       if (!deferredPrompt) return;
-      // Exibe o prompt de instalação
       deferredPrompt.prompt();
-      // Aguarda a resposta do usuário
       deferredPrompt.userChoice.then((choiceResult) => {
         if (choiceResult.outcome === 'accepted') {
           console.log('Usuário aceitou a instalação do PWA');
@@ -348,9 +360,8 @@
     });
 
     // ----------------------------------------------------
-    // LÓGICA DO TEMPORIZADOR E ALARMES
+    // LÓGICA DO TEMPORIZADOR E ALARMES COM LOCALSTORAGE E SW
     // ----------------------------------------------------
-    let alarmIntervalId = null;
     let countdownIntervalId = null;
     let tempoRestante = 0; // em segundos
 
@@ -358,7 +369,6 @@
      * INICIA OU ATUALIZA O ALARME PROGRAMADO
      */
     function iniciarAlarme() {
-      // Limpa temporizadores antigos se existirem
       pararTemporizadores();
 
       const val = parseInt(document.getElementById('interval-value').value) || 2;
@@ -368,21 +378,23 @@
       const totalSegundos = (unit === 'minutos') ? val * 60 : val;
       tempoRestante = totalSegundos;
 
+      // Calcula e salva o momento futuro do alarme
+      const limiteAlarme = Date.now() + (totalSegundos * 1000);
+      localStorage.setItem('alarme_ativo', 'true');
+      localStorage.setItem('alarme_limite', limiteAlarme);
+      localStorage.setItem('alarme_intervalo_s', totalSegundos);
+
       // Atualiza painel e status
       atualizarStatusInterface(true);
       atualizarDisplayRegressivo(tempoRestante);
 
-      // Inicia a contagem regressiva de 1 em 1 segundo
-      countdownIntervalId = setInterval(() => {
-        tempoRestante--;
-        if (tempoRestante < 0) {
-          tempoRestante = totalSegundos; // Reseta para o ciclo contínuo
-          dispararAlarmeSonoro();
-        }
-        atualizarDisplayRegressivo(tempoRestante);
-      }, 1000);
+      // 1. Inicia a contagem regressiva visual no frontend (enquanto o app estiver aberto)
+      iniciarLoopContagem(totalSegundos);
 
-      console.log(`Alarme ativado a cada ${val} ${unit}.`);
+      // 2. Avisa o Service Worker para agendar a notificação nativa em segundo plano
+      agendarNotificacaoNoSW(totalSegundos * 1000, totalSegundos);
+
+      console.log(`Alarme ativado a cada ${val} ${unit}. Sincronizado com o Service Worker.`);
     }
 
     /**
@@ -393,36 +405,107 @@
       tempoRestante = 0;
       atualizarDisplayRegressivo(0);
       atualizarStatusInterface(false);
-      console.log("Alarme cancelado pelo usuário.");
+      
+      // Limpa dados de persistência
+      localStorage.removeItem('alarme_ativo');
+      localStorage.removeItem('alarme_limite');
+      localStorage.removeItem('alarme_intervalo_s');
+
+      // Avisa o Service Worker para cancelar o timer de segundo plano
+      if (navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({
+          action: 'cancelar_alarme'
+        });
+      }
+
+      console.log("Alarme cancelado no celular e no Service Worker.");
     }
 
     /**
-     * PARA OS INTERVALOS DO JAVASCRIPT
+     * RECUPERA O ALARME PERSISTIDO SE O APP TIVER SIDO FECHADO
      */
-    function pararTemporizadores() {
-      if (alarmIntervalId) clearInterval(alarmIntervalId);
-      if (countdownIntervalId) clearInterval(countdownIntervalId);
-      alarmIntervalId = null;
-      countdownIntervalId = null;
+    function recuperarAlarmePersistente() {
+      const ativo = localStorage.getItem('alarme_ativo') === 'true';
+      if (!ativo) return;
+
+      const limite = parseInt(localStorage.getItem('alarme_limite'));
+      const totalSegundos = parseInt(localStorage.getItem('alarme_intervalo_s'));
+      const agora = Date.now();
+
+      if (!limite || !totalSegundos) return;
+
+      // Calcula o tempo que falta comparando com o relógio do sistema
+      tempoRestante = Math.round((limite - agora) / 1000);
+
+      if (tempoRestante <= 0) {
+        // Se o tempo expirou com o app fechado, o Service Worker já deve ter mandado a notificação.
+        // Toca o bip na abertura por redundância e reinicia o ciclo
+        tocarBipAlerta();
+        
+        tempoRestante = totalSegundos;
+        const novoLimite = Date.now() + (totalSegundos * 1000);
+        localStorage.setItem('alarme_limite', novoLimite);
+        
+        // Sincroniza Service Worker com o novo ciclo
+        agendarNotificacaoNoSW(totalSegundos * 1000, totalSegundos);
+      } else {
+        // Se ainda não expirou, agenda o tempo restante no Service Worker para sincronia perfeita
+        agendarNotificacaoNoSW(tempoRestante * 1000, totalSegundos);
+      }
+
+      // Restaura o visual
+      atualizarStatusInterface(true);
+      atualizarDisplayRegressivo(tempoRestante);
+
+      // Retoma os loops do frontend
+      iniciarLoopContagem(totalSegundos);
+      console.log(`Estado do alarme retomado. Restam ${tempoRestante}s.`);
     }
 
     /**
-     * EMITE O SOM DE BIP E ENVIA A NOTIFICAÇÃO VISUAL
+     * ENVIA COMANDO PARA O SERVICE WORKER AGENDAR O ALERTA FUTURO
      */
-    function dispararAlarmeSonoro() {
-      tocarBipAlerta();
-
-      // Envia notificação nativa do sistema se permitido
-      if ('Notification' in window && Notification.permission === 'granted') {
-        new Notification("Alarme PWA SSVP", {
-          body: "Temporizador de testes atingiu o limite!",
-          icon: "icon.png"
+    function agendarNotificacaoNoSW(tempoMs, totalSegundos) {
+      if (navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({
+          action: 'agendar_alarme',
+          tempoMs: tempoMs,
+          totalSegundos: totalSegundos
         });
       }
     }
 
     /**
-     * TOCA UM BIP ELETRÔNICO USANDO A WEB AUDIO API (CÓDIGO PURO)
+     * DISPARA E MANTÉM O LOOP DA CONTAGEM REGRESSIVA DO FRONTEND
+     */
+    function iniciarLoopContagem(totalSegundos) {
+      countdownIntervalId = setInterval(() => {
+        tempoRestante--;
+        
+        if (tempoRestante < 0) {
+          tempoRestante = totalSegundos;
+          // Atualiza limite do próximo ciclo
+          const proximoLimite = Date.now() + (totalSegundos * 1000);
+          localStorage.setItem('alarme_limite', proximoLimite);
+          
+          // Re-agenda o próximo alarme no Service Worker
+          agendarNotificacaoNoSW(totalSegundos * 1000, totalSegundos);
+        }
+        
+        atualizarDisplayRegressivo(tempoRestante);
+      }, 1000);
+    }
+
+    /**
+     * PARA OS INTERVALOS DO JAVASCRIPT LOCAL DO FRONTEND
+     */
+    function pararTemporizadores() {
+      if (countdownIntervalId) clearInterval(countdownIntervalId);
+      countdownIntervalId = null;
+    }
+
+    /**
+     * TOCA UM BIP ELETRÔNICO USANDO A WEB AUDIO API
      */
     function tocarBipAlerta() {
       try {
@@ -433,18 +516,17 @@
         oscillator.connect(gainNode);
         gainNode.connect(audioCtx.destination);
 
-        oscillator.type = 'sine'; // Onda senoidal (som de bip clássico)
-        oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // Frequência do bip (Lá 880Hz)
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // Tom agudo 880Hz
 
-        // Volume e esmaecimento suave para não estourar o som
         gainNode.gain.setValueAtTime(1, audioCtx.currentTime);
         gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
 
         oscillator.start();
         oscillator.stop(audioCtx.currentTime + 0.6);
-        console.log("Bip reproduzido via Web Audio API.");
+        console.log("Bip tocado localmente no frontend.");
       } catch (e) {
-        console.error("Erro ao gerar áudio:", e);
+        console.error("Erro ao reproduzir som:", e);
       }
     }
 
