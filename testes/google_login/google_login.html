@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Painel de Segurança SSVP - Google Login v1.2.0</title>
+  <title>Painel de Segurança SSVP - Google Login v1.3.0</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -155,6 +155,37 @@
       text-align: center;
     }
 
+    /* Badge de Status da Sessão */
+    .status-badge {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 1.05rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: all 0.3s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid transparent;
+      margin-bottom: 5px;
+    }
+
+    .status-logged-out {
+      background-color: rgba(239, 68, 68, 0.08);
+      border-color: rgba(239, 68, 68, 0.25);
+      color: var(--danger-color);
+    }
+
+    .status-logged-in {
+      background-color: rgba(16, 185, 129, 0.08);
+      border-color: rgba(16, 185, 129, 0.25);
+      color: var(--success-color);
+    }
+
     .google-btn-wrapper {
       width: 100%;
       display: flex;
@@ -261,13 +292,16 @@
   <div class="container">
 
     <header>
-      <h1>Webapp SSVP - Google Login v1.2.0</h1>
+      <h1>Webapp SSVP - Google Login v1.3.0</h1>
       <p>Demonstrador de Login/Logout com Conta Google</p>
     </header>
 
     <div class="login-card">
       <div class="app-logo">🛡️</div>
       <div class="card-title">Área do Vicentino</div>
+      
+      <!-- Badge de Status da Sessão -->
+      <div id="status-badge" class="status-badge status-logged-out">🔴 Logged Out</div>
 
       <!-- Configuração de Login do Google (ID do cliente OAuth do projeto webappssvp) -->
       <div id="g_id_onload" data-client_id="828671781872-1bp6jpmm3jj8rm2gjhjk72jennob4da1.apps.googleusercontent.com"
@@ -294,7 +328,7 @@
           style="font-size: 0.85rem; font-weight: bold; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase;">
           Token JWT Decodificado (Payload):</p>
         <div class="token-box" id="token-data">-</div>
-
+        
         <!-- Botão de Desconexão (Logout) -->
         <button class="btn-logout" onclick="efetuarLogout()">🚪 Sair da Conta (Logout)</button>
       </div>
@@ -353,6 +387,11 @@
 
       // Oculta o botão de login do Google
       document.querySelector(".google-btn-wrapper").style.display = "none";
+
+      // Atualiza o indicador de status para conectado (verde)
+      const badge = document.getElementById("status-badge");
+      badge.className = "status-badge status-logged-in";
+      badge.innerHTML = "🟢 Logged In";
     }
 
     /**
@@ -371,7 +410,12 @@
       // 3. Exibe novamente o botão de Login
       document.querySelector(".google-btn-wrapper").style.display = "flex";
 
-      // 4. Desabilita a seleção automática no Google Accounts (revoga sessão local)
+      // 4. Atualiza o indicador de status para desconectado (vermelho)
+      const badge = document.getElementById("status-badge");
+      badge.className = "status-badge status-logged-out";
+      badge.innerHTML = "🔴 Logged Out";
+
+      // 5. Desabilita a seleção automática no Google Accounts (revoga sessão local)
       if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
         google.accounts.id.disableAutoSelect();
         console.log("Sessão do Google revogada localmente.");
