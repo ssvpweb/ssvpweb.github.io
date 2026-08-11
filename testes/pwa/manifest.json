@@ -1,0 +1,18 @@
+{
+  "name": "Testador de Alarmes PWA SSVP",
+  "short_name": "Alarme PWA",
+  "description": "Aplicativo de teste para alarmes sonoros e agendamento em segundo plano.",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#080c14",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
