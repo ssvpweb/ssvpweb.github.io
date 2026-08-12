@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teste UX - Cards Expansíveis (Padrão Moto E7)</title>
+  
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- CSS Externo -->
+  <link rel="stylesheet" href="01_cards.css">
+</head>
+<body>
+
+  <header>
+    <h1>Teste UX #01: Cards Expansíveis</h1>
+    <p>Simulação otimizada para o dispositivo móvel <strong>Moto E7</strong> (360px de largura).</p>
+  </header>
+
+  <!-- Simulador de Visualização Mobile (Auxiliar para Desktop) -->
+  <div class="simulator-control">
+    <label for="toggleSimulator">
+      <input type="checkbox" id="toggleSimulator" onchange="toggleSimulatorView(this)">
+      Simular visualização no Moto E7 (360px)
+    </label>
+  </div>
+
+  <!-- Contêiner de Cards -->
+  <main id="cardsContainer" class="cards-container">
+    
+    <!-- CARD 1: Conferência Nossa Senhora -->
+    <section class="card" id="card1">
+      <div class="card-header" onclick="toggleCard('card1')">
+        <div class="card-title-group">
+          <div class="card-icon">CN</div>
+          <h2 class="card-title">Conferência N. Sra. das Graças</h2>
+        </div>
+        <button class="card-toggle-btn" aria-label="Expandir informações">＋</button>
+      </div>
+      
+      <div class="card-content-wrapper">
+        <div class="card-content">
+          <div class="card-body">
+            <p><strong>Presidente:</strong> Confrade Antônio Souza</p>
+            <p><strong>Reuniões:</strong> Domingos às 08:30h, na sala paroquial.</p>
+            <p>Esta conferência atua ativamente no amparo a 12 famílias carentes da comunidade, com distribuição de cestas básicas e assistência escolar básica.</p>
+            
+            <div class="card-meta">
+              <span class="card-tag">Ativa</span>
+              <span>Ref: 2026/A</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CARD 2: Ação Solidária de Inverno -->
+    <section class="card" id="card2">
+      <div class="card-header" onclick="toggleCard('card2')">
+        <div class="card-title-group">
+          <div class="card-icon">AS</div>
+          <h2 class="card-title">Campanha do Agasalho 2026</h2>
+        </div>
+        <button class="card-toggle-btn" aria-label="Expandir informações">＋</button>
+      </div>
+      
+      <div class="card-content-wrapper">
+        <div class="card-content">
+          <div class="card-body">
+            <p><strong>Meta:</strong> Arrecadar 500 cobertores e agasalhos para distribuição a pessoas em situação de rua até o final do mês.</p>
+            <p><strong>Ponto de Coleta:</strong> Sede do Conselho Central (Secretaria).</p>
+            <p>Participe doando roupas de frio em bom estado de conservação. Todo o material será triado e entregue pelas conferências locais.</p>
+            
+            <div class="card-meta">
+              <span class="card-tag" style="background-color: rgba(211, 47, 47, 0.1); color: var(--ssvp-red);">Urgente</span>
+              <span>Prazo: 31/08</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CARD 3: Conselho Central Metropolitano -->
+    <section class="card" id="card3">
+      <div class="card-header" onclick="toggleCard('card3')">
+        <div class="card-title-group">
+          <div class="card-icon">CC</div>
+          <h2 class="card-title">Conselho Central SVP</h2>
+        </div>
+        <button class="card-toggle-btn" aria-label="Expandir informações">＋</button>
+      </div>
+      
+      <div class="card-content-wrapper">
+        <div class="card-content">
+          <div class="card-body">
+            <p><strong>Presidente:</strong> Consócia Maria Oliveira</p>
+            <p><strong>Endereço:</strong> Rua São Vicente de Paulo, 120 - Centro</p>
+            <p>Órgão responsável pela coordenação administrativa e espiritual das conferências da nossa região. Entre em contato para informações sobre doações de grande porte ou voluntariado.</p>
+            
+            <div class="card-meta">
+              <span class="card-tag">Administrativo</span>
+              <span>Central</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CARD 4: Ajuda de Custo e Relatórios -->
+    <section class="card" id="card4">
+      <div class="card-header" onclick="toggleCard('card4')">
+        <div class="card-title-group">
+          <div class="card-icon">R1</div>
+          <h2 class="card-title">Relatório Financeiro Simplificado</h2>
+        </div>
+        <button class="card-toggle-btn" aria-label="Expandir informações">＋</button>
+      </div>
+      
+      <div class="card-content-wrapper">
+        <div class="card-content">
+          <div class="card-body">
+            <p>Demonstrativo resumido de entradas e saídas voltado para a transparência das ações assistenciais do último trimestre.</p>
+            <p><strong>Total de Entradas:</strong> R$ 4.850,00</p>
+            <p><strong>Total de Assistências:</strong> R$ 4.120,00</p>
+            <p><strong>Saldo Disponível:</strong> R$ 730,00 (destinado ao fundo de emergência comunitário).</p>
+            
+            <div class="card-meta">
+              <span class="card-tag">Finanças</span>
+              <span>Q2 2026</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Desenvolvido para testes de usabilidade e responsividade.</p>
+    <p>Sociedade de São Vicente de Paulo - Conselho SVP &copy; 2026</p>
+  </footer>
+
+  <script>
+    // Lógica para alternar a expansão dos cards
+    function toggleCard(cardId) {
+      const card = document.getElementById(cardId);
+      if (!card) return;
+
+      const wrapper = card.querySelector('.card-content-wrapper');
+      const toggleBtn = card.querySelector('.card-toggle-btn');
+      
+      if (!wrapper || !toggleBtn) return;
+
+      const isExpanded = wrapper.classList.contains('expanded');
+
+      // Fecha todos os outros cards para um efeito sanfona mais organizado (opcional, melhora a UX no celular)
+      // Se preferir que múltiplos cards fiquem abertos ao mesmo tempo, comente o bloco abaixo.
+      document.querySelectorAll('.card').forEach(otherCard => {
+        if (otherCard.id !== cardId) {
+          const otherWrapper = otherCard.querySelector('.card-content-wrapper');
+          const otherBtn = otherCard.querySelector('.card-toggle-btn');
+          if (otherWrapper && otherBtn) {
+            otherWrapper.classList.remove('expanded');
+            otherCard.classList.remove('expanded-active');
+            otherBtn.innerText = '＋';
+            otherBtn.setAttribute('aria-label', 'Expandir informações');
+          }
+        }
+      });
+
+      // Alterna o estado do card atual
+      if (isExpanded) {
+        wrapper.classList.remove('expanded');
+        card.classList.remove('expanded-active');
+        toggleBtn.innerText = '＋'; // Caractere Especial de Adição
+        toggleBtn.setAttribute('aria-label', 'Expandir informações');
+      } else {
+        wrapper.classList.add('expanded');
+        card.classList.add('expanded-active');
+        toggleBtn.innerText = '─'; // Caractere Especial de Subtração
+        toggleBtn.setAttribute('aria-label', 'Recolher informações');
+        
+        // Pequena rolagem suave para garantir que o card expandido fique visível no mobile
+        setTimeout(() => {
+          card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 150);
+      }
+    }
+
+    // Alternar visualização simulada do Moto E7
+    function toggleSimulatorView(checkbox) {
+      const container = document.getElementById('cardsContainer');
+      if (!container) return;
+
+      if (checkbox.checked) {
+        container.classList.add('simulating-moto-e7');
+      } else {
+        container.classList.remove('simulating-moto-e7');
+      }
+    }
+
+    // Ativar o simulador por padrão se a tela do computador for grande (largura > 768px)
+    window.addEventListener('DOMContentLoaded', () => {
+      const toggleCheckbox = document.getElementById('toggleSimulator');
+      if (window.innerWidth > 768 && toggleCheckbox) {
+        toggleCheckbox.checked = true;
+        toggleSimulatorView(toggleCheckbox);
+      }
+    });
+  </script>
+</body>
+</html>
