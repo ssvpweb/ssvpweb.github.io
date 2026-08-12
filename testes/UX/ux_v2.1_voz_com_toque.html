@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teste UX - Voz Contextual v2.1</title>
+  
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- CSS Externo Compartilhado -->
+  <link rel="stylesheet" href="global.css">
+
+  <style>
+    /* ==========================================================================
+       CONFIGURAÇÕES ERGONÔMICAS E SCROLL SNAPPING (TRAVA MAGNÉTICA)
+       ========================================================================== */
+    html {
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      padding-bottom: 90vh !important; 
+    }
+
+    .card {
+      scroll-snap-align: center;
+      scroll-snap-stop: always;
+      scroll-margin: 15px;
+      cursor: pointer;
+    }
+
+    /* Borda estável nos inputs */
+    .card-body input[type="text"] {
+      border: 2px solid var(--ssvp-gray-border);
+      margin-top: 0.4rem;
+      margin-bottom: 0.2rem;
+      font-size: 0.85rem;
+      user-select: none; /* Evita seleção padrão de texto no toque longo */
+    }
+
+    .card-body input[type="text"]:focus {
+      border-color: var(--ssvp-red);
+      box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.15);
+      outline: none;
+    }
+
+    .input-hint {
+      font-size: 0.7rem;
+      color: var(--ssvp-text-muted);
+      margin-bottom: 0.6rem;
+      display: block;
+    }
+
+    /* ==========================================================================
+       TEXTOS SELECIONÁVEIS PARA LEITURA (SÍNTESE DE VOZ)
+       ========================================================================== */
+    .readable-text {
+      border: 2px solid transparent;
+      border-radius: 6px;
+      padding: 2px 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-block;
+      position: relative;
+    }
+
+    .readable-text:hover {
+      background-color: rgba(0, 45, 98, 0.03);
+    }
+
+    .readable-text.focused-text {
+      border-color: var(--ssvp-red);
+      box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.15);
+      background-color: rgba(211, 47, 47, 0.03);
+    }
+
+    /* ==========================================================================
+       BARRA INFERIOR DE VOZ CONTEXTUAL (ONE-HAND UX)
+       ========================================================================== */
+    .bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 70px;
+      background-color: var(--ssvp-navy);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 1.5rem;
+      box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+    }
+
+    .voice-action-btn {
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--ssvp-blue) 0%, #005ec4 100%);
+      color: white;
+      border: 4px solid var(--ssvp-white);
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      top: -30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(0, 127, 255, 0.4);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      z-index: 1001;
+    }
+
+    .voice-action-btn:active {
+      transform: translateX(-50%) scale(0.95);
+    }
+
+    .voice-action-btn svg {
+      width: 32px;
+      height: 32px;
+      fill: currentColor;
+    }
+
+    .voice-action-btn.listening {
+      background: linear-gradient(135deg, var(--ssvp-red) 0%, #b91c1c 100%);
+      box-shadow: 0 4px 20px rgba(239, 68, 68, 0.5);
+      animation: pulseBtn 1.5s infinite;
+    }
+
+    .voice-action-btn.speaking {
+      background: linear-gradient(135deg, var(--ssvp-success) 0%, #047857 100%);
+      box-shadow: 0 4px 20px rgba(16, 185, 129, 0.5);
+    }
+
+    @keyframes pulseBtn {
+      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+      70% { box-shadow: 0 0 0 16px rgba(239, 68, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
+    .status-text-left, .status-text-right {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.75rem;
+      font-weight: 500;
+      max-width: 30%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .status-text-right {
+      text-align: right;
+    }
+
+    .voice-alert-banner {
+      background-color: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      border-radius: 12px;
+      padding: 0.75rem;
+      color: var(--ssvp-error);
+      font-size: 0.8rem;
+      margin-bottom: 1rem;
+      display: none;
+    }
+
+    .voice-alert-banner.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>v2.1_voz_com_toque.html</h1>
+    <p>Sociedade de São Vicente de Paulo</p>
+  </header>
+
+  <!-- Banner de aviso caso falte HTTPS para usar voz no celular -->
+  <div id="voiceAlert" class="voice-alert-banner">
+    <strong>Aviso de Voz:</strong> O reconhecimento de fala (microfone) requer uma conexão segura **HTTPS** para funcionar no celular. Em conexões HTTP locais, apenas a leitura de texto (alto-falante) estará disponível.
+  </div>
+
+  <!-- Contêiner de Cards -->
+  <main id="cardsContainer" class="cards-container">
+    
+    <!-- CARD 1: Conferência Nossa Senhora -->
+    <section class="card" id="card1" onclick="toggleCard('card1', event)">
+      <div class="card-header">
+        <div class="card-title-group">
+          <div class="card-icon">CN</div>
+          <h2 class="card-title">Conferência N. Sra. das Graças</h2>
+        </div>
+        <button class="card-toggle-btn" aria-label="Expandir informações">＋</button>
+      </div>
+      
+      <div class="card-content-wrapper">
+        <div class="card-content">
+          <div class="card-body">
+            <!-- Input Superior -->
+            <div class="form-group">
+              <label for="input1_sup">Nome do Relator (Superior)</label>
+              <input type="text" id="input1_sup" placeholder="Toque rápido p/ Voz. Segure p/ Teclado..." readonly>
+              <span class="input-hint">💡 Toque rápido = Voz | Segure = Teclado</span>
+            </div>
+
+            <p><strong>Presidente:</strong> 
+              <span class="readable-text" onclick="setTextFocus(this, event)">Confrade Antônio Souza</span>
+            </p>
+            <p><strong>Reuniões:</strong> 
+              <span class="readable-text" onclick="setTextFocus(this, event)">Domingos às 08:30h, na sala paroquial.</span>
+            </p>
+            <p><strong>Ações:</strong> 
+              <span class="readable-text" onclick="setTextFocus(this, event)">Esta conferência atua ativamente no amparo a 12 famílias carentes.</span>
+            </p>
+            
+            <!-- Input Inferior -->
+            <div class="form-group" style="margin-top: 0.5rem;">
+              <label for="input1_inf">Observações da Reunião (Inferior)</label>
+              <input type="text" id="input1_inf" placeholder="Toque rápido p/ Voz. Segure p/ Teclado..." readonly>
+              <span class="input-hint">💡 Toque rápido = Voz | Segure = Teclado</span>
+            </div>
+            
+            <div class="card-meta">
+              <span class="card-tag">Ativa</span>
+              <span>Ref: 2026/A</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CARD 2: Ação Solidária de Inverno -->
+    <section class="card" id="card2" onclick="toggleCard('card2', event)">
+      <div class="card-header">
+        <div class="card-title-group">
+          <div class="card-icon">AS</div>
+          <h2 class="card-title">Campanha do Agasalho 2026</h2>
+        </div>
+        <button class="card-toggle-btn" aria-label="Expandir informações">＋</button>
+      </div>
+      
+      <div class="card-content-wrapper">
+        <div class="card-content">
+          <div class="card-body">
+            <!-- Input Superior -->
+            <div class="form-group">
+              <label for="input2_sup">Responsável pela Ação (Superior)</label>
+              <input type="text" id="input2_sup" placeholder="Toque rápido p/ Voz. Segure p/ Teclado..." readonly>
+              <span class="input-hint">💡 Toque rápido = Voz | Segure = Teclado</span>
+            </div>
+
+            <p><strong>Objetivo:</strong> 
+              <span class="readable-text" onclick="setTextFocus(this, event)">Arrecadar 500 cobertores e agasalhos para pessoas em situação de rua.</span>
+            </p>
+            
+            <!-- Input Inferior -->
+            <div class="form-group" style="margin-top: 0.5rem;">
+              <label for="input2_inf">Ponto de Coleta Principal (Inferior)</label>
+              <input type="text" id="input2_inf" placeholder="Toque rápido p/ Voz. Segure p/ Teclado..." readonly>
+              <span class="input-hint">💡 Toque rápido = Voz | Segure = Teclado</span>
+            </div>
+            
+            <div class="card-meta">
+              <span class="card-tag" style="background-color: rgba(211, 47, 47, 0.1); color: var(--ssvp-red);">Urgente</span>
+              <span>Prazo: 31/08</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Console de logs simplificado -->
+  <div style="width: 100%; max-width: 600px; margin-top: 1.5rem; padding: 0 0.5rem;">
+    <div id="consoleLogs" class="console-logs"></div>
+  </div>
+
+  <!-- BARRA INFERIOR ERGONÔMICA -->
+  <nav class="bottom-bar">
+    <div id="statusLeft" class="status-text-left">Nenhum foco</div>
+    
+    <button id="btnVoiceAction" class="voice-action-btn" onclick="handleVoiceAction()" title="Ação de Voz Contextual">
+      <svg id="svgMicIcon" viewBox="0 0 24 24"><path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg>
+    </button>
+    
+    <div id="statusRight" class="status-text-right">Toque em algo</div>
+  </nav>
+
+  <script>
+    // Configurações e estados de Voz
+    let activeInput = null;
+    let activeTextElement = null;
+    
+    let recognition = null;
+    let synth = window.speechSynthesis;
+    let isListening = false;
+    let isSpeaking = false;
+
+    // Elementos DOM
+    const btnVoiceAction = document.getElementById('btnVoiceAction');
+    const statusLeft = document.getElementById('statusLeft');
+    const statusRight = document.getElementById('statusRight');
+    const voiceAlert = document.getElementById('voiceAlert');
+    const consoleLogs = document.getElementById('consoleLogs');
+
+    // Ícones SVG
+    const svgMic = `<path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>`;
+    const svgSpeaker = `<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>`;
+    
+    function log(msg) {
+      const now = new Date();
+      const time = now.toTimeString().split(' ')[0];
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+      entry.innerHTML = `<span class="log-time">[${time}]</span> ${msg}`;
+      consoleLogs.appendChild(entry);
+      consoleLogs.scrollTop = consoleLogs.scrollHeight;
+    }
+
+    // Inicialização da página e vinculo de eventos
+    window.addEventListener('DOMContentLoaded', () => {
+      log('Iniciando v2.1: Toque Híbrido (Voz vs Teclado)...');
+      initSpeechRecognition();
+      checkHttps();
+      setupInputsTactileControls();
+    });
+
+    // Configura os gestos de Toque e Mouse nos inputs
+    function setupInputsTactileControls() {
+      const inputs = document.querySelectorAll('.card-body input[type="text"]');
+      const HOLD_DELAY = 550; // Tempo em milissegundos para segurar
+
+      inputs.forEach(input => {
+        let touchTimer = null;
+        let isLongPress = false;
+
+        // --- GESTOS MOBILE (TOUCH) ---
+        input.addEventListener('touchstart', (e) => {
+          isLongPress = false;
+          
+          touchTimer = setTimeout(() => {
+            isLongPress = true;
+            
+            // Ativa o teclado virtual mudando o estado do input
+            input.readOnly = false;
+            input.inputMode = "text";
+            input.focus();
+            
+            // Vibração tátil no celular
+            if (navigator.vibrate) {
+              navigator.vibrate(40);
+            }
+            log('Segurou: Ativando teclado virtual.');
+          }, HOLD_DELAY);
+        }, { passive: true });
+
+        input.addEventListener('touchend', (e) => {
+          clearTimeout(touchTimer);
+          
+          if (!isLongPress) {
+            // Toque Rápido: Foca para Voz apenas
+            e.preventDefault(); // Impede o navegador de tentar abrir o teclado
+            
+            input.readOnly = true;
+            input.inputMode = "none";
+            input.focus();
+            
+            setInputFocus(input);
+            log('Toque rápido: Focado para Voz (Teclado oculto).');
+          }
+        });
+
+        input.addEventListener('touchcancel', () => {
+          clearTimeout(touchTimer);
+        });
+
+        // --- MOUSE DESKTOP (Para testes no Laptop) ---
+        input.addEventListener('mousedown', (e) => {
+          // Ignora cliques gerados por emulação de toque
+          if (e.pointerType === 'touch') return;
+          
+          isLongPress = false;
+          touchTimer = setTimeout(() => {
+            isLongPress = true;
+            input.readOnly = false;
+            input.inputMode = "text";
+            input.focus();
+            log('Mouse longo: Teclado ativado.');
+          }, HOLD_DELAY);
+        });
+
+        input.addEventListener('mouseup', (e) => {
+          if (e.pointerType === 'touch') return;
+          clearTimeout(touchTimer);
+          
+          if (!isLongPress) {
+            e.preventDefault();
+            input.readOnly = true;
+            input.inputMode = "none";
+            input.focus();
+            setInputFocus(input);
+            log('Mouse rápido: Focado para Voz.');
+          }
+        });
+      });
+    }
+
+    // Verifica restrições de HTTPS
+    function checkHttps() {
+      const isSecure = window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      if (!isSecure) {
+        voiceAlert.classList.add('active');
+        log('Aviso: Conexão HTTP insegura. Microfone desativado pelo navegador.');
+      }
+    }
+
+    // Configura o reconhecimento de fala
+    function initSpeechRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        recognition = new SpeechRecognition();
+        recognition.lang = 'pt-BR';
+        recognition.continuous = false;
+        recognition.interimResults = false;
+
+        recognition.onstart = () => {
+          isListening = true;
+          btnVoiceAction.classList.add('listening');
+          statusLeft.innerText = "🎤 Escutando...";
+          log('Microfone ativado. Dite seu texto.');
+        };
+
+        recognition.onresult = (event) => {
+          const text = event.results[0][0].transcript;
+          log(`Transcrito: "${text}"`);
+          if (activeInput) {
+            // Insere o texto ditado
+            activeInput.value = text;
+            activeInput.dispatchEvent(new Event('input'));
+          }
+        };
+
+        recognition.onerror = (e) => {
+          log(`Erro no microfone: ${e.error}`);
+        };
+
+        recognition.onend = () => {
+          isListening = false;
+          btnVoiceAction.classList.remove('listening');
+          updateStatusBar();
+          log('Microfone encerrado.');
+        };
+      } else {
+        log('Aviso: Reconhecimento de Voz (Microfone) indisponível neste navegador.');
+      }
+    }
+
+    // Ativa o foco de um input (Ação: Gravar/Microfone)
+    function setInputFocus(inputElement) {
+      clearTextFocus();
+      activeInput = inputElement;
+      btnVoiceAction.innerHTML = `<svg id="svgMicIcon" viewBox="0 0 24 24">${svgMic}</svg>`;
+      updateStatusBar();
+      
+      // Auto-scroll assistido
+      scrollIntoViewOnFocus(inputElement);
+    }
+
+    // Limpa o foco de um input
+    function clearInputFocus(inputElement) {
+      setTimeout(() => {
+        if (activeInput === inputElement && !isListening) {
+          activeInput = null;
+          updateStatusBar();
+        }
+      }, 300);
+    }
+
+    // Ativa o foco em um texto legível (Ação: Falar/Alto-falante)
+    function setTextFocus(element, event) {
+      event.stopPropagation();
+      clearTextFocus();
+      if (activeInput) {
+        activeInput.blur();
+        activeInput = null;
+      }
+      activeTextElement = element;
+      element.classList.add('focused-text');
+      btnVoiceAction.innerHTML = `<svg id="svgMicIcon" viewBox="0 0 24 24">${svgSpeaker}</svg>`;
+      updateStatusBar();
+      log(`Texto selecionado: "${element.innerText.substring(0, 25)}..."`);
+    }
+
+    // Limpa a seleção do texto
+    function clearTextFocus() {
+      if (activeTextElement) {
+        activeTextElement.classList.remove('focused-text');
+        activeTextElement = null;
+      }
+      btnVoiceAction.innerHTML = `<svg id="svgMicIcon" viewBox="0 0 24 24">${svgMic}</svg>`;
+      updateStatusBar();
+    }
+
+    // Atualiza os painéis de status da barra inferior
+    function updateStatusBar() {
+      if (activeInput) {
+        statusLeft.innerText = "✍️ Digitando no campo";
+        statusRight.innerText = activeInput.id.replace('input', 'Campo ');
+      } else if (activeTextElement) {
+        statusLeft.innerText = "📢 Pronto para ler";
+        statusRight.innerText = "Texto Focado";
+      } else {
+        statusLeft.innerText = "Nenhum foco ativo";
+        statusRight.innerText = "Toque em algo";
+      }
+    }
+
+    // Controller da Ação de Voz
+    function handleVoiceAction() {
+      if (isListening) {
+        if (recognition) recognition.stop();
+        return;
+      }
+      if (isSpeaking) {
+        stopSpeaking();
+        return;
+      }
+
+      if (activeInput) {
+        if (!recognition) {
+          log('Erro: Seu dispositivo não suporta o reconhecimento de voz.');
+          alert('Microfone não suportado no navegador atual.');
+          return;
+        }
+        try {
+          recognition.start();
+        } catch (e) {
+          log(`Falha ao ligar microfone: ${e.message}`);
+        }
+      } 
+      else if (activeTextElement) {
+        speakTextContent(activeTextElement.innerText);
+      } 
+      else {
+        speakTextContent("Selecione um texto para ouvir ou toque em um campo para ditar.");
+      }
+    }
+
+    // Executa a síntese de voz (leitura)
+    function speakTextContent(text) {
+      if (!synth) {
+        log('Erro: Seu navegador não possui síntese de voz.');
+        return;
+      }
+      synth.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'pt-BR';
+
+      utterance.onstart = () => {
+        isSpeaking = true;
+        btnVoiceAction.classList.add('speaking');
+        statusLeft.innerText = "🔊 Lendo...";
+        log(`Lendo: "${text.substring(0, 30)}..."`);
+      };
+
+      utterance.onend = () => {
+        isSpeaking = false;
+        btnVoiceAction.classList.remove('speaking');
+        updateStatusBar();
+        log('Leitura concluída.');
+      };
+
+      utterance.onerror = (e) => {
+        isSpeaking = false;
+        btnVoiceAction.classList.remove('speaking');
+        updateStatusBar();
+        log(`Erro de síntese: ${e.error}`);
+      };
+
+      synth.speak(utterance);
+    }
+
+    function stopSpeaking() {
+      if (synth) {
+        synth.cancel();
+        isSpeaking = false;
+        btnVoiceAction.classList.remove('speaking');
+        updateStatusBar();
+        log('Leitura interrompida.');
+      }
+    }
+
+    // Comportamento de rolagem e expansão dos cards
+    function toggleCard(cardId, event) {
+      const card = document.getElementById(cardId);
+      if (!card) return;
+
+      const wrapper = card.querySelector('.card-content-wrapper');
+      const toggleBtn = card.querySelector('.card-toggle-btn');
+      
+      if (!wrapper || !toggleBtn) return;
+
+      const targetTagName = event.target.tagName.toUpperCase();
+      const isReadable = event.target.classList.contains('readable-text') || event.target.closest('.readable-text');
+      
+      if (
+        targetTagName === 'INPUT' || 
+        targetTagName === 'TEXTAREA' || 
+        targetTagName === 'A' || 
+        isReadable ||
+        (targetTagName === 'BUTTON' && !event.target.classList.contains('card-toggle-btn'))
+      ) {
+        return; 
+      }
+
+      const isExpanded = wrapper.classList.contains('expanded');
+
+      document.querySelectorAll('.card').forEach(otherCard => {
+        if (otherCard.id !== cardId) {
+          const otherWrapper = otherCard.querySelector('.card-content-wrapper');
+          const otherBtn = otherCard.querySelector('.card-toggle-btn');
+          if (otherWrapper && otherBtn) {
+            otherWrapper.classList.remove('expanded');
+            otherCard.classList.remove('expanded-active');
+            otherBtn.innerText = '＋';
+            otherBtn.setAttribute('aria-label', 'Expandir informações');
+          }
+        }
+      });
+
+      if (isExpanded) {
+        wrapper.classList.remove('expanded');
+        card.classList.remove('expanded-active');
+        toggleBtn.innerText = '＋';
+        toggleBtn.setAttribute('aria-label', 'Expandir informações');
+        clearTextFocus();
+      } else {
+        wrapper.classList.add('expanded');
+        card.classList.add('expanded-active');
+        toggleBtn.innerText = '─';
+        toggleBtn.setAttribute('aria-label', 'Recolher informações');
+        
+        setTimeout(() => {
+          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 150);
+      }
+    }
+
+    function scrollIntoViewOnFocus(element) {
+      setTimeout(() => {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 350);
+    }
+  </script>
+</body>
+</html>
