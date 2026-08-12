@@ -95,7 +95,7 @@
       justify-content: space-between;
       align-items: center;
       padding: 0 1.5rem;
-      box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 -4px 15 rgba(0, 0, 0, 0.2);
       z-index: 1000;
     }
 
@@ -208,7 +208,7 @@
             <div class="form-group">
               <label for="input1_sup">Nome do Relator (Superior)</label>
               <input type="text" id="input1_sup" placeholder="Toque p/ Voz | Segure p/ Teclado ou Copiar" readonly>
-              <span class="input-hint">💡 Toque Rápido = Voz | Segure (1s) = Teclado | Segure + (2s) = Menu Copiar</span>
+              <span class="input-hint">💡 Toque Rápido = Voz | Segure (0.5s) = Teclado | Segure + (2.0s) = Menu Copiar</span>
             </div>
 
             <p><strong>Presidente:</strong> 
@@ -225,7 +225,7 @@
             <div class="form-group" style="margin-top: 0.5rem;">
               <label for="input1_inf">Observações da Reunião (Inferior)</label>
               <input type="text" id="input1_inf" placeholder="Toque p/ Voz | Segure p/ Teclado ou Copiar" readonly>
-              <span class="input-hint">💡 Toque Rápido = Voz | Segure (1s) = Teclado | Segure + (2s) = Menu Copiar</span>
+              <span class="input-hint">💡 Toque Rápido = Voz | Segure (0.5s) = Teclado | Segure + (2.0s) = Menu Copiar</span>
             </div>
             
             <div class="card-meta">
@@ -254,7 +254,7 @@
             <div class="form-group">
               <label for="input2_sup">Responsável pela Ação (Superior)</label>
               <input type="text" id="input2_sup" placeholder="Toque p/ Voz | Segure p/ Teclado ou Copiar" readonly>
-              <span class="input-hint">💡 Toque Rápido = Voz | Segure (1s) = Teclado | Segure + (2s) = Menu Copiar</span>
+              <span class="input-hint">💡 Toque Rápido = Voz | Segure (0.5s) = Teclado | Segure + (2.0s) = Menu Copiar</span>
             </div>
 
             <p><strong>Objetivo:</strong> 
@@ -265,7 +265,7 @@
             <div class="form-group" style="margin-top: 0.5rem;">
               <label for="input2_inf">Ponto de Coleta Principal (Inferior)</label>
               <input type="text" id="input2_inf" placeholder="Toque p/ Voz | Segure p/ Teclado ou Copiar" readonly>
-              <span class="input-hint">💡 Toque Rápido = Voz | Segure (1s) = Teclado | Segure + (2s) = Menu Copiar</span>
+              <span class="input-hint">💡 Toque Rápido = Voz | Segure (0.5s) = Teclado | Segure + (2.0s) = Menu Copiar</span>
             </div>
             
             <div class="card-meta">
@@ -338,7 +338,7 @@
     function setupTripleTouchControls() {
       const inputs = document.querySelectorAll('.card-body input[type="text"]');
       const DELAY_KEYBOARD = 500;   // Estágio 2: Abre Teclado
-      const DELAY_SELECTION = 1200; // Estágio 3: Abre Copiar/Colar
+      const DELAY_SELECTION = 2000; // Estágio 3: Abre Copiar/Colar (Ajustado para 2 segundos)
 
       inputs.forEach(input => {
         let timerTeclado = null;
@@ -364,7 +364,7 @@
             log('Estágio 2: Teclado Virtual ativado.');
           }, DELAY_KEYBOARD);
 
-          // Estágio 3: Copiar/Colar aos 1200ms
+          // Estágio 3: Copiar/Colar aos 2000ms
           timerSelecao = setTimeout(() => {
             modoAtivo = "selecao";
             input.readOnly = false;
@@ -688,6 +688,7 @@
       }
     }
 
+    // UX Helper
     function scrollIntoViewOnFocus(element) {
       setTimeout(() => {
         element.scrollIntoView({ behavior: 'smooth', block: 'center' });
