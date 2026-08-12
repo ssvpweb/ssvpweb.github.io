@@ -59,22 +59,22 @@
     }
 
     /* ==========================================================================
-       BOTOES DE INTERROGAÇÃO (?) AJUDA CONTEXTUAL
+       BOTOES DE INTERROGAÇÃO (?) AJUDA CONTEXTUAL - ERGONÔMICOS E GRANDES
        ========================================================================== */
     .help-btn {
-      width: 18px;
-      height: 18px;
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
       background-color: var(--ssvp-light-blue);
       color: var(--ssvp-navy);
-      border: 1px solid var(--ssvp-gray-border);
-      font-size: 0.7rem;
+      border: 2px solid var(--ssvp-blue);
+      font-size: 1.1rem;
       font-weight: 700;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      margin-left: 0.4rem;
+      margin-left: 0.5rem;
       transition: all 0.2s ease;
       vertical-align: middle;
     }
@@ -391,8 +391,8 @@
     <div id="consoleLogs" class="console-logs"></div>
   </div>
 
-  <!-- BARRA INFERIOR ERGONÔMICA -->
-  <nav class="bottom-bar" style="position: relative;">
+  <!-- BARRA INFERIOR ERGONÔMICA (Posição Fixed restaurada do CSS, sem estilo inline local) -->
+  <nav class="bottom-bar">
     <div id="statusLeft" class="status-text-left">Nenhum foco</div>
     
     <button id="btnVoiceAction" class="voice-action-btn" onclick="handleVoiceAction()" title="Ação de Voz Contextual">
@@ -401,7 +401,7 @@
     
     <div id="statusRight" class="status-text-right">Toque em algo</div>
     
-    <!-- Botão de interrogação absoluto na ponta direita da barra -->
+    <!-- Botão de interrogação absoluto na ponta direita da barra (34px de área de toque) -->
     <button class="help-btn" onclick="openHelpSheet('barra_voz', event)" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); z-index: 1002; margin-left: 0;" title="Ajuda sobre a barra de voz">?</button>
   </nav>
 
@@ -491,6 +491,7 @@
       log('Fechou ajuda.');
     }
 
+    // Leitura por voz ativa
     function speakActiveHelp() {
       if (textoAjudaAtivo) {
         speakTextContent(textoAjudaAtivo);
@@ -712,16 +713,12 @@
     // Reconfigura dinamicamente o ícone do botão central baseado no contexto
     function updateVoiceButtonIcon() {
       if (isHelpOpen) {
-        // Se a ajuda de contexto estiver aberta na tela, o botão vira o Alto-falante de leitura
         btnVoiceAction.innerHTML = `<svg id="svgMicIcon" viewBox="0 0 24 24">${svgSpeaker}</svg>`;
       } else if (activeInput) {
-        // Input focado -> Modo Gravação (Microfone)
         btnVoiceAction.innerHTML = `<svg id="svgMicIcon" viewBox="0 0 24 24">${svgMic}</svg>`;
       } else if (activeTextElement) {
-        // Texto focado -> Modo Leitura (Alto-falante)
         btnVoiceAction.innerHTML = `<svg id="svgMicIcon" viewBox="0 0 24 24">${svgSpeaker}</svg>`;
       } else {
-        // Sem foco -> Volta para Microfone padrão
         btnVoiceAction.innerHTML = `<svg id="svgMicIcon" viewBox="0 0 24 24">${svgMic}</svg>`;
       }
     }
@@ -745,7 +742,6 @@
 
     // Controller da Ação de Voz (Centralizador do Botão da Barra Inferior)
     function handleVoiceAction() {
-      // 1. Se estiver gravando ou lendo, para a execução ativa
       if (isListening) {
         if (recognition) recognition.stop();
         return;
@@ -755,11 +751,9 @@
         return;
       }
 
-      // 2. Se a Ajuda Contextual estiver aberta -> Lê o texto do painel
       if (isHelpOpen) {
         speakActiveHelp();
       }
-      // 3. Se houver um input ativo -> Grava fala
       else if (activeInput) {
         if (!recognition) {
           log('Erro: Seu dispositivo não suporta o reconhecimento de voz.');
@@ -772,11 +766,9 @@
           log(`Falha ao ligar microfone: ${e.message}`);
         }
       } 
-      // 4. Se houver um texto focado -> Lê em voz alta
       else if (activeTextElement) {
         speakTextContent(activeTextElement.innerText);
       } 
-      // 5. Sem foco -> Dá ajuda de voz padrão
       else {
         speakTextContent("Selecione um texto para ouvir ou toque em um campo para ditar.");
       }
@@ -841,7 +833,6 @@
       
       if (!wrapper || !toggleBtn) return;
 
-      // Se clicar para expandir/recolher card, fecha a ajuda de contexto se estiver aberta
       if (isHelpOpen) closeHelpSheet();
 
       const targetTagName = event.target.tagName.toUpperCase();
@@ -892,7 +883,6 @@
       }
     }
 
-    // UX Helper
     function scrollIntoViewOnFocus(element) {
       setTimeout(() => {
         element.scrollIntoView({ behavior: 'smooth', block: 'center' });
