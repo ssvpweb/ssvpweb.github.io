@@ -392,17 +392,17 @@
   </div>
 
   <!-- BARRA INFERIOR ERGONÔMICA -->
-  <nav class="bottom-bar">
+  <nav class="bottom-bar" style="position: relative;">
     <div id="statusLeft" class="status-text-left">Nenhum foco</div>
     
     <button id="btnVoiceAction" class="voice-action-btn" onclick="handleVoiceAction()" title="Ação de Voz Contextual">
       <svg id="svgMicIcon" viewBox="0 0 24 24"><path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg>
     </button>
     
-    <div id="statusRight" class="status-text-right">
-      Toque em algo
-      <button class="help-btn" onclick="openHelpSheet('barra_voz', event)" style="margin-left: 0.3rem;" title="Ajuda sobre a barra de voz">?</button>
-    </div>
+    <div id="statusRight" class="status-text-right">Toque em algo</div>
+    
+    <!-- Botão de interrogação absoluto na ponta direita da barra -->
+    <button class="help-btn" onclick="openHelpSheet('barra_voz', event)" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); z-index: 1002; margin-left: 0;" title="Ajuda sobre a barra de voz">?</button>
   </nav>
 
   <script>
@@ -892,6 +892,7 @@
       }
     }
 
+    // UX Helper
     function scrollIntoViewOnFocus(element) {
       setTimeout(() => {
         element.scrollIntoView({ behavior: 'smooth', block: 'center' });
