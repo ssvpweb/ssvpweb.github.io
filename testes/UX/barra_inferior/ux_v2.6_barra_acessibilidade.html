@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Testes de Usabilidade - Acessibilidade v2.6</title>
+  
+  <!-- Open Graph / WhatsApp Meta Tags -->
+  <meta property="og:title" content="Testes de Usabilidade">
+  <meta property="og:description" content="Painel de Visitas SSVP - Teste de Usabilidade v2.6 de Entrada por Voz com Bordas Diferenciadas (Discreta/Intensa) nos Inputs.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://webappssvp.github.io/testes/ux/barra_inferior/ux_v2.6_barra_acessibilidade.html">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- CSS Externo Compartilhado -->
+  <link rel="stylesheet" href="../global.css">
+
+  <style>
+    /* ==========================================================================
+       SISTEMA DE TEMAS E ACESSIBILIDADE DE FONTES (DINÂMICO)
+       ========================================================================== */
+    
+    html {
+      --ssvp-font-scale: 100%;
+      font-size: var(--ssvp-font-scale);
+      transition: font-size 0.2s ease;
+    }
+
+    html.font-large {
+      --ssvp-font-scale: 115%;
+    }
+
+    html.font-xlarge {
+      --ssvp-font-scale: 130%;
+    }
+
+    /* Tema Escuro */
+    body.theme-dark {
+      --ssvp-navy: #1e293b;
+      --ssvp-blue: #3b82f6;
+      --ssvp-light-blue: #334155;
+      --ssvp-white: #0f172a;
+      --ssvp-gray-light: #020617;
+      --ssvp-gray-border: #334155;
+      --ssvp-text-main: #f8fafc;
+      --ssvp-text-muted: #94a3b8;
+      --ssvp-shadow: rgba(0, 0, 0, 0.4);
+    }
+
+    body {
+      padding: 0 !important;
+      margin: 0 !important;
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-color: var(--ssvp-gray-light);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* Cabeçalho Fixo SSVP - Hierarquia e Tamanhos Otimizados (v2.5) */
+    .header-fixed {
+      background-color: var(--ssvp-navy);
+      color: white;
+      padding: 0.4rem 1rem 0.5rem 1rem; /* Margens compactadas 20% menores */
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      z-index: 1000;
+      transition: background-color 0.3s ease;
+    }
+
+    .app-title-mini {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #94a3b8;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      margin-bottom: 0.12rem; /* Margem inferior 20% menor */
+      opacity: 0.85;
+    }
+
+    body.theme-dark .app-title-mini {
+      color: #cbd5e1;
+    }
+
+    .active-module-main {
+      font-size: 2rem;
+      margin: 0;
+      font-weight: 700;
+      color: white;
+      letter-spacing: 0.5px;
+    }
+
+    /* Container Externo de Scroll Vertical (Eixo Y) */
+    .grid-vertical-container {
+      flex: 1;
+      width: 100vw;
+      overflow-y: auto;
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      box-sizing: border-box;
+      padding-top: 16px;
+      padding-bottom: 150px;
+      scrollbar-width: none;
+    }
+
+    .grid-vertical-container::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Linha de Cards de um Assunto (Eixo X) */
+    .subject-row {
+      scroll-snap-align: center;
+      scroll-snap-stop: always;
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      width: 100vw;
+      flex: 0 0 62vh;
+      min-height: 310px;
+      box-sizing: border-box;
+      padding: 0 16px;
+      gap: 16px;
+      scrollbar-width: none;
+    }
+
+    .subject-row::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Cards de Conteúdo */
+    .card-item {
+      flex: 0 0 82vw;
+      max-width: 480px;
+      scroll-snap-align: center;
+      scroll-snap-stop: always;
+      background-color: var(--ssvp-white);
+      border: 1px solid var(--ssvp-gray-border);
+      border-radius: 18px;
+      padding: 1.15rem;
+      box-shadow: 0 4px 12px var(--ssvp-shadow);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+      opacity: 0.5;
+      transform: scale(0.95);
+      height: 100%;
+    }
+
+    .card-item.active-card {
+      opacity: 1;
+      transform: scale(1);
+      box-shadow: 0 10px 24px var(--ssvp-shadow);
+      border-color: rgba(0, 127, 255, 0.3);
+    }
+
+    .card-item.tutorial-card {
+      background: linear-gradient(135deg, var(--ssvp-light-blue) 0%, rgba(0, 127, 255, 0.05) 100%);
+      border: 2px dashed rgba(0, 127, 255, 0.3);
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 1.5rem;
+    }
+
+    .tutorial-icon {
+      font-size: 2.3rem;
+      margin-bottom: 0.5rem;
+      animation: floatIcon 3s ease-in-out infinite;
+    }
+
+    @keyframes floatIcon {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .tutorial-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--ssvp-navy);
+      margin-bottom: 0.4rem;
+    }
+
+    .tutorial-desc {
+      font-size: 0.95rem;
+      color: var(--ssvp-text-main);
+      line-height: 1.4;
+    }
+
+    .tutorial-arrow {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--ssvp-blue);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      animation: pulseArrow 1.5s infinite;
+    }
+
+    @keyframes pulseArrow {
+      0%, 100% { transform: translateX(0); opacity: 0.6; }
+      50% { transform: translateX(6px); opacity: 1; }
+    }
+
+    /* Elementos Internos dos Cards */
+    .card-header-mini {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      border-bottom: 1px solid var(--ssvp-gray-border);
+      padding-bottom: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .card-badge {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background-color: var(--ssvp-navy);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.8rem;
+    }
+
+    .card-badge.badge-vicentino {
+      background-color: var(--ssvp-blue);
+    }
+
+    .card-title-mini {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--ssvp-navy);
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-body-mini {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      font-size: 0.95rem;
+      color: var(--ssvp-text-main);
+    }
+
+    .card-body-mini p {
+      margin-bottom: 0.15rem;
+    }
+
+    .card-body-mini strong {
+      color: var(--ssvp-navy);
+    }
+
+    .readable-text {
+      border: 1px solid transparent;
+      border-radius: 4px;
+      padding: 0px 2px;
+      cursor: pointer;
+      display: inline-block;
+      transition: all 0.2s ease;
+    }
+
+    .readable-text:hover {
+      background-color: rgba(0, 127, 255, 0.08);
+    }
+
+    .readable-text.focused-text {
+      border-color: var(--ssvp-red);
+      box-shadow: 0 0 0 2px rgba(211, 47, 47, 0.15);
+      background-color: rgba(211, 47, 47, 0.04);
+    }
+
+    .btn-maps-action {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      background-color: var(--ssvp-white);
+      color: var(--ssvp-text-main);
+      border: 2px solid var(--ssvp-navy);
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      padding: 0.6rem 0.8rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      margin-top: 0.4rem;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-maps-action:active {
+      transform: scale(0.97);
+    }
+
+    /* Inputs e Controles - Bordas Diferenciadas (Tracejada/Sólida) */
+    .card-input-group {
+      margin-top: auto;
+    }
+
+    .card-input-group label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--ssvp-text-muted);
+      margin-bottom: 0.25rem;
+      display: block;
+    }
+
+    /* Borda Padrão Discreta (Tracejada para indicar que é editável) */
+    .card-input-2d {
+      width: 100%;
+      background: var(--ssvp-gray-light);
+      border: 2px dashed #94a3b8; /* Borda discreta tracejada */
+      border-radius: 8px;
+      color: var(--ssvp-text-main);
+      padding: 0.6rem 0.7rem;
+      font-family: inherit;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    /* Borda de Seleção Intensa (Foco de gravação/escrita ativa) */
+    .card-input-2d.selected-input {
+      border: 3px solid var(--ssvp-red); /* Borda vermelha sólida de 3px */
+      box-shadow: 0 0 0 4px rgba(211, 47, 47, 0.25); /* Sombra de foco vermelha */
+      background-color: var(--ssvp-white);
+    }
+
+    .card-hint {
+      font-size: 0.65rem;
+      color: var(--ssvp-text-muted);
+      margin-top: 0.15rem;
+      display: block;
+    }
+
+    /* ==========================================================================
+       BARRA INFERIOR DE ACESSIBILIDADE E ERGONÔMICA (AMPLIADA, ALINHADA E PLANA)
+       ========================================================================== */
+    .bottom-navigation-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 100px;
+      background-color: var(--ssvp-navy);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
+      padding: 0 12px;
+      transition: flex-direction 0.3s ease, background-color 0.3s ease;
+    }
+
+    body.hand-left .bottom-navigation-bar {
+      flex-direction: row-reverse;
+    }
+
+    /* Botões Laterais Planos (+) e (?) (65px) */
+    .nav-circle-btn {
+      width: 65px;
+      height: 65px;
+      border-radius: 50%;
+      background-color: var(--ssvp-white);
+      color: var(--ssvp-text-main);
+      border: 2px solid var(--ssvp-gray-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      z-index: 1001;
+      font-size: 1.6rem;
+      font-weight: 700;
+      box-shadow: none;
+      margin-top: 0 !important;
+    }
+
+    .nav-circle-btn:active {
+      transform: scale(0.95);
+      background-color: var(--ssvp-gray-light);
+    }
+
+    /* Botão Central de Voz Plano (78px - 20% maior que 65px) */
+    .voice-center-btn {
+      width: 78px;
+      height: 78px;
+      border-radius: 50%;
+      background-color: var(--ssvp-blue);
+      color: white;
+      border: 3px solid var(--ssvp-white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      z-index: 1002;
+      box-shadow: none;
+      margin-top: 0 !important;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .voice-center-btn:active {
+      transform: scale(0.95);
+    }
+
+    .voice-center-btn svg {
+      width: 32px;
+      height: 32px;
+      fill: currentColor;
+    }
+
+    .voice-center-btn.listening {
+      background-color: var(--ssvp-red) !important;
+      animation: pulseMicPlane 1.5s infinite;
+    }
+
+    .voice-center-btn.speaking {
+      background-color: var(--ssvp-success) !important;
+    }
+
+    @keyframes pulseMicPlane {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    /* ==========================================================================
+       PAINÉIS BOTTOM SHEET E OVERLAY (MÓVEL ERGONÔMICO)
+       ========================================================================== */
+    
+    .overlay-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.4);
+      z-index: 1004;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      cursor: pointer;
+    }
+
+    .bottom-sheet {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: var(--ssvp-white);
+      color: var(--ssvp-text-main);
+      border-radius: 20px 20px 0 0;
+      box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.15);
+      z-index: 1005;
+      transform: translateY(100%);
+      transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+      padding: 1.5rem;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .bottom-sheet.open-sheet {
+      transform: translateY(0);
+    }
+
+    body.hand-left .bottom-sheet {
+      text-align: left;
+    }
+
+    .sheet-drag-handle {
+      width: 40px;
+      height: 4px;
+      background-color: var(--ssvp-gray-border);
+      border-radius: 2px;
+      margin: -0.5rem auto 1rem auto;
+      cursor: pointer;
+    }
+
+    .sheet-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--ssvp-navy);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Opções Acessibilidade */
+    .option-row {
+      margin-bottom: 1.2rem;
+    }
+
+    .option-label {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--ssvp-text-muted);
+      margin-bottom: 0.4rem;
+      display: block;
+    }
+
+    .option-selector-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-option {
+      flex: 1;
+      padding: 0.6rem 0.5rem;
+      border: 2px solid var(--ssvp-gray-border);
+      border-radius: 10px;
+      background-color: var(--ssvp-white);
+      color: var(--ssvp-text-main);
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-option.selected-opt {
+      background-color: var(--ssvp-navy);
+      border-color: var(--ssvp-navy);
+      color: white;
+    }
+
+    /* Ajuda Contextual */
+    .help-dynamic-box {
+      background-color: var(--ssvp-gray-light);
+      border: 1px solid var(--ssvp-gray-border);
+      border-radius: 12px;
+      padding: 1rem;
+      font-size: 0.9rem;
+      line-height: 1.45;
+      margin-bottom: 1rem;
+    }
+
+    .command-list {
+      list-style: none;
+      margin-top: 0.5rem;
+      padding: 0;
+    }
+
+    .command-list li {
+      font-size: 0.85rem;
+      padding: 4px 8px;
+      background-color: var(--ssvp-white);
+      border: 1px solid var(--ssvp-gray-border);
+      border-radius: 6px;
+      margin-bottom: 4px;
+      font-family: monospace;
+      color: var(--ssvp-blue);
+      display: inline-block;
+      margin-right: 4px;
+    }
+
+    /* Console de logs */
+    .console-pane {
+      background-color: #0f172a;
+      color: #38bdf8;
+      font-family: monospace;
+      font-size: 0.65rem;
+      padding: 6px 12px;
+      height: 48px;
+      overflow-y: auto;
+      border-top: 1px solid #1e293b;
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
+    }
+  </style>
+</head>
+<body class="theme-light font-normal">
+
+  <!-- Cabeçalho Fixo SSVP - Hierarquia e Tamanhos Otimizados -->
+  <header class="header-fixed">
+    <div class="app-title-mini">Webapp SSVP</div>
+    <h1 id="activeModuleTitle" class="active-module-main">Pessoas</h1>
+  </header>
+
+  <!-- Container de Scroll Vertical -->
+  <main id="verticalGrid" class="grid-vertical-container">
+    
+    <!-- LINHA 0: PESSOAS -->
+    <section class="subject-row" id="row0">
+      
+      <!-- Card Explicativo (Tutorial) -->
+      <article class="card-item tutorial-card" id="card-row0-col0">
+        <div class="tutorial-icon">👥</div>
+        <h3 class="tutorial-title">Módulo Pessoas</h3>
+        <p class="tutorial-desc">Veja o cadastro e o endereço residencial dos vicentinos e das famílias assistidas na região de Moema.</p>
+        <div class="tutorial-arrow">deslize para o lado ➔</div>
+      </article>
+
+      <!-- Card Vicentino 1 -->
+      <article class="card-item" id="card-row0-col1">
+        <div class="card-header-mini">
+          <div class="card-badge badge-vicentino">AS</div>
+          <h2 class="card-title-mini">Antônio Souza (Vicentino)</h2>
+        </div>
+        <div class="card-body-mini">
+          <p><strong>Papel:</strong> Confrade (Relator)</p>
+          <p><strong>Endereço Residencial:</strong> <span class="readable-text" onclick="speakText(this)">Praça Nossa Senhora Aparecida, s/nº - Moema, SP</span></p>
+          
+          <a href="https://www.google.com/maps/dir/?api=1&destination=Praca+Nossa+Senhora+Aparecida,+Moema+Sao+Paulo+SP" 
+             target="_blank" 
+             class="btn-maps-action"
+             onclick="logConsole('Traçando rota para Antônio Souza')">
+            abrir Google Maps
+          </a>
+          
+          <div class="card-input-group">
+            <label for="input-row0-col1">Anotação do Vicentino</label>
+            <input type="text" id="input-row0-col1" class="card-input-2d" placeholder="Toque para selecionar" readonly>
+            <span class="card-hint">💡 Toque no campo + clique rápido Mic = Voz | Segure Mic = Teclado</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Card Assistido 1 -->
+      <article class="card-item" id="card-row0-col2">
+        <div class="card-header-mini">
+          <div class="card-badge">MS</div>
+          <h2 class="card-title-mini">Maria da Silva (Assistida)</h2>
+        </div>
+        <div class="card-body-mini">
+          <p><strong>Papel:</strong> Família Assistida (Vulnerável)</p>
+          <p><strong>Endereço Residencial:</strong> <span class="readable-text" onclick="speakText(this)">Av. dos Carinás, 525 - Moema, SP</span></p>
+          
+          <a href="https://www.google.com/maps/dir/?api=1&destination=Av.+dos+Carinas,+525+Moema+Sao+Paulo+SP" 
+             target="_blank" 
+             class="btn-maps-action"
+             onclick="logConsole('Traçando rota para Maria da Silva')">
+            abrir Google Maps
+          </a>
+          
+          <div class="card-input-group">
+            <label for="input-row0-col2">Ficha Cadastral (Observações)</label>
+            <input type="text" id="input-row0-col2" class="card-input-2d" placeholder="Toque para selecionar" readonly>
+            <span class="card-hint">💡 Toque no campo + clique rápido Mic = Voz | Segure Mic = Teclado</span>
+          </div>
+        </div>
+      </article>
+
+    </section>
+
+    <!-- LINHA 1: VISITAS -->
+    <section class="subject-row" id="row1">
+      
+      <!-- Card Explicativo (Tutorial) -->
+      <article class="card-item tutorial-card" id="card-row1-col0">
+        <div class="tutorial-icon">📅</div>
+        <h3 class="tutorial-title">Módulo Visitas</h3>
+        <p class="tutorial-desc">Acompanhe a agenda das visitas domiciliares planejadas e trace rotas pelo Google Maps.</p>
+        <div class="tutorial-arrow">deslize para o lado ➔</div>
+      </article>
+
+      <!-- Card de Dados 1 -->
+      <article class="card-item" id="card-row1-col1">
+        <div class="card-header-mini">
+          <div class="card-badge">V1</div>
+          <h2 class="card-title-mini">Visita: Maria da Silva</h2>
+        </div>
+        <div class="card-body-mini">
+          <p><strong>Data Prevista:</strong> 13/08/2026 às 14:00h</p>
+          <p><strong>Endereço:</strong> <span class="readable-text" onclick="speakText(this)">Av. dos Carinás, 400 - Moema, SP</span></p>
+          
+          <a href="https://www.google.com/maps/dir/?api=1&destination=Av.+dos+Carinas,+400+Moema+Sao+Paulo+SP" 
+             target="_blank" 
+             class="btn-maps-action"
+             onclick="logConsole('Calculando rota de visita')">
+            abrir Google Maps
+          </a>
+          
+          <div class="card-input-group">
+            <label for="input-row1-col1">Relato de Visita Atual</label>
+            <input type="text" id="input-row1-col1" class="card-input-2d" placeholder="Toque para selecionar" readonly>
+            <span class="card-hint">💡 Toque no campo + clique rápido Mic = Voz | Segure Mic = Teclado</span>
+          </div>
+        </div>
+      </article>
+
+    </section>
+
+    <!-- LINHA 2: METAS -->
+    <section class="subject-row" id="row2">
+      
+      <!-- Card Explicativo (Tutorial) -->
+      <article class="card-item tutorial-card" id="card-row2-col0">
+        <div class="tutorial-icon">🎯</div>
+        <h3 class="tutorial-title">Módulo Metas</h3>
+        <p class="tutorial-desc">Gerencie metas de saúde e bem-estar acordadas com as famílias, integradas com a rede de saúde local.</p>
+        <div class="tutorial-arrow">deslize para o lado ➔</div>
+      </article>
+
+      <!-- Card de Dados 1 -->
+      <article class="card-item" id="card-row2-col1">
+        <div class="card-header-mini">
+          <div class="card-badge">M1</div>
+          <h2 class="card-title-mini">Meta: Exames Médicos (Cardiologia)</h2>
+        </div>
+        <div class="card-body-mini">
+          <p><strong>Família:</strong> Maria da Silva</p>
+          <p><strong>Prazo:</strong> 31/08/2026</p>
+          <p><strong>Unidade de Saúde:</strong> <span class="readable-text" onclick="speakText(this)">UBS Indianópolis – Av. dos Carinás, 525</span></p>
+          
+          <a href="https://www.google.com/maps/dir/?api=1&destination=Av.+dos+Carinas,+525+Moema+Sao+Paulo+SP" 
+             target="_blank" 
+             class="btn-maps-action"
+             onclick="logConsole('Buscando rota para UBS')">
+            abrir Google Maps
+          </a>
+          
+          <div class="card-input-group">
+            <label for="input-row2-col1">Progresso da Meta</label>
+            <input type="text" id="input-row2-col1" class="card-input-2d" placeholder="Toque para selecionar" readonly>
+            <span class="card-hint">💡 Toque no campo + clique rápido Mic = Voz | Segure Mic = Teclado</span>
+          </div>
+        </div>
+      </article>
+
+    </section>
+
+  </main>
+
+  <!-- Console Log Inferior -->
+  <div id="consolePane" class="console-pane">
+    [Console de Acessibilidade v2.6 Iniciado]
+  </div>
+
+  <!-- BARRA INFERIOR DE ACESSIBILIDADE (ALINHADA E PLANA) -->
+  <nav class="bottom-navigation-bar" id="bottomBar">
+    <button class="nav-circle-btn" onclick="toggleSheet('settingsSheet')" aria-label="Preferências e Acessibilidade">+</button>
+    
+    <button id="btnVoice" class="voice-center-btn" title="Gravar Observação / Ditar" aria-label="Ação de Voz Contextual">
+      <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg>
+    </button>
+    
+    <button class="nav-circle-btn" onclick="toggleSheet('helpSheet')" aria-label="Central de Ajuda e Tutoriais">?</button>
+  </nav>
+
+  <!-- OVERLAY BACKDROP -->
+  <div id="overlayBackdrop" class="overlay-backdrop"></div>
+
+  <!-- BOTTOM SHEET 1: CONFIGURAÇÕES E ACESSIBILIDADE (+) -->
+  <div id="settingsSheet" class="bottom-sheet">
+    <div class="sheet-drag-handle" onclick="closeAllSheets()"></div>
+    <div class="sheet-title">⚙️ Ergonomia e Acessibilidade</div>
+    
+    <div class="option-row">
+      <span class="option-label">Tamanho do Texto</span>
+      <div class="option-selector-group">
+        <button id="btnFontNormal" class="btn-option selected-opt" onclick="setFontScale('normal')">A (Normal)</button>
+        <button id="btnFontLarge" class="btn-option" onclick="setFontScale('large')">A+ (Grande)</button>
+        <button id="btnFontXlarge" class="btn-option" onclick="setFontScale('xlarge')">A++ (Extra)</button>
+      </div>
+    </div>
+
+    <div class="option-row">
+      <span class="option-label">Esquema de Cores</span>
+      <div class="option-selector-group">
+        <button id="btnThemeLight" class="btn-option selected-opt" onclick="setThemeStyle('light')">Tema Claro</button>
+        <button id="btnThemeDark" class="btn-option" onclick="setThemeStyle('dark')">Tema Escuro</button>
+      </div>
+    </div>
+
+    <div class="option-row">
+      <span class="option-label">Orientação Manual (Ergonomia)</span>
+      <div class="option-selector-group">
+        <button id="btnHandRight" class="btn-option selected-opt" onclick="setHandedness('right')">Destro</button>
+        <button id="btnHandLeft" class="btn-option" onclick="setHandedness('left')">Canhoto</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM SHEET 2: CENTRAL DE AJUDA E DICAS (?) -->
+  <div id="helpSheet" class="bottom-sheet">
+    <div class="sheet-drag-handle" onclick="closeAllSheets()"></div>
+    <div class="sheet-title">💡 Central de Ajuda</div>
+    
+    <div class="help-dynamic-box">
+      <strong>O que você está vendo agora:</strong>
+      <div id="dynamicHelpText" style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--ssvp-text-main);">
+        Dica contextual baseada no módulo ativo.
+      </div>
+    </div>
+
+    <!-- Como Falar (Tutorial de Voz) -->
+    <div style="margin-top: 1rem; border-top: 1px solid var(--ssvp-gray-border); padding-top: 1rem;">
+      <span class="option-label">🎙️ Como Falar com o App:</span>
+      <div style="font-size: 0.85rem; line-height: 1.45; color: var(--ssvp-text-main);">
+        <p>1. Selecione um <strong>campo de texto</strong> nos cards (ele ficará destacado com borda vermelha sólida).</p>
+        <p>2. Toque no <strong>microfone azul</strong> central e comece a falar para ditar.</p>
+        <p>3. **Segure** o microfone por 1 segundo para habilitar o **teclado virtual**.</p>
+        <p style="margin-top: 0.5rem;">4. Fale comandos iniciando com estes verbos para controlar a tela:</p>
+        <ul style="margin: 0.3rem 0; padding-left: 1.2rem; list-style-type: square;">
+          <li><strong>Ir para / Mostrar:</strong> <em>"ir para visitas"</em>, <em>"ir para metas"</em></li>
+          <li><strong>Abrir:</strong> <em>"abrir Google Maps"</em> (abre rota do card focado)</li>
+          <li><strong>Abrir para:</strong> <em>"abrir Google Maps para farmácia"</em> (busca externa)</li>
+          <li><strong>Mudar para:</strong> <em>"modo escuro"</em>, <em>"modo claro"</em></li>
+          <li><strong>Fonte:</strong> <em>"fonte grande"</em>, <em>"fonte normal"</em></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const verticalGrid = document.getElementById('verticalGrid');
+    const rows = document.querySelectorAll('.subject-row');
+    const activeModuleTitle = document.getElementById('activeModuleTitle');
+    const dynamicHelpText = document.getElementById('dynamicHelpText');
+    const btnVoice = document.getElementById('btnVoice');
+    const consolePane = document.getElementById('consolePane');
+
+    let activeRowIndex = 0;
+    let activeCardPerRow = { 0: 0, 1: 0, 2: 0 };
+    
+    // Rastreia o input selecionado
+    let activeInputEl = null;
+
+    function logConsole(message, type = 'info') {
+      const time = new Date().toLocaleTimeString();
+      let colorStyle = 'color: #38bdf8;'; // info
+      if (type === 'command') colorStyle = 'color: #a855f7; font-weight: bold;'; // purple
+      if (type === 'text') colorStyle = 'color: #10b981;'; // green
+      if (type === 'error') colorStyle = 'color: #f43f5e;'; // red
+
+      consolePane.innerHTML = `<span style="${colorStyle}">[${time}] ${message}</span><br>` + consolePane.innerHTML;
+      console.log(`[Acessibilidade] ${message}`);
+    }
+
+    // ==========================================================================
+    // PERSISTÊNCIA E PREFERÊNCIAS EM LOCALSTORAGE
+    // ==========================================================================
+    window.addEventListener('DOMContentLoaded', () => {
+      setFontScale(localStorage.getItem('ssvp-font-size') || 'normal');
+      setThemeStyle(localStorage.getItem('ssvp-theme') || 'light');
+      setHandedness(localStorage.getItem('ssvp-hand') || 'right');
+      logConsole("Preferências de acessibilidade aplicadas.");
+    });
+
+    function setFontScale(scale) {
+      const htmlEl = document.documentElement;
+      htmlEl.classList.remove('font-normal', 'font-large', 'font-xlarge');
+      document.getElementById('btnFontNormal').classList.remove('selected-opt');
+      document.getElementById('btnFontLarge').classList.remove('selected-opt');
+      document.getElementById('btnFontXlarge').classList.remove('selected-opt');
+
+      if (scale === 'large') {
+        htmlEl.classList.add('font-large');
+        document.getElementById('btnFontLarge').classList.add('selected-opt');
+      } else if (scale === 'xlarge') {
+        htmlEl.classList.add('font-xlarge');
+        document.getElementById('btnFontXlarge').classList.add('selected-opt');
+      } else {
+        htmlEl.classList.add('font-normal');
+        document.getElementById('btnFontNormal').classList.add('selected-opt');
+      }
+
+      localStorage.setItem('ssvp-font-size', scale);
+      logConsole(`Fonte configurada: ${scale}`);
+    }
+
+    // Controle temas
+    function setThemeStyle(theme) {
+      if (theme === 'dark') {
+        document.body.classList.add('theme-dark');
+        document.getElementById('btnThemeDark').classList.add('selected-opt');
+        document.getElementById('btnThemeLight').classList.remove('selected-opt');
+      } else {
+        document.body.classList.remove('theme-dark');
+        document.getElementById('btnThemeLight').classList.add('selected-opt');
+        document.getElementById('btnThemeDark').classList.remove('selected-opt');
+      }
+      localStorage.setItem('ssvp-theme', theme);
+      logConsole(`Tema configurado: ${theme}`);
+    }
+
+    // Modo canhoto / destro
+    function setHandedness(hand) {
+      if (hand === 'left') {
+        document.body.classList.add('hand-left');
+        document.getElementById('btnHandLeft').classList.add('selected-opt');
+        document.getElementById('btnHandRight').classList.remove('selected-opt');
+      } else {
+        document.body.classList.remove('hand-left');
+        document.getElementById('btnHandRight').classList.add('selected-opt');
+        document.getElementById('btnHandLeft').classList.remove('selected-opt');
+      }
+      localStorage.setItem('ssvp-hand', hand);
+      logConsole(`Modo ergonômico: ${hand === 'left' ? 'Canhoto' : 'Destro'}`);
+    }
+
+    // ==========================================================================
+    // SELEÇÃO E CONTROLE DOS INPUTS DE DADOS
+    // ==========================================================================
+    const windowInputs = document.querySelectorAll('.card-input-2d');
+
+    windowInputs.forEach(input => {
+      input.addEventListener('click', (e) => {
+        e.stopPropagation(); // Impede clique no document de limpar
+        clearInputSelection();
+        activeInputEl = input;
+        input.classList.add('selected-input');
+        logConsole(`Input selecionado: ${input.id}. Use o microfone da barra.`);
+        triggerVib(40);
+      });
+
+      input.addEventListener('blur', () => {
+        setTimeout(() => {
+          if (document.activeElement !== input) {
+            input.readOnly = true;
+          }
+        }, 150);
+      });
+    });
+
+    function clearInputSelection() {
+      windowInputs.forEach(input => {
+        input.classList.remove('selected-input');
+        input.readOnly = true;
+      });
+      activeInputEl = null;
+    }
+
+    // ==========================================================================
+    // DETECÇÃO DE VIEWPORT E AJUDA CONTEXTUAL
+    // ==========================================================================
+    const verticalObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const rowIndex = parseInt(entry.target.id.replace('row', ''));
+          updateActiveRow(rowIndex);
+        }
+      });
+    }, { root: verticalGrid, threshold: 0.6 });
+
+    rows.forEach(row => verticalObserver.observe(row));
+
+    function updateActiveRow(index) {
+      if (index === activeRowIndex) return;
+      activeRowIndex = index;
+
+      const subjects = ["Pessoas", "Visitas", "Metas"];
+      activeModuleTitle.textContent = subjects[index];
+      logConsole(`Rolou para o módulo: ${subjects[index]}`);
+
+      updateHelpContext(index);
+      clearReadFocus();
+      checkActiveHorizontalCard(index);
+    }
+
+    function scrollToRow(index) {
+      const targetRow = document.getElementById(`row${index}`);
+      if (targetRow) {
+        targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    function updateHelpContext(index) {
+      const tips = [
+        `👥 <strong>Módulo Pessoas:</strong> Cadastro residencial de vicentinos e assistidos.<br><br><strong>Como ditar:</strong> Toque no campo de anotação de um card (ganhará borda vermelha sólida) e dê um toque rápido no botão central de voz para ditar.`,
+        `📅 <strong>Módulo Visitas:</strong> Acompanhe visitas planejadas.<br><br><strong>Como usar teclado:</strong> Toque no input de relato da visita e <strong>segure por 1s</strong> o botão central de voz para abrir o teclado manual.`,
+        `🎯 <strong>Módulo Metas:</strong> Monitoramento de metas e exames médicos.<br><br><strong>Ergonomia:</strong> Use a voz para controle e digitação híbrida centralizada no botão inferior de 78px.`
+      ];
+      dynamicHelpText.innerHTML = tips[index];
+    }
+
+    function setupHorizontalObservers() {
+      rows.forEach((row, rowIndex) => {
+        const cards = row.querySelectorAll('.card-item');
+
+        const horizontalObserver = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              const colIndex = parseInt(entry.target.id.split('-')[2].replace('col', ''));
+              setActiveHorizontalCard(rowIndex, colIndex);
+            }
+          });
+        }, { root: row, threshold: 0.55 });
+
+        cards.forEach(card => horizontalObserver.observe(card));
+      });
+    }
+
+    setupHorizontalObservers();
+
+    function setActiveHorizontalCard(rowIndex, colIndex) {
+      activeCardPerRow[rowIndex] = colIndex;
+
+      if (rowIndex === activeRowIndex) {
+        const row = document.getElementById(`row${rowIndex}`);
+        const cards = row.querySelectorAll('.card-item');
+
+        cards.forEach((card, i) => {
+          if (i === colIndex) {
+            card.classList.add('active-card');
+          } else {
+            card.classList.remove('active-card');
+          }
+        });
+      }
+    }
+
+    function checkActiveHorizontalCard(rowIndex) {
+      setActiveHorizontalCard(rowIndex, activeCardPerRow[rowIndex]);
+    }
+
+    // ==========================================================================
+    // SÍNTESE DE VOZ (TEXT-TO-SPEECH)
+    // ==========================================================================
+    const synth = window.speechSynthesis;
+
+    function clearReadFocus() {
+      document.querySelectorAll('.readable-text').forEach(el => el.classList.remove('focused-text'));
+    }
+
+    function speakText(element) {
+      clearReadFocus();
+
+      if (synth.speaking) {
+        synth.cancel();
+        btnVoice.classList.remove('speaking');
+        logConsole("Leitura em áudio cancelada.");
+        return;
+      }
+
+      element.classList.add('focused-text');
+      const phrase = element.textContent.trim();
+      logConsole(`Lendo: "${phrase}"`);
+
+      const utterance = new SpeechSynthesisUtterance(phrase);
+      utterance.lang = 'pt-BR';
+
+      utterance.onstart = () => btnVoice.classList.add('speaking');
+      utterance.onend = () => {
+        btnVoice.classList.remove('speaking');
+        element.classList.remove('focused-text');
+        logConsole("Leitura em áudio concluída.");
+      };
+      utterance.onerror = () => {
+        btnVoice.classList.remove('speaking');
+        element.classList.remove('focused-text');
+      };
+
+      synth.speak(utterance);
+    }
+
+    // ==========================================================================
+    // RECONHECIMENTO DE FALA E PARSER DE COMANDOS INTELIGENTES
+    // ==========================================================================
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+    let isListening = false;
+
+    if (SpeechRecognition) {
+      recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.lang = 'pt-BR';
+      recognition.interimResults = false;
+
+      recognition.onstart = () => {
+        isListening = true;
+        btnVoice.classList.add('listening');
+        logConsole("Ouvindo...", 'info');
+        triggerVib(80);
+      };
+
+      recognition.onend = () => {
+        isListening = false;
+        btnVoice.classList.remove('listening');
+      };
+
+      recognition.onresult = (event) => {
+        const rawText = event.results[0][0].transcript.toLowerCase().trim();
+        logConsole(`Fala capturada: "${rawText}"`, 'info');
+
+        const firstWord = rawText.split(' ')[0];
+        const commandVerbs = ["ir", "mostrar", "abrir", "modo", "tela", "fonte", "letra", "canhoto", "destro", "ajuda", "tutorial"];
+        const isCommand = commandVerbs.includes(firstWord) || rawText === 'ajuda' || rawText === 'tutorial';
+
+        if (isCommand) {
+          if (rawText.startsWith("ir para ") || rawText.startsWith("mostrar ")) {
+            const target = rawText.replace("ir para ", "").replace("mostrar ", "").trim();
+            const subjects = ["pessoas", "visitas", "metas"];
+            const index = subjects.indexOf(target);
+            if (index !== -1) {
+              scrollToRow(index);
+              logConsole(`Comando executado: Rolar para ${subjects[index]}`, 'command');
+              triggerVib([40, 40]);
+              return;
+            }
+          }
+
+          if (rawText.startsWith("abrir google maps para ") || rawText.startsWith("abrir maps para ")) {
+            const local = rawText.replace("abrir google maps para ", "").replace("abrir maps para ", "").trim();
+            const searchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(local)}`;
+            logConsole(`Comando executado: Busca no Maps "${local}"`, 'command');
+            triggerVib([40, 80]);
+            window.open(searchUrl, '_blank');
+            return;
+          }
+
+          if (rawText === "abrir google maps" || rawText === "abrir rota" || rawText === "abrir o mapa") {
+            const activeCol = activeCardPerRow[activeRowIndex];
+            const activeCardEl = document.getElementById(`card-row${activeRowIndex}-col${activeCol}`);
+            const mapsLink = activeCardEl?.querySelector('a.btn-maps-action');
+            if (mapsLink) {
+              logConsole(`Comando executado: Abrindo rota do card ativo`, 'command');
+              triggerVib([40, 80]);
+              mapsLink.click();
+            } else {
+              logConsole(`⚠️ Erro: Nenhuma rota de mapas no card ativo.`, 'error');
+              triggerVib([120, 120]);
+            }
+            return;
+          }
+
+          if (rawText === 'modo escuro' || rawText === 'tela escura') {
+            setThemeStyle('dark');
+            return;
+          }
+          if (rawText === 'modo claro' || rawText === 'tela clara') {
+            setThemeStyle('light');
+            return;
+          }
+          if (rawText === 'fonte grande' || rawText === 'letra grande') {
+            setFontScale('large');
+            return;
+          }
+          if (rawText === 'fonte normal' || rawText === 'letra normal') {
+            setFontScale('normal');
+            return;
+          }
+          if (rawText === 'canhoto') {
+            setHandedness('left');
+            return;
+          }
+          if (rawText === 'destro') {
+            setHandedness('right');
+            return;
+          }
+          if (rawText === 'ajuda' || rawText === 'tutorial') {
+            toggleSheet('helpSheet');
+            return;
+          }
+        }
+
+        // Se houver input ativo e não for comando, insere o texto ditado
+        if (activeInputEl) {
+          activeInputEl.value = event.results[0][0].transcript;
+          logConsole(`Texto transcrito: "${event.results[0][0].transcript}"`, 'text');
+          triggerVib([40, 40]);
+        } else {
+          logConsole(`⚠️ Fala ignorada. Selecione um campo de texto primeiro.`, 'error');
+          triggerVib([100, 100]);
+        }
+      };
+
+      recognition.onerror = (e) => {
+        isListening = false;
+        btnVoice.classList.remove('listening');
+        logConsole(`Erro reconhecimento: ${e.error}`, 'error');
+      };
+    }
+
+    // ==========================================================================
+    // DETECÇÃO DE TOQUE LONGO E TOQUE RÁPIDO NO BOTÃO CENTRAL DE VOZ
+    // ==========================================================================
+    let voiceBtnTimer = null;
+    let isLongPress = false;
+
+    btnVoice.addEventListener('mousedown', startVoiceBtnTimer);
+    btnVoice.addEventListener('touchstart', (e) => {
+      startVoiceBtnTimer();
+    }, { passive: true });
+
+    btnVoice.addEventListener('mouseup', endVoiceBtnTimer);
+    btnVoice.addEventListener('touchend', endVoiceBtnTimer);
+
+    function startVoiceBtnTimer() {
+      isLongPress = false;
+      voiceBtnTimer = setTimeout(() => {
+        isLongPress = true;
+        handleVoiceLongPress();
+      }, 550);
+    }
+
+    function endVoiceBtnTimer() {
+      clearTimeout(voiceBtnTimer);
+      if (!isLongPress) {
+        handleVoiceClick();
+      }
+      isLongPress = false;
+    }
+
+    function handleVoiceClick() {
+      if (synth.speaking) {
+        synth.cancel();
+        btnVoice.classList.remove('speaking');
+        clearReadFocus();
+        logConsole("Leitura interrompida.");
+        return;
+      }
+
+      if (!recognition) return;
+
+      if (isListening) {
+        recognition.stop();
+      } else {
+        recognition.start();
+      }
+    }
+
+    function handleVoiceLongPress() {
+      if (activeInputEl) {
+        activeInputEl.readOnly = false;
+        activeInputEl.focus();
+        logConsole(`Teclado manual ativado para input: ${activeInputEl.id}`, 'command');
+        triggerVib([80, 80]);
+      } else {
+        logConsole("⚠️ Selecione um campo de texto e depois segure o microfone.", 'error');
+        triggerVib([120, 120]);
+      }
+    }
+
+    // Controle sheets
+    function toggleSheet(sheetId) {
+      const sheet = document.getElementById(sheetId);
+      const backdrop = document.getElementById('overlayBackdrop');
+      const isOpened = sheet.classList.contains('open-sheet');
+
+      closeAllSheets();
+
+      if (!isOpened) {
+        sheet.classList.add('open-sheet');
+        backdrop.style.display = 'block';
+        setTimeout(() => { backdrop.style.opacity = '1'; }, 10);
+        triggerVib(40);
+        logConsole(`Abrindo painel: ${sheetId}`);
+      }
+    }
+
+    function closeAllSheets() {
+      document.querySelectorAll('.bottom-sheet').forEach(sheet => sheet.classList.remove('open-sheet'));
+      const backdrop = document.getElementById('overlayBackdrop');
+      backdrop.style.opacity = '0';
+      setTimeout(() => { backdrop.style.display = 'none'; }, 300);
+    }
+
+    // ==========================================================================
+    // ESCUTA DE CLIQUES GLOBAL NO DOCUMENT (FECHAMENTO SEGURO E RESETS)
+    // ==========================================================================
+    document.addEventListener('click', (event) => {
+      const isInputClick = event.target.classList.contains('card-input-2d');
+      const settingsSheet = document.getElementById('settingsSheet');
+      const helpSheet = document.getElementById('helpSheet');
+      const bottomBar = document.getElementById('bottomBar');
+      
+      const isSettingsOpen = settingsSheet.classList.contains('open-sheet');
+      const isHelpOpen = helpSheet.classList.contains('open-sheet');
+      
+      if (isSettingsOpen || isHelpOpen) {
+        if (!settingsSheet.contains(event.target) && 
+            !helpSheet.contains(event.target) && 
+            !bottomBar.contains(event.target)) {
+          closeAllSheets();
+          logConsole("Clicou fora: fechando painéis de menu.");
+        }
+      }
+
+      // Limpa seleção do input se clicar fora de áreas de controle
+      if (!isInputClick && 
+          !bottomBar.contains(event.target) && 
+          !settingsSheet.contains(event.target) && 
+          !helpSheet.contains(event.target)) {
+        clearInputSelection();
+      }
+    });
+
+    document.addEventListener('touchstart', (event) => {
+      const isInputClick = event.target.classList.contains('card-input-2d');
+      const settingsSheet = document.getElementById('settingsSheet');
+      const helpSheet = document.getElementById('helpSheet');
+      const bottomBar = document.getElementById('bottomBar');
+      
+      const isSettingsOpen = settingsSheet.classList.contains('open-sheet');
+      const isHelpOpen = helpSheet.classList.contains('open-sheet');
+      
+      if (isSettingsOpen || isHelpOpen) {
+        if (!settingsSheet.contains(event.target) && 
+            !helpSheet.contains(event.target) && 
+            !bottomBar.contains(event.target)) {
+          closeAllSheets();
+          logConsole("Toque fora: fechando painéis de menu.");
+        }
+      }
+
+      if (!isInputClick && 
+          !bottomBar.contains(event.target) && 
+          !settingsSheet.contains(event.target) && 
+          !helpSheet.contains(event.target)) {
+        clearInputSelection();
+      }
+    }, { passive: true });
+
+    function triggerVib(duration) {
+      if ('vibrate' in navigator) {
+        navigator.vibrate(duration);
+      }
+    }
+  </script>
+</body>
+</html>
