@@ -25,15 +25,15 @@
        ========================================================================== */
     
     /* Configuração padrão de fontes (Normal) */
-    :root {
+    html {
       --ssvp-font-scale: 100%;
     }
 
-    body.font-large {
+    html.font-large {
       --ssvp-font-scale: 115%;
     }
 
-    body.font-xlarge {
+    html.font-xlarge {
       --ssvp-font-scale: 130%;
     }
 
@@ -451,6 +451,7 @@
       display: none;
       opacity: 0;
       transition: opacity 0.3s ease;
+      cursor: pointer;
     }
 
     .bottom-sheet {
@@ -861,20 +862,21 @@
     });
 
     function setFontScale(scale) {
-      document.body.classList.remove('font-normal', 'font-large', 'font-xlarge');
+      const htmlEl = document.documentElement;
+      htmlEl.classList.remove('font-normal', 'font-large', 'font-xlarge');
       
       document.getElementById('btnFontNormal').classList.remove('selected-opt');
       document.getElementById('btnFontLarge').classList.remove('selected-opt');
       document.getElementById('btnFontXlarge').classList.remove('selected-opt');
 
       if (scale === 'large') {
-        document.body.classList.add('font-large');
+        htmlEl.classList.add('font-large');
         document.getElementById('btnFontLarge').classList.add('selected-opt');
       } else if (scale === 'xlarge') {
-        document.body.classList.add('font-xlarge');
+        htmlEl.classList.add('font-xlarge');
         document.getElementById('btnFontXlarge').classList.add('selected-opt');
       } else {
-        document.body.classList.add('font-normal');
+        htmlEl.classList.add('font-normal');
         document.getElementById('btnFontNormal').classList.add('selected-opt');
       }
 
@@ -1229,6 +1231,16 @@
       if ('vibrate' in navigator) {
         navigator.vibrate(duration);
       }
+    }
+
+    // Adiciona listener robusto de clique e toque para fechar os painéis ao tocar fora
+    const backdropEl = document.getElementById('overlayBackdrop');
+    if (backdropEl) {
+      backdropEl.addEventListener('click', closeAllSheets);
+      backdropEl.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        closeAllSheets();
+      }, { passive: false });
     }
   </script>
 </body>
