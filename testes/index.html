@@ -296,36 +296,73 @@
       const banner = document.getElementById('status-banner');
 
       try {
-        // 1. Busca os diretórios principais de "testes"
-        const response = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${baseFolder}`);
+        // Consulta recursiva na árvore de commits (Git Trees API)
+        const response = await fetch(`https://api.github.com/repos/${user}/${repo}/git/trees/main?recursive=true`);
         if (!response.ok) throw new Error('Limite da API do GitHub atingido ou offline');
 
-        const items = await response.json();
+        const data = await response.json();
         
-        // Filtra para manter somente subpastas
-        const folders = items.filter(item => item.type === 'dir');
+        // Filtra caminhos que estão dentro de "testes/", terminam com ".html" e não são "index.html"
+        // E também ignora arquivos html que estejam diretamente na pasta "testes/" (sem subpasta)
+        const testsPrefix = `${baseFolder}/`;
+        const testFiles = data.tree.filter(item => {
+          return item.type === 'blob' &&
+                 item.path.startsWith(testsPrefix) &&
+                 item.path.endsWith('.html') &&
+                 !item.path.endsWith('index.html') &&
+                 item.path.substring(testsPrefix.length).includes('/');
+        });
 
-        if (folders.length === 0) {
-          container.innerHTML = '<div class="loading-state">Nenhuma subpasta de teste encontrada.</div>';
+        if (testFiles.length === 0) {
+          container.innerHTML = '<div class="loading-state">Nenhum arquivo de teste encontrado.</div>';
           return;
         }
 
-        // 2. Busca os arquivos HTML de todas as subpastas em paralelo
-        const folderDataPromises = folders.map(async (folder) => {
-          const subRes = await fetch(folder.url);
-          if (!subRes.ok) return { folder: folder.name, files: [] };
-          const subItems = await subRes.json();
-          // Filtra para manter somente arquivos HTML que não sejam índices internos duplicados
-          const htmlFiles = subItems.filter(f => f.name.endsWith('.html') && f.name !== 'index.html');
+        // Agrupa os arquivos por pasta
+        const foldersMap = {};
+
+        testFiles.forEach(file => {
+          // Extrai o caminho após "testes/" (ex: "ux/card_expand/meu_teste.html")
+          const relativePath = file.path.substring(testsPrefix.length);
+          
+          // Divide para descobrir a pasta e o nome do arquivo
+          const pathParts = relativePath.split('/');
+          const fileName = pathParts.pop(); // Remove o último elemento que é o arquivo
+          
+          // O nome da pasta será a junção do restante (ex: "ux/card_expand")
+          // Formatamos visualmente para usar " / " no lugar de "/"
+          const rawFolderName = pathParts.join('/');
+          const displayFolderName = pathParts.join(' / ');
+
+          if (!foldersMap[rawFolderName]) {
+            foldersMap[rawFolderName] = {
+              displayName: displayFolderName,
+              folderPath: rawFolderName,
+              files: []
+            };
+          }
+
+          foldersMap[rawFolderName].files.push({
+            name: fileName,
+            link: `./${rawFolderName}/${fileName}`
+          });
+        });
+
+        // Converte o mapa para um array e ordena alfabeticamente pelo nome da pasta
+        const sortedFolders = Object.values(foldersMap).sort((a, b) => {
+          return a.folderPath.localeCompare(b.folderPath);
+        });
+
+        // Mapeia para a estrutura uniforme esperada pela função renderFolders
+        const results = sortedFolders.map(folderObj => {
+          // Ordena os arquivos da pasta alfabeticamente pelo nome
+          folderObj.files.sort((a, b) => a.name.localeCompare(b.name));
           return {
-            folder: folder.name,
-            files: htmlFiles
+            folder: folderObj.displayName,
+            files: folderObj.files
           };
         });
 
-        const results = await Promise.all(folderDataPromises);
-        
-        // Renderiza com dados obtidos da API do GitHub
         renderFolders(results);
 
       } catch (error) {
@@ -360,11 +397,13 @@
         card.className = 'folder-card';
         card.id = `folder-card-${index}`;
 
-        // Contrói os links dos arquivos para esta pasta
+        // Constrói os links dos arquivos para esta pasta
         let filesHtml = '';
         folderObj.files.forEach(file => {
+          // Suporta links relativos diretos (definidos na Git Trees API) ou constrói a partir da pasta (fallback)
+          const fileLink = file.link || `./${folderObj.folder}/${file.name}`;
           filesHtml += `
-            <a href="./${folderObj.folder}/${file.name}" class="file-item">
+            <a href="${fileLink}" class="file-item">
               <div class="file-info">
                 <span>📄</span>
                 <span>${file.name}</span>
