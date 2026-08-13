@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Teste UX - Slide de Cards v1.0</title>
+  
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- CSS Externo Compartilhado -->
+  <link rel="stylesheet" href="../global.css">
+
+  <style>
+    /* Configurações específicas para a visualização móvel no Moto E7 (360px) */
+    body {
+      padding-bottom: 120px !important; /* Espaço para a barra de botões proeminente */
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      background: linear-gradient(180deg, var(--ssvp-gray-light) 0%, #eef2f6 100%);
+    }
+
+    header {
+      margin-bottom: 1rem;
+      padding: 0 10px;
+    }
+
+    /* Container de Slide Horizontal */
+    .slide-outer-container {
+      width: 100%;
+      max-width: 600px;
+      position: relative;
+      margin: 0 auto;
+    }
+
+    .slide-container {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      gap: 16px;
+      padding: 10px 20px 24px 20px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none; /* Oculta scrollbar no Firefox */
+    }
+
+    .slide-container::-webkit-scrollbar {
+      display: none; /* Oculta scrollbar no Chrome/Safari */
+    }
+
+    /* Estilo Premium dos Cards */
+    .card-slide {
+      flex: 0 0 82vw; /* Peek effect: mostra 9% do anterior e 9% do próximo em tela de 360px */
+      max-width: 480px;
+      scroll-snap-align: center;
+      scroll-snap-stop: always;
+      background: var(--ssvp-white);
+      border: 1px solid var(--ssvp-gray-border);
+      border-radius: 20px;
+      padding: 1.25rem;
+      box-shadow: 0 8px 20px rgba(0, 45, 98, 0.05);
+      transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), 
+                  opacity 0.4s ease, 
+                  box-shadow 0.4s ease;
+      opacity: 0.5;
+      transform: scale(0.92);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 380px;
+    }
+
+    /* Efeito de Card Ativo/Focado */
+    .card-slide.active-card {
+      opacity: 1;
+      transform: scale(1);
+      box-shadow: 0 12px 30px rgba(0, 45, 98, 0.12);
+      border-color: rgba(0, 127, 255, 0.2);
+    }
+
+    .card-header-slide {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      border-bottom: 1px solid var(--ssvp-gray-border);
+      padding-bottom: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .card-icon-slide {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background-color: var(--ssvp-light-blue);
+      color: var(--ssvp-navy);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .card-title-slide {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--ssvp-navy);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
+    }
+
+    .card-body-slide {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+    }
+
+    .card-body-slide p {
+      margin-bottom: 0.25rem;
+      color: var(--ssvp-text-main);
+    }
+
+    .card-body-slide strong {
+      color: var(--ssvp-navy);
+    }
+
+    /* Textos selecionáveis para síntese de voz */
+    .readable-text {
+      border: 2px solid transparent;
+      border-radius: 6px;
+      padding: 1px 4px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-block;
+    }
+
+    .readable-text:hover {
+      background-color: rgba(0, 45, 98, 0.04);
+    }
+
+    .readable-text.focused-text {
+      border-color: var(--ssvp-red);
+      box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.15);
+      background-color: rgba(211, 47, 47, 0.04);
+    }
+
+    /* Input estável dentro do card */
+    .form-group-slide {
+      margin-top: auto;
+    }
+
+    .form-group-slide label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--ssvp-text-muted);
+      margin-bottom: 0.25rem;
+      display: block;
+    }
+
+    .card-input {
+      width: 100%;
+      background: var(--ssvp-gray-light);
+      border: 2px solid var(--ssvp-gray-border);
+      border-radius: 10px;
+      color: var(--ssvp-text-main);
+      padding: 0.6rem 0.75rem;
+      font-family: inherit;
+      font-size: 0.85rem;
+      transition: all 0.2s ease;
+    }
+
+    .card-input:focus {
+      outline: none;
+      background: var(--ssvp-white);
+      border-color: var(--ssvp-red);
+      box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.15);
+    }
+
+    .input-hint-slide {
+      font-size: 0.68rem;
+      color: var(--ssvp-text-muted);
+      margin-top: 0.25rem;
+      display: block;
+    }
+
+    /* Dots Indicadores de Progresso */
+    .dots-container {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 1.5rem;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--ssvp-gray-border);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .dot.active-dot {
+      width: 24px;
+      border-radius: 4px;
+      background-color: var(--ssvp-blue);
+    }
+
+    /* BARRA INFERIOR SIMÉTRICA COM 3 BOTÕES ERGONÔMICOS */
+    .bottom-navigation-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 70px;
+      background-color: var(--ssvp-navy);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
+      padding: 0 10px;
+    }
+
+    .nav-circle-btn {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--ssvp-white) 0%, #f1f5f9 100%);
+      color: var(--ssvp-navy);
+      border: 3px solid var(--ssvp-white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      margin-top: -24px; /* Projeta o botão ligeiramente para cima */
+      z-index: 1001;
+    }
+
+    .nav-circle-btn:active {
+      transform: scale(0.9);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .nav-circle-btn:disabled {
+      background: #e2e8f0;
+      border-color: #e2e8f0;
+      color: #94a3b8;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+
+    /* Botão Central de Voz */
+    .voice-center-btn {
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--ssvp-blue) 0%, #005ec4 100%);
+      color: white;
+      border: 4px solid var(--ssvp-white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(0, 127, 255, 0.4);
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      margin-top: -30px; /* Mais proeminente que os laterais */
+      z-index: 1002;
+    }
+
+    .voice-center-btn:active {
+      transform: scale(0.92);
+    }
+
+    .voice-center-btn svg {
+      width: 32px;
+      height: 32px;
+      fill: currentColor;
+    }
+
+    /* Status de gravação / reprodução */
+    .voice-center-btn.listening {
+      background: linear-gradient(135deg, var(--ssvp-red) 0%, #b91c1c 100%);
+      box-shadow: 0 4px 20px rgba(239, 68, 68, 0.5);
+      animation: pulseMic 1.5s infinite;
+    }
+
+    .voice-center-btn.speaking {
+      background: linear-gradient(135deg, var(--ssvp-success) 0%, #047857 100%);
+      box-shadow: 0 4px 20px rgba(16, 185, 129, 0.5);
+    }
+
+    @keyframes pulseMic {
+      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+      70% { box-shadow: 0 0 0 14px rgba(239, 68, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
+    /* Console de Logs de Teste */
+    .console-box {
+      width: 90%;
+      max-width: 500px;
+      margin: 0.5rem auto;
+      background-color: #0f172a;
+      color: #38bdf8;
+      font-family: monospace;
+      font-size: 0.7rem;
+      padding: 8px 12px;
+      border-radius: 8px;
+      max-height: 80px;
+      overflow-y: auto;
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
+      border: 1px solid #1e293b;
+    }
+
+    .voice-alert-banner {
+      background-color: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      border-radius: 12px;
+      padding: 0.6rem;
+      color: var(--ssvp-error);
+      font-size: 0.75rem;
+      margin: 0 20px 10px 20px;
+      display: none;
+      text-align: center;
+    }
+
+    .voice-alert-banner.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Slide de Cards UX</h1>
+    <p>Otimizado para Moto E7 (360px)</p>
+  </header>
+
+  <!-- Alerta HTTPS para Reconhecimento de Voz no celular -->
+  <div id="voiceAlert" class="voice-alert-banner">
+    ⚠️ O reconhecimento de voz requer **HTTPS** em redes móveis/celular.
+  </div>
+
+  <!-- Container Geral do Slide -->
+  <div class="slide-outer-container">
+    <main id="slideContainer" class="slide-container">
+      
+      <!-- CARD 1: Família Silva -->
+      <section class="card-slide active-card" id="card0">
+        <div class="card-header-slide">
+          <div class="card-icon-slide">FS</div>
+          <h2 class="card-title-slide">Família Silva</h2>
+        </div>
+        
+        <div class="card-body-slide">
+          <p><strong>Responsável:</strong> 
+            <span class="readable-text" onclick="speakText(this)">Dona Maria da Silva</span>
+          </p>
+          <p><strong>Endereço:</strong> 
+            <span class="readable-text" onclick="speakText(this)">Rua das Conferências, nº 123</span>
+          </p>
+          <p><strong>Metas:</strong> 
+            <span class="readable-text" onclick="speakText(this)">Concluir reforma do telhado até o final deste mês.</span>
+          </p>
+          
+          <div class="form-group-slide">
+            <label for="relato0">Relato da Visita (Anotações)</label>
+            <input type="text" id="relato0" class="card-input" placeholder="Toque p/ Voz | Segure p/ Teclado" readonly>
+            <span class="input-hint-slide">💡 Dica: Toque rápido para Voz | Segure 500ms para Teclado</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- CARD 2: Família Oliveira -->
+      <section class="card-slide" id="card1">
+        <div class="card-header-slide">
+          <div class="card-icon-slide">FO</div>
+          <h2 class="card-title-slide">Família Oliveira</h2>
+        </div>
+        
+        <div class="card-body-slide">
+          <p><strong>Responsável:</strong> 
+            <span class="readable-text" onclick="speakText(this)">Sr. João Oliveira</span>
+          </p>
+          <p><strong>Endereço:</strong> 
+            <span class="readable-text" onclick="speakText(this)">Av. São Vicente de Paulo, nº 456</span>
+          </p>
+          <p><strong>Metas:</strong> 
+            <span class="readable-text" onclick="speakText(this)">Fazer a matrícula das três crianças na escola municipal.</span>
+          </p>
+          
+          <div class="form-group-slide">
+            <label for="relato1">Relato da Visita (Anotações)</label>
+            <input type="text" id="relato1" class="card-input" placeholder="Toque p/ Voz | Segure p/ Teclado" readonly>
+            <span class="input-hint-slide">💡 Dica: Toque rápido para Voz | Segure 500ms para Teclado</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- CARD 3: Família Santos -->
+      <section class="card-slide" id="card2">
+        <div class="card-header-slide">
+          <div class="card-icon-slide">FS</div>
+          <h2 class="card-title-slide">Família Santos</h2>
+        </div>
+        
+        <div class="card-body-slide">
+          <p><strong>Responsável:</strong> 
+            <span class="readable-text" onclick="speakText(this)">Dona Francisca Santos</span>
+          </p>
+          <p><strong>Endereço:</strong> 
+            <span class="readable-text" onclick="speakText(this)">Travessa do Amparo, nº 89</span>
+          </p>
+          <p><strong>Metas:</strong> 
+            <span class="readable-text" onclick="speakText(this)">Encaminhar os exames médicos pendentes para o posto de saúde.</span>
+          </p>
+          
+          <div class="form-group-slide">
+            <label for="relato2">Relato da Visita (Anotações)</label>
+            <input type="text" id="relato2" class="card-input" placeholder="Toque p/ Voz | Segure p/ Teclado" readonly>
+            <span class="input-hint-slide">💡 Dica: Toque rápido para Voz | Segure 500ms para Teclado</span>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Indicadores Dots -->
+  <div id="dotsContainer" class="dots-container">
+    <span class="dot active-dot" onclick="scrollToCard(0)"></span>
+    <span class="dot" onclick="scrollToCard(1)"></span>
+    <span class="dot" onclick="scrollToCard(2)"></span>
+  </div>
+
+  <!-- Console Logs de Teste -->
+  <div id="consoleBox" class="console-box">
+    [Console de Teste Iniciado]
+  </div>
+
+  <!-- BARRA INFERIOR SIMÉTRICA -->
+  <nav class="bottom-navigation-bar">
+    <button id="btnPrev" class="nav-circle-btn" onclick="navigateCard(-1)" aria-label="Card Anterior" disabled>
+      <!-- Ícone Voltar (<) -->
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+    </button>
+    
+    <button id="btnVoice" class="voice-center-btn" onclick="handleVoiceAction()" title="Gravar Observação" aria-label="Ação de Voz Contextual">
+      <!-- Ícone Microfone -->
+      <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg>
+    </button>
+    
+    <button id="btnNext" class="nav-circle-btn" onclick="navigateCard(1)" aria-label="Próximo Card">
+      <!-- Ícone Avançar (>) -->
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+    </button>
+  </nav>
+
+  <script>
+    // Configurações e Variáveis de Controle
+    const slideContainer = document.getElementById('slideContainer');
+    const cards = document.querySelectorAll('.card-slide');
+    const dots = document.querySelectorAll('.dot');
+    const btnPrev = document.getElementById('btnPrev');
+    const btnNext = document.getElementById('btnNext');
+    const btnVoice = document.getElementById('btnVoice');
+    const consoleBox = document.getElementById('consoleBox');
+
+    let currentCardIndex = 0;
+    let voiceActiveInput = null;
+
+    // Detecta HTTPS para fins de diagnóstico
+    if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      document.getElementById('voiceAlert').classList.add('active');
+    }
+
+    // Função auxiliar para imprimir no painel de console
+    function logTest(message) {
+      const time = new Date().toLocaleTimeString();
+      consoleBox.innerHTML = `[${time}] ${message}<br>` + consoleBox.innerHTML;
+      console.log(`[UX Test] ${message}`);
+    }
+
+    // Configura o IntersectionObserver para detectar qual card está no centro da tela
+    const observerOptions = {
+      root: slideContainer,
+      threshold: 0.6, // Card deve estar pelo menos 60% visível para ser considerado o principal
+      rootMargin: '0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const cardId = entry.target.id;
+          const index = parseInt(cardId.replace('card', ''));
+          updateActiveCardState(index);
+        }
+      });
+    }, observerOptions);
+
+    cards.forEach(card => observer.observe(card));
+
+    // Atualiza o estado visual com base no card ativo
+    function updateActiveCardState(index) {
+      if (index === currentCardIndex) return;
+
+      cards.forEach((card, i) => {
+        if (i === index) {
+          card.classList.add('active-card');
+        } else {
+          card.classList.remove('active-card');
+        }
+      });
+
+      dots.forEach((dot, i) => {
+        if (i === index) {
+          dot.classList.add('active-dot');
+        } else {
+          dot.classList.remove('active-dot');
+        }
+      });
+
+      currentCardIndex = index;
+      logTest(`Card ativo alterado para: Família ${index === 0 ? 'Silva' : index === 1 ? 'Oliveira' : 'Santos'}`);
+
+      // Atualiza botões de navegação
+      btnPrev.disabled = (index === 0);
+      btnNext.disabled = (index === cards.length - 1);
+
+      // Limpa qualquer foco em leitura
+      clearFocusedText();
+    }
+
+    // Navega manualmente através dos botões da barra inferior
+    function navigateCard(direction) {
+      const targetIndex = currentCardIndex + direction;
+      if (targetIndex >= 0 && targetIndex < cards.length) {
+        scrollToCard(targetIndex);
+      }
+    }
+
+    // Rolagem suave até o card de índice específico
+    function scrollToCard(index) {
+      cards[index].scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'center'
+      });
+      // Emulação de vibração tátil
+      triggerVibration(50);
+    }
+
+    // Vibração tátil do dispositivo móvel
+    function triggerVibration(duration) {
+      if ('vibrate' in navigator) {
+        navigator.vibrate(duration);
+      }
+    }
+
+    // ==========================================================================
+    // LOGICA DE SÍNTESE DE VOZ (LEITURA TEXTO-PARA-FALA)
+    // ==========================================================================
+    let synth = window.speechSynthesis;
+    let currentSpeech = null;
+
+    function clearFocusedText() {
+      document.querySelectorAll('.readable-text').forEach(el => el.classList.remove('focused-text'));
+    }
+
+    function speakText(element) {
+      clearFocusedText();
+      
+      if (synth.speaking) {
+        synth.cancel();
+        btnVoice.classList.remove('speaking');
+        logTest("Leitura interrompida.");
+      }
+
+      element.classList.add('focused-text');
+      const textToSpeak = element.textContent.trim();
+      logTest(`Lendo: "${textToSpeak}"`);
+
+      const utterance = new SpeechSynthesisUtterance(textToSpeak);
+      utterance.lang = 'pt-BR';
+
+      utterance.onstart = () => {
+        btnVoice.classList.add('speaking');
+      };
+
+      utterance.onend = () => {
+        btnVoice.classList.remove('speaking');
+        element.classList.remove('focused-text');
+        logTest("Leitura concluída.");
+      };
+
+      utterance.onerror = (e) => {
+        btnVoice.classList.remove('speaking');
+        element.classList.remove('focused-text');
+        logTest(`Erro na leitura: ${e.error}`);
+      };
+
+      synth.speak(utterance);
+    }
+
+    // ==========================================================================
+    // LOGICA DE RECONHECIMENTO DE VOZ (FALA-PARA-TEXTO)
+    // ==========================================================================
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+    let isListening = false;
+
+    if (SpeechRecognition) {
+      recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.lang = 'pt-BR';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      recognition.onstart = () => {
+        isListening = true;
+        btnVoice.classList.add('listening');
+        logTest("🎙️ Ouvindo... Fale agora.");
+        triggerVibration(100);
+      };
+
+      recognition.onend = () => {
+        isListening = false;
+        btnVoice.classList.remove('listening');
+        logTest("Microfone desligado.");
+      };
+
+      recognition.onresult = (event) => {
+        const resultText = event.results[0][0].transcript;
+        logTest(`Texto reconhecido: "${resultText}"`);
+        
+        // Insere o texto no input do card atualmente ativo
+        const activeInput = document.getElementById(`relato${currentCardIndex}`);
+        if (activeInput) {
+          activeInput.value = resultText;
+          logTest(`Texto inserido no relato da Família ${currentCardIndex === 0 ? 'Silva' : currentCardIndex === 1 ? 'Oliveira' : 'Santos'}`);
+          triggerVibration([50, 50, 50]); // Feedback triplo de sucesso
+        }
+      };
+
+      recognition.onerror = (event) => {
+        isListening = false;
+        btnVoice.classList.remove('listening');
+        logTest(`Erro de voz: ${event.error}`);
+      };
+    } else {
+      logTest("⚠️ Reconhecimento de Voz não suportado neste navegador.");
+    }
+
+    // Ação do Botão Central de Voz
+    function handleVoiceAction() {
+      // Se houver leitura em andamento, cancela
+      if (synth.speaking) {
+        synth.cancel();
+        btnVoice.classList.remove('speaking');
+        clearFocusedText();
+        logTest("Leitura interrompida.");
+        return;
+      }
+
+      if (!recognition) {
+        logTest("Reconhecimento de fala indisponível.");
+        return;
+      }
+
+      if (isListening) {
+        recognition.stop();
+      } else {
+        recognition.start();
+      }
+    }
+
+    // ==========================================================================
+    // LOGICA DE ENTRADA DO TECLADO HÍBRIDA (TOQUE VS TOQUE LONGO)
+    // ==========================================================================
+    const inputs = document.querySelectorAll('.card-input');
+
+    inputs.forEach(input => {
+      let pressTimer;
+
+      // Toque rápido ativa comando de voz focado naquele input específico
+      input.addEventListener('touchstart', (e) => {
+        // Ignora se for clique com o mouse simulado
+        if (e.touches.length > 1) return;
+        
+        pressTimer = window.setTimeout(() => {
+          // Clique longo: ativa o teclado (remove readonly temporariamente)
+          input.readOnly = false;
+          input.focus();
+          logTest(`Teclado ativado para o input: ${input.id}`);
+          triggerVibration(100);
+        }, 500); // 500ms para toque longo
+      }, { passive: true });
+
+      input.addEventListener('touchend', () => {
+        clearTimeout(pressTimer);
+      });
+
+      // Se o usuário clicar rápido (comunidade de toque tradicional)
+      input.addEventListener('click', (e) => {
+        // Se já está focado com o teclado, não faz nada
+        if (!input.readOnly) return;
+        
+        logTest(`Toque rápido detectado. Iniciando voz para: ${input.id}`);
+        handleVoiceAction();
+      });
+
+      // Restaura readonly quando perde o foco
+      input.addEventListener('blur', () => {
+        input.readOnly = true;
+      });
+    });
+
+  </script>
+</body>
+</html>

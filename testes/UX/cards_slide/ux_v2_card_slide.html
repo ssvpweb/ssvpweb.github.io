@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Teste UX - Grid Bidirecional 2D v2.0</title>
+  
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- CSS Externo Compartilhado -->
+  <link rel="stylesheet" href="../global.css">
+
+  <style>
+    /* Reset e Layout Base Móvel */
+    body {
+      padding: 0 !important;
+      margin: 0 !important;
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-color: var(--ssvp-gray-light);
+    }
+
+    /* Cabeçalho Fixo Otimizado */
+    .header-fixed {
+      background-color: var(--ssvp-navy);
+      color: white;
+      padding: 0.6rem 1rem;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      z-index: 1000;
+    }
+
+    .header-fixed h1 {
+      font-size: 1.15rem;
+      margin: 0;
+      font-weight: 700;
+      color: white;
+    }
+
+    .header-fixed p {
+      font-size: 0.7rem;
+      margin: 0;
+      color: rgba(255,255,255,0.7);
+    }
+
+    /* Indicador de Abas Horizontais (Módulos/Assuntos) */
+    .tabs-indicator {
+      display: flex;
+      background-color: var(--ssvp-navy);
+      border-bottom: 2px solid rgba(255,255,255,0.1);
+      z-index: 1000;
+    }
+
+    .tab-btn {
+      flex: 1;
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, 0.6);
+      padding: 0.6rem 0;
+      font-family: inherit;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .tab-btn.active-tab {
+      color: var(--ssvp-white);
+    }
+
+    .tab-btn.active-tab::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 15%;
+      width: 70%;
+      height: 3px;
+      background-color: var(--ssvp-blue);
+      border-radius: 2px;
+    }
+
+    /* Container de Grid Bidirecional */
+    .grid-2d-container {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      flex: 1;
+      width: 100vw;
+      scrollbar-width: none;
+    }
+
+    .grid-2d-container::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Coluna de Assunto (Vertical) */
+    .subject-column {
+      flex: 0 0 100vw;
+      width: 100vw;
+      height: 100%;
+      overflow-y: auto;
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+      padding: 12px 16px 120px 16px; /* Espaço na base para a barra e peek */
+      gap: 16px;
+      scrollbar-width: none;
+    }
+
+    .subject-column::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Cards Individuais com Scroll Snap Vertical */
+    .card-item {
+      flex: 0 0 62vh; /* Altura controlada para gerar o peek vertical no Moto E7 */
+      min-height: 300px;
+      scroll-snap-align: center;
+      scroll-snap-stop: always;
+      background-color: var(--ssvp-white);
+      border: 1px solid var(--ssvp-gray-border);
+      border-radius: 16px;
+      padding: 1.1rem;
+      box-shadow: 0 4px 12px rgba(0, 45, 98, 0.04);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.3s ease;
+      opacity: 0.6;
+      transform: scale(0.96);
+    }
+
+    /* Card Focado */
+    .card-item.active-card {
+      opacity: 1;
+      transform: scale(1);
+      box-shadow: 0 10px 24px rgba(0, 45, 98, 0.1);
+      border-color: rgba(0, 127, 255, 0.2);
+    }
+
+    .card-header-mini {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      border-bottom: 1px solid var(--ssvp-gray-border);
+      padding-bottom: 0.6rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .card-badge {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background-color: var(--ssvp-light-blue);
+      color: var(--ssvp-navy);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.8rem;
+    }
+
+    .card-title-mini {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--ssvp-navy);
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-body-mini {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+    }
+
+    .card-body-mini p {
+      margin-bottom: 0.15rem;
+      color: var(--ssvp-text-main);
+    }
+
+    .readable-text {
+      border: 1px solid transparent;
+      border-radius: 4px;
+      padding: 0px 2px;
+      cursor: pointer;
+      display: inline-block;
+      transition: all 0.2s ease;
+    }
+
+    .readable-text:hover {
+      background-color: rgba(0, 45, 98, 0.05);
+    }
+
+    .readable-text.focused-text {
+      border-color: var(--ssvp-red);
+      box-shadow: 0 0 0 2px rgba(211, 47, 47, 0.15);
+      background-color: rgba(211, 47, 47, 0.04);
+    }
+
+    /* Input e Controles dentro do Card */
+    .card-input-group {
+      margin-top: auto;
+    }
+
+    .card-input-group label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--ssvp-text-muted);
+      margin-bottom: 0.2rem;
+      display: block;
+    }
+
+    .card-input-2d {
+      width: 100%;
+      background: var(--ssvp-gray-light);
+      border: 2px solid var(--ssvp-gray-border);
+      border-radius: 8px;
+      color: var(--ssvp-text-main);
+      padding: 0.5rem 0.6rem;
+      font-family: inherit;
+      font-size: 0.8rem;
+      transition: all 0.2s ease;
+    }
+
+    .card-input-2d:focus {
+      outline: none;
+      background: var(--ssvp-white);
+      border-color: var(--ssvp-red);
+      box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.15);
+    }
+
+    .card-hint {
+      font-size: 0.65rem;
+      color: var(--ssvp-text-muted);
+      margin-top: 0.15rem;
+      display: block;
+    }
+
+    /* Barra inferior simétrica de navegação */
+    .bottom-navigation-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 70px;
+      background-color: var(--ssvp-navy);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
+      padding: 0 10px;
+    }
+
+    .nav-circle-btn {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--ssvp-white) 0%, #f1f5f9 100%);
+      color: var(--ssvp-navy);
+      border: 3px solid var(--ssvp-white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      margin-top: -24px;
+      z-index: 1001;
+    }
+
+    .nav-circle-btn:active {
+      transform: scale(0.9);
+    }
+
+    .nav-circle-btn:disabled {
+      background: #e2e8f0;
+      border-color: #e2e8f0;
+      color: #94a3b8;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .voice-center-btn {
+      width: 74px;
+      height: 74px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--ssvp-blue) 0%, #005ec4 100%);
+      color: white;
+      border: 4px solid var(--ssvp-white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(0, 127, 255, 0.35);
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      margin-top: -28px;
+      z-index: 1002;
+    }
+
+    .voice-center-btn:active {
+      transform: scale(0.92);
+    }
+
+    .voice-center-btn svg {
+      width: 30px;
+      height: 30px;
+      fill: currentColor;
+    }
+
+    /* Animação dos estados de voz */
+    .voice-center-btn.listening {
+      background: linear-gradient(135deg, var(--ssvp-red) 0%, #b91c1c 100%);
+      box-shadow: 0 4px 20px rgba(239, 68, 68, 0.5);
+      animation: pulseMic 1.5s infinite;
+    }
+
+    .voice-center-btn.speaking {
+      background: linear-gradient(135deg, var(--ssvp-success) 0%, #047857 100%);
+      box-shadow: 0 4px 20px rgba(16, 185, 129, 0.5);
+    }
+
+    @keyframes pulseMic {
+      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); }
+      70% { box-shadow: 0 0 0 12px rgba(239, 68, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
+    /* Console logs do protótipo */
+    .console-pane {
+      background-color: #0f172a;
+      color: #38bdf8;
+      font-family: monospace;
+      font-size: 0.65rem;
+      padding: 6px 12px;
+      height: 48px;
+      overflow-y: auto;
+      border-top: 1px solid #1e293b;
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Cabeçalho Fixo SSVP -->
+  <header class="header-fixed">
+    <h1>Módulos de Visita SSVP</h1>
+    <p>Grid de Navegação Bidirecional 2D</p>
+  </header>
+
+  <!-- Indicador de Abas Horizontais (Mapeado nas colunas) -->
+  <nav class="tabs-indicator">
+    <button id="tab0" class="tab-btn active-tab" onclick="scrollToColumn(0)">1. Pessoas</button>
+    <button id="tab1" class="tab-btn" onclick="scrollToColumn(1)">2. Visitas</button>
+    <button id="tab2" class="tab-btn" onclick="scrollToColumn(2)">3. Metas</button>
+    <button id="tab3" class="tab-btn" onclick="scrollToColumn(3)">4. Relatos</button>
+  </nav>
+
+  <!-- Container Geral da Grade de Rolagem Bidirecional -->
+  <main id="grid2D" class="grid-2d-container">
+    
+    <!-- COLUNA 0: PESSOAS (FAMÍLIAS) -->
+    <section class="subject-column" id="col0">
+      
+      <!-- Card 0.1 -->
+      <article class="card-item active-card" id="card-col0-row0">
+        <div class="card-header-mini">
+          <div class="card-badge">MS</div>
+          <h2 class="card-title-mini">Maria da Silva</h2>
+        </div>
+        <div class="card-body-mini">
+          <p><strong>Papel:</strong> Assistida (Chefe de Família)</p>
+          <p><strong>CPF:</strong> <span class="readable-text" onclick="speakText(this)">123.456.789-00</span></p>
+          <p><strong>Telefone:</strong> <span class="readable-text" onclick="speakText(this)">(11) 98765-4321</span></p>
+          <p><strong>Observação:</strong> <span class="readable-text" onclick="speakText(this)">Mora com dois netos pequenos e necessita de cesta especial.</span></p>
+          
+          <div class="card-input-group">
+            <label for="input-col0-row0">Anotação Cadastral</label>
+            <input type="text" id="input-col0-row0" class="card-input-2d" placeholder="Toque p/ Voz | Segure p/ Teclado" readonly>
+            <span class="card-hint">💡 Toque rápido = Voz | Segure 500ms = Teclado</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Card 0.2 -->
+      <article class="card-item" id="card-col0-row1">
+        <div class="card-header-mini">
+          <div class="card-badge">JO</div>
+          <h2 class="card-title-mini">João Oliveira</h2>
+        </div>
+        <div class="card-body-mini">
+          <p><strong>Papel:</strong> Assistido (Idoso)</p>
+          <p><strong>CPF:</strong> <span class="readable-text" onclick="speakText(this)">987.654.321-11</span></p>
+          <p><strong>Telefone:</strong> <span class="readable-text" onclick="speakText(this)">(11) 91234-5678</span></p>
+          <p><strong>Observação:</strong> <span class="readable-text" onclick="speakText(this)">Necessita de ajuda com transporte para fisioterapia e remédios.</span></p>
+          
+          <div class="card-input-group">
+            <label for="input-col0-row1">Anotação Cadastral</label>
+            <input type="text" id="input-col0-row1" class="card-input-2d" placeholder="Toque p/ Voz | Segure p/ Teclado" readonly>
+            <span class="card-hint">💡 Toque rápido = Voz | Segure 500ms = Teclado</span>
+          </div>
+        </div>
+      </article>
+
+    </section>
+
+    <!-- COLUNA 1: VISITAS (PLANEJAMENTO) -->
+    <section class="subject-column" id="col1">
+      
+      <!-- Card 1.1 -->
+      <article class="card-item" id="card-col1-row0">
+        <div class="card-header-mini">
+          <div class="card-badge">V1</div>
+          <h2 class="card-title-mini">Visita: Maria da Silva</h2>
+        </div>
+        <div class="card-body-mini">
+          <p><strong>Data Prevista:</strong> <span class="readable-text" onclick="speakText(this)">13 de Agosto de 2026</span></p>
+          <p><strong>Horário:</strong> <span class="readable-text" onclick="speakText(this)">14:00 horas</span></p>
+          <p><strong>Vicentinos:</strong> Antônio Souza e Cleide Lima</p>
+          <p><strong>Status:</strong> Agendada</p>
+          
+          <div class="card-input-group">
+            <label for="input-col1-row0">Relato de Chegada/Visita</label>
+            <input type="text" id="input-col1-row0" class="card-input-2d" placeholder="Toque p/ Voz | Segure p/ Teclado" readonly>
+            <span class="card-hint">💡 Toque rápido = Voz | Segure 500ms = Teclado</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Card 1.2 -->
+      <article class="card-item" id="card-col1-row1">
+        <div class="card-header-mini">
+          <div class="card-badge">V2</div>
+          <h2 class="card-title-mini">Visita: João Oliveira</h2>
+        </div>
+        <div class="card-body-mini">
+          <p><strong>Data Prevista:</strong> <span class="readable-text" onclick="speakText(this)">14 de Agosto de 2026</span></p>
+          <p><strong>Horário:</strong> <span class="readable-text" onclick="speakText(this)">10:00 horas</span></p>
+          <p><strong>Vicentinos:</strong> Antônio Souza e Pedro Silva</p>
+          <p><strong>Status:</strong> Planejada</p>
+          
+          <div class="card-input-group">
+            <label for="input-col1-row1">Relato de Chegada/Visita</label>
+            <input type="text" id="input-col1-row1" class="card-input-2d" placeholder="Toque p/ Voz | Segure p/ Teclado" readonly>
+            <span class="card-hint">💡 Toque rápido = Voz | Segure 500ms = Teclado</span>
+          </div>
+        </div>
+      </article>
+
+    </section>
+
+    <!-- COLUNA 2: METAS -->
+    <section class="subject-column" id="col2">
+      
+      <!-- Card 2.1 -->
+      <article class="card-item" id="card-col2-row0">
+        <div class="card-header-mini">
+          <div class="card-badge">M1</div>
+          <h2 class="card-title-mini">Meta: Reforma do Telhado</h2>
+        </div>
+        <div class="card-body-mini">
+          <p><strong>Assistido:</strong> Maria da Silva</p>
+          <p><strong>Descrição:</strong> <span class="readable-text" onclick="speakText(this)">Trocar as telhas quebradas da cozinha e reforçar caibros de madeira.</span></p>
+          <p><strong>Prazo Final:</strong> <span class="readable-text" onclick="speakText(this)">31 de Agosto de 2026</span></p>
+          <p><strong>Status:</strong> Em andamento (Aguardando materiais)</p>
+          
+          <div class="card-input-group">
+            <label for="input-col2-row0">Atualização do Progresso da Meta</label>
+            <input type="text" id="input-col2-row0" class="card-input-2d" placeholder="Toque p/ Voz | Segure p/ Teclado" readonly>
+            <span class="card-hint">💡 Toque rápido = Voz | Segure 500ms = Teclado</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Card 2.2 -->
+      <article class="card-item" id="card-col2-row1">
+        <div class="card-header-mini">
+          <div class="card-badge">M2</div>
+          <h2 class="card-title-mini">Meta: Matrícula Escolar</h2>
+        </div>
+        <div class="card-body-mini">
+          <p><strong>Assistido:</strong> João Oliveira (Netos)</p>
+          <p><strong>Descrição:</strong> <span class="readable-text" onclick="speakText(this)">Fazer as inscrições das crianças na creche e escola do bairro.</span></p>
+          <p><strong>Prazo Final:</strong> <span class="readable-text" onclick="speakText(this)">20 de Agosto de 2026</span></p>
+          <p><strong>Status:</strong> Planejada</p>
+          
+          <div class="card-input-group">
+            <label for="input-col2-row1">Atualização do Progresso da Meta</label>
+            <input type="text" id="input-col2-row1" class="card-input-2d" placeholder="Toque p/ Voz | Segure p/ Teclado" readonly>
+            <span class="card-hint">💡 Toque rápido = Voz | Segure 500ms = Teclado</span>
+          </div>
+        </div>
+      </article>
+
+    </section>
+
+    <!-- COLUNA 3: RELATOS (ANOTAÇÕES ADICIONAIS) -->
+    <section class="subject-column" id="col3">
+      
+      <!-- Card 3.1 -->
+      <article class="card-item" id="card-col3-row0">
+        <div class="card-header-mini">
+          <div class="card-badge">R1</div>
+          <h2 class="card-title-mini">Relato: Reunião do Conselho</h2>
+        </div>
+        <div class="card-body-mini">
+          <p><strong>Assunto:</strong> Notas Gerais da Reunião Mensal</p>
+          <p><strong>Data:</strong> <span class="readable-text" onclick="speakText(this)">10 de Agosto de 2026</span></p>
+          <p><strong>Descrição:</strong> <span class="readable-text" onclick="speakText(this)">Discussão de orçamentos e distribuição de auxílio emergencial de inverno.</span></p>
+          
+          <div class="card-input-group">
+            <label for="input-col3-row0">Relato Livre (Voz)</label>
+            <input type="text" id="input-col3-row0" class="card-input-2d" placeholder="Toque p/ Voz | Segure p/ Teclado" readonly>
+            <span class="card-hint">💡 Toque rápido = Voz | Segure 500ms = Teclado</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Card 3.2 -->
+      <article class="card-item" id="card-col3-row1">
+        <div class="card-header-mini">
+          <div class="card-badge">R2</div>
+          <h2 class="card-title-mini">Relato: Ação de Cesta Básica</h2>
+        </div>
+        <div class="card-body-mini">
+          <p><strong>Assunto:</strong> Logística de Entregas</p>
+          <p><strong>Data:</strong> <span class="readable-text" onclick="speakText(this)">12 de Agosto de 2026</span></p>
+          <p><strong>Descrição:</strong> <span class="readable-text" onclick="speakText(this)">Definição dos vicentinos responsáveis pela montagem e entrega das cestas.</span></p>
+          
+          <div class="card-input-group">
+            <label for="input-col3-row1">Relato Livre (Voz)</label>
+            <input type="text" id="input-col3-row1" class="card-input-2d" placeholder="Toque p/ Voz | Segure p/ Teclado" readonly>
+            <span class="card-hint">💡 Toque rápido = Voz | Segure 500ms = Teclado</span>
+          </div>
+        </div>
+      </article>
+
+    </section>
+
+  </main>
+
+  <!-- Console Log Inferior -->
+  <div id="consolePane" class="console-pane">
+    [Console de Teste 2D Iniciado]
+  </div>
+
+  <!-- Barra de Navegação Inferior Simétrica -->
+  <nav class="bottom-navigation-bar">
+    <button id="btnPrev" class="nav-circle-btn" onclick="navigateColumn(-1)" aria-label="Aba Anterior" disabled>
+      <!-- Ícone Voltar (<) -->
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+    </button>
+    
+    <button id="btnVoice" class="voice-center-btn" onclick="handleVoiceAction()" title="Gravar Observação" aria-label="Ação de Voz Contextual">
+      <!-- Ícone Microfone -->
+      <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg>
+    </button>
+    
+    <button id="btnNext" class="nav-circle-btn" onclick="navigateColumn(1)" aria-label="Próxima Aba">
+      <!-- Ícone Avançar (>) -->
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+    </button>
+  </nav>
+
+  <script>
+    // Configurações do Grid
+    const grid2D = document.getElementById('grid2D');
+    const columns = document.querySelectorAll('.subject-column');
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    
+    const btnPrev = document.getElementById('btnPrev');
+    const btnNext = document.getElementById('btnNext');
+    const btnVoice = document.getElementById('btnVoice');
+    const consolePane = document.getElementById('consolePane');
+
+    let activeColumnIndex = 0;
+    let activeCardPerColumn = { 0: 0, 1: 0, 2: 0, 3: 0 }; // Guarda qual card vertical está ativo em cada coluna
+
+    function log2D(message) {
+      const time = new Date().toLocaleTimeString();
+      consolePane.innerHTML = `[${time}] ${message}<br>` + consolePane.innerHTML;
+      console.log(`[UX 2D] ${message}`);
+    }
+
+    // ==========================================================================
+    // DETECÇÃO DE EIXOS (INTERSECTION OBSERVER)
+    // ==========================================================================
+    
+    // 1. Observer Horizontal (Colunas/Assuntos)
+    const horizontalOptions = {
+      root: grid2D,
+      threshold: 0.6,
+      rootMargin: '0px'
+    };
+
+    const horizontalObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const colId = entry.target.id;
+          const colIndex = parseInt(colId.replace('col', ''));
+          updateActiveColumn(colIndex);
+        }
+      });
+    }, horizontalOptions);
+
+    columns.forEach(col => horizontalObserver.observe(col));
+
+    function updateActiveColumn(index) {
+      if (index === activeColumnIndex) return;
+
+      activeColumnIndex = index;
+      
+      // Atualiza Abas no Topo
+      tabButtons.forEach((btn, i) => {
+        if (i === index) {
+          btn.classList.add('active-tab');
+        } else {
+          btn.classList.remove('active-tab');
+        }
+      });
+
+      // Habilita/Desabilita botões laterais
+      btnPrev.disabled = (index === 0);
+      btnNext.disabled = (index === columns.length - 1);
+
+      const subjects = ["Pessoas", "Visitas", "Metas", "Relatos"];
+      log2D(`Módulo ativo: ${subjects[index]}`);
+      
+      // Limpa leituras em execução
+      clearReadFocus();
+      
+      // Força a validação de qual card vertical está ativo nesta coluna
+      checkActiveVerticalCard(index);
+    }
+
+    // 2. Observer Vertical (Cards dentro de cada Coluna)
+    const verticalOptions = {
+      threshold: 0.55,
+      rootMargin: '0px'
+    };
+
+    // Função que observa os cards e atualiza o estado vertical
+    function setupVerticalObservers() {
+      columns.forEach((col, colIndex) => {
+        const cards = col.querySelectorAll('.card-item');
+        
+        const verticalObserver = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              const cardId = entry.target.id;
+              // Formato: card-colX-rowY
+              const parts = cardId.split('-');
+              const rowIndex = parseInt(parts[2].replace('row', ''));
+              
+              // Atualiza o estado
+              setActiveCard(colIndex, rowIndex);
+            }
+          });
+        }, { root: col, ...verticalOptions });
+
+        cards.forEach(card => verticalObserver.observe(card));
+      });
+    }
+
+    setupVerticalObservers();
+
+    function setActiveCard(colIndex, rowIndex) {
+      activeCardPerColumn[colIndex] = rowIndex;
+
+      // Se for a coluna atualmente ativa na visualização do usuário, atualiza a classe visual
+      if (colIndex === activeColumnIndex) {
+        const col = document.getElementById(`col${colIndex}`);
+        const cards = col.querySelectorAll('.card-item');
+        
+        cards.forEach((card, i) => {
+          if (i === rowIndex) {
+            card.classList.add('active-card');
+          } else {
+            card.classList.remove('active-card');
+          }
+        });
+        
+        log2D(`Card focado: Aba ${colIndex + 1}, Card ${rowIndex + 1}`);
+      }
+    }
+
+    function checkActiveVerticalCard(colIndex) {
+      const activeRow = activeCardPerColumn[colIndex];
+      setActiveCard(colIndex, activeRow);
+    }
+
+    // ==========================================================================
+    // NAVEGAÇÃO DE ROLAGEM (HORIZONTAL E VERTICAL)
+    // ==========================================================================
+
+    function scrollToColumn(index) {
+      const targetCol = document.getElementById(`col${index}`);
+      if (targetCol) {
+        targetCol.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'center'
+        });
+        triggerVib(40);
+      }
+    }
+
+    function navigateColumn(direction) {
+      const targetIndex = activeColumnIndex + direction;
+      if (targetIndex >= 0 && targetIndex < columns.length) {
+        scrollToColumn(targetIndex);
+      }
+    }
+
+    function triggerVib(duration) {
+      if ('vibrate' in navigator) {
+        navigator.vibrate(duration);
+      }
+    }
+
+    // ==========================================================================
+    // LEITURA POR VOZ (TEXTO-PARA-FALA)
+    // ==========================================================================
+    const synth = window.speechSynthesis;
+    
+    function clearReadFocus() {
+      document.querySelectorAll('.readable-text').forEach(el => el.classList.remove('focused-text'));
+    }
+
+    function speakText(element) {
+      clearReadFocus();
+      
+      if (synth.speaking) {
+        synth.cancel();
+        btnVoice.classList.remove('speaking');
+        log2D("Leitura cancelada.");
+        return;
+      }
+
+      element.classList.add('focused-text');
+      const phrase = element.textContent.trim();
+      log2D(`Lendo: "${phrase}"`);
+
+      const utterance = new SpeechSynthesisUtterance(phrase);
+      utterance.lang = 'pt-BR';
+
+      utterance.onstart = () => btnVoice.classList.add('speaking');
+      utterance.onend = () => {
+        btnVoice.classList.remove('speaking');
+        element.classList.remove('focused-text');
+        log2D("Leitura concluída.");
+      };
+      utterance.onerror = (e) => {
+        btnVoice.classList.remove('speaking');
+        element.classList.remove('focused-text');
+        log2D(`Erro de voz: ${e.error}`);
+      };
+
+      synth.speak(utterance);
+    }
+
+    // ==========================================================================
+    // RECONHECIMENTO DE VOZ (FALA-PARA-TEXTO)
+    // ==========================================================================
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+    let isListening = false;
+
+    if (SpeechRecognition) {
+      recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.lang = 'pt-BR';
+      recognition.interimResults = false;
+
+      recognition.onstart = () => {
+        isListening = true;
+        btnVoice.classList.add('listening');
+        log2D("🎙️ Ouvindo... Fale a observação.");
+        triggerVib(80);
+      };
+
+      recognition.onend = () => {
+        isListening = false;
+        btnVoice.classList.remove('listening');
+      };
+
+      recognition.onresult = (event) => {
+        const text = event.results[0][0].transcript;
+        log2D(`Texto transcrito: "${text}"`);
+        
+        // Determina qual o input ativo baseado no card e coluna focado
+        const activeRow = activeCardPerColumn[activeColumnIndex];
+        const targetInput = document.getElementById(`input-col${activeColumnIndex}-row${activeRow}`);
+        
+        if (targetInput) {
+          targetInput.value = text;
+          log2D(`Notas inseridas no input do módulo ${activeColumnIndex + 1}, card ${activeRow + 1}`);
+          triggerVib([40, 40, 40]); // Feedback tátil de sucesso
+        }
+      };
+
+      recognition.onerror = (e) => {
+        isListening = false;
+        btnVoice.classList.remove('listening');
+        log2D(`Erro microfone: ${e.error}`);
+      };
+    } else {
+      log2D("Microfone não suportado no navegador.");
+    }
+
+    function handleVoiceAction() {
+      if (synth.speaking) {
+        synth.cancel();
+        btnVoice.classList.remove('speaking');
+        clearReadFocus();
+        log2D("Leitura cancelada.");
+        return;
+      }
+
+      if (!recognition) return;
+
+      if (isListening) {
+        recognition.stop();
+      } else {
+        recognition.start();
+      }
+    }
+
+    // ==========================================================================
+    // ENTRADA HÍBRIDA DE TECLADO (CLIQUE CURTO VS CLIQUE LONGO)
+    // ==========================================================================
+    const allInputs = document.querySelectorAll('.card-input-2d');
+
+    allInputs.forEach(input => {
+      let timer;
+
+      input.addEventListener('touchstart', (e) => {
+        if (e.touches.length > 1) return;
+        timer = setTimeout(() => {
+          input.readOnly = false;
+          input.focus();
+          log2D(`Teclado aberto para: ${input.id}`);
+          triggerVib(90);
+        }, 500); // 500ms
+      }, { passive: true });
+
+      input.addEventListener('touchend', () => {
+        clearTimeout(timer);
+      });
+
+      input.addEventListener('click', () => {
+        if (!input.readOnly) return;
+        log2D(`Toque rápido detectado. Chamando comando de voz.`);
+        handleVoiceAction();
+      });
+
+      input.addEventListener('blur', () => {
+        input.readOnly = true;
+      });
+    });
+  </script>
+</body>
+</html>
