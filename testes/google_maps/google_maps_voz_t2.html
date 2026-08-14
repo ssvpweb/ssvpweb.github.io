@@ -39,9 +39,10 @@
       font-size: 1.3rem;
       font-weight: 500;
       color: var(--ssvp-text-main);
-      line-height: 1.4;
-      min-height: 50px;
+      line-height: 1.5;
+      min-height: 70px;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       word-break: break-word;
@@ -53,6 +54,8 @@
       font-weight: 700;
       border-bottom: 2px dashed var(--ssvp-blue);
       padding-bottom: 2px;
+      display: inline-block;
+      margin: 0.15rem 0;
     }
     
     /* Painel de Ação Sugerida */
@@ -259,6 +262,7 @@
 
   <script>
     // Lógica para expandir/recolher o card de instruções
+    // ...
     function toggleInstrucoes() {
       const card = document.getElementById('cardInstrucoes');
       const wrapper = document.getElementById('contentWrapper');
@@ -334,7 +338,7 @@
       processarComando(frase);
     }
 
-    // Processamento semântico avançado para refinamento em campo (Universal)
+    // Processamento semântico avançado para refinamento em campo (Universal) com quebra de 3 linhas
     function processarComando(frase) {
       const texto = frase.toLowerCase().trim();
       const painel = document.getElementById('painelAcao');
@@ -365,26 +369,22 @@
         const ordinal = matchOrdinal[1];
         const estabelecimento = matchOrdinal[2].replace(/(?:mais próximo|mais próxima|próximo|próxima)/gi, "").trim();
         realceTermo = `${ordinal} ${estabelecimento}`;
-        
-        // Query de destino nativa do Google Maps
         queryRefinada = `${ordinal}+${estabelecimento}+mais+proximo`;
       } 
       else if (matchQuantidade) {
         const quantidade = matchQuantidade[1];
         const estabelecimento = matchQuantidade[2].replace(/(?:mais próximo|mais próxima|próximo|próxima|próximos|próximas)/gi, "").trim();
         realceTermo = `${quantidade} ${estabelecimento}`;
-        
         queryRefinada = `${quantidade}+${estabelecimento}+mais+proximos`;
       }
       else if (matchNome && matchNome[2].trim().length > 0 && !matchNome[2].includes('mais') && !matchNome[2].includes('proxim')) {
         const categoria = matchNome[1];
         const nomeEspecifico = matchNome[2].trim();
         realceTermo = `${categoria} ${nomeEspecifico}`;
-        
         queryRefinada = `${categoria}+${nomeEspecifico}`;
       }
       else {
-        // Fallback para termos simples caso não caia em regras de refinamento
+        // Fallback
         const regexFallback = /(?:rota para|ir para|mapa com|buscar|até o|até a|com as|com os|próximos de|próximas de)\s+([a-zA-Záàâãéèêíïóôõöúçñ\s]+)/i;
         const matchFallback = texto.match(regexFallback);
         if (matchFallback && matchFallback[1]) {
@@ -406,10 +406,29 @@
         return;
       }
 
-      // 1. Realçar dinamicamente a frase falada na tela
-      const regexRealce = new RegExp(`(${realceTermo})`, 'gi');
-      const fraseRealçada = frase.replace(regexRealce, `<span class="realce-voz">$1</span>`);
-      document.getElementById('textoTranscrito').innerHTML = `"${fraseRealçada}"`;
+      // 1. Dividir a transcrição visualmente em até 3 linhas (Opção 2)
+      // Ajusta para cobrir sinônimos complexos como "posto de saúde" no match de regex
+      const regexRealce = new RegExp(`(${realceTermo}|posto\\s+de\\s+saú?de|postos\\s+de\\s+saú?de|ubs)`, 'gi');
+      const indexTermo = frase.toLowerCase().search(regexRealce);
+      
+      if (indexTermo !== -1) {
+        const matchArray = frase.match(regexRealce);
+        const termoReal = matchArray ? matchArray[0] : realceTermo;
+        
+        const parte1 = frase.substring(0, indexTermo).trim();
+        const parte2 = frase.substring(indexTermo, indexTermo + termoReal.length);
+        const parte3 = frase.substring(indexTermo + termoReal.length).trim();
+        
+        let htmlTranscricao = '"';
+        if (parte1) htmlTranscricao += parte1 + '<br>';
+        htmlTranscricao += `<span class="realce-voz">${parte2}</span>`;
+        if (parte3) htmlTranscricao += '<br>' + parte3;
+        htmlTranscricao += '"';
+        
+        document.getElementById('textoTranscrito').innerHTML = htmlTranscricao;
+      } else {
+        document.getElementById('textoTranscrito').innerHTML = `"${frase}"`;
+      }
 
       // 2. Monta o card de ação de acordo com a intenção
       let html = "";

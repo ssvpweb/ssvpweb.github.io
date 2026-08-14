@@ -39,9 +39,10 @@
       font-size: 1.3rem;
       font-weight: 500;
       color: var(--ssvp-text-main);
-      line-height: 1.4;
-      min-height: 50px;
+      line-height: 1.5;
+      min-height: 70px;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       word-break: break-word;
@@ -53,6 +54,8 @@
       font-weight: 700;
       border-bottom: 2px dashed var(--ssvp-blue);
       padding-bottom: 2px;
+      display: inline-block;
+      margin: 0.15rem 0;
     }
     
     /* Painel de Ação Sugerida */
@@ -331,7 +334,7 @@
       processarComando(frase);
     }
 
-    // Processamento e interpretação semântica dos comandos de voz com realce do termo
+    // Processamento e interpretação semântica dos comandos de voz com realce e quebra de linha
     function processarComando(frase) {
       const texto = frase.toLowerCase().trim();
       const painel = document.getElementById('painelAcao');
@@ -372,11 +375,30 @@
         return;
       }
 
-      // 1. Realçar dinamicamente a palavra do estabelecimento na frase de feedback da voz
-      // Cria regex para capturar a palavra e flexões de plural (s)
+      // 1. Dividir a transcrição visualmente em até 3 linhas baseadas no termo realçado (Opção 2)
       const regexRealce = new RegExp(`(${estabelecimento}s?|posto\\s+de\\s+saú?de|postos\\s+de\\s+saú?de|ubs)`, 'gi');
-      const fraseRealçada = frase.replace(regexRealce, `<span class="realce-voz">$1</span>`);
-      document.getElementById('textoTranscrito').innerHTML = `"${fraseRealçada}"`;
+      const indexTermo = frase.toLowerCase().search(regexRealce);
+      
+      if (indexTermo !== -1) {
+        // Encontra o tamanho real do termo na frase original
+        const matchArray = frase.match(regexRealce);
+        const termoReal = matchArray ? matchArray[0] : estabelecimento;
+        
+        const parte1 = frase.substring(0, indexTermo).trim();
+        const parte2 = frase.substring(indexTermo, indexTermo + termoReal.length);
+        const parte3 = frase.substring(indexTermo + termoReal.length).trim();
+        
+        // Constrói HTML com quebra de linha condicionais
+        let htmlTranscricao = '"';
+        if (parte1) htmlTranscricao += parte1 + '<br>';
+        htmlTranscricao += `<span class="realce-voz">${parte2}</span>`;
+        if (parte3) htmlTranscricao += '<br>' + parte3;
+        htmlTranscricao += '"';
+        
+        document.getElementById('textoTranscrito').innerHTML = htmlTranscricao;
+      } else {
+        document.getElementById('textoTranscrito').innerHTML = `"${frase}"`;
+      }
 
       // 2. Determinar a intenção: ROTA ou BUSCA
       const ehRota = texto.includes('rota') || texto.includes('ir') || texto.includes('caminho') || texto.includes('chegar') || texto.includes('até');
