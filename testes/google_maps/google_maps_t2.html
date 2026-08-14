@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visita Vicentina - Google Maps T2</title>
+  <!-- Link para o CSS Externo básico -->
+  <link rel="stylesheet" href="../teste_padrao.css">
+  <!-- Fonte Inter para tipografia premium -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Estilos locais complementares para o card de informações dos assistidos */
+    .card-assistido {
+      border: 1px solid var(--ssvp-gray-border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+      background-color: var(--ssvp-white);
+      box-shadow: 0 2px 4px var(--ssvp-shadow);
+      width: 100%;
+    }
+    
+    .card-assistido:last-child {
+      margin-bottom: 0;
+    }
+    
+    .card-assistido-header {
+      background-color: var(--ssvp-light-blue);
+      color: var(--ssvp-navy);
+      padding: 1rem;
+    }
+    
+    .card-assistido-header h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 0.15rem;
+    }
+    
+    .card-assistido-header p {
+      font-size: 0.85rem;
+      opacity: 0.9;
+    }
+    
+    .card-assistido-body {
+      padding: 1.25rem 1rem;
+    }
+    
+    .address-info {
+      font-size: 0.95rem;
+      color: var(--ssvp-text-main);
+      margin-bottom: 1.25rem;
+      line-height: 1.4;
+    }
+    
+    /* Botões de Ação */
+    .btn-group-horizontal {
+      display: flex;
+      gap: 0.5rem;
+      width: 100%;
+    }
+    
+    .btn-maps {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 14px 10px;
+      background-color: var(--ssvp-success);
+      color: var(--ssvp-white);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.9rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(16, 185, 129, 0.2);
+      transition: background-color 0.2s, transform 0.1s;
+      outline: none;
+    }
+    
+    .btn-maps:hover {
+      background-color: #0f9f6e;
+    }
+    
+    .btn-maps:active {
+      transform: scale(0.97);
+    }
+    
+    .btn-toggle-map {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 14px 10px;
+      background-color: var(--ssvp-white);
+      color: var(--ssvp-navy);
+      font-weight: 600;
+      font-size: 0.9rem;
+      border-radius: 8px;
+      border: 1px solid var(--ssvp-gray-border);
+      cursor: pointer;
+      transition: background-color 0.2s, border-color 0.2s;
+      outline: none;
+    }
+    
+    .btn-toggle-map:hover {
+      background-color: var(--ssvp-light-blue);
+      border-color: var(--ssvp-blue);
+    }
+    
+    .btn-toggle-map:active {
+      transform: scale(0.97);
+    }
+    
+    /* Painel do Mapa Embutido (Iframe) */
+    .mapa-embutido-container {
+      display: none;
+      width: 100%;
+      height: 250px;
+      margin-top: 1rem;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--ssvp-gray-border);
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    
+    .mapa-embutido-container iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Cabeçalho com Versão e Card de Destaque da Funcionalidade (Centralizados) -->
+  <header class="teste-header">
+    <div class="teste-versao">teste v1.2 [T2]</div>
+    <div class="card-funcionalidade">
+      <h1 class="teste-funcionalidade">Google Maps</h1>
+    </div>
+  </header>
+
+  <!-- Card de Instruções (Inicia aberto) -->
+  <section class="card-instrucoes ativo" id="cardInstrucoes">
+    <div class="card-header" onclick="toggleInstrucoes()">
+      <span>Instruções do Teste (Abordagem T2)</span>
+      <span class="seta-toggle" id="setaToggle" style="transform: rotate(180deg);">▼</span>
+    </div>
+    <!-- Wrapper do Grid -->
+    <div class="card-content-wrapper expanded" id="contentWrapper">
+      <!-- Container intermediário necessário para colapso total do padding no grid -->
+      <div class="card-content">
+        <div class="card-body">
+          <p><strong>Aviso importante:</strong> Os nomes das famílias e assistidos listados abaixo são fictícios. Os endereços são de Unidades Básicas de Saúde (UBSs) reais e próximas da região de Moema para viabilizar simulações reais de rotas no celular.</p>
+          <p>1. Verifique as informações das famílias listadas na área de testes abaixo.</p>
+          <p>2. Toque em <strong>"📍 Ver Mapa Local"</strong> para carregar o mapa do local embutido diretamente na própria página, sem sair do aplicativo.</p>
+          <p>3. Toque em <strong>"🗺️ Abrir Rota"</strong> para iniciar a navegação por GPS no app externo do Google Maps.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Área dedicada para o Teste Específico (5 Famílias com endereços de UBS em Moema) -->
+  <main class="teste-container" style="gap: 1.25rem;">
+    
+    <!-- Família 1 (UBS Sigmund Freud) -->
+    <div class="card-assistido">
+      <div class="card-assistido-header">
+        <h2>Família Santos</h2>
+        <p>Assistido: João da Silva</p>
+      </div>
+      <div class="card-assistido-body">
+        <div class="address-info">
+          📍 <strong>Endereço (UBS Sigmund Freud):</strong><br>
+          Avenida Indianópolis, 650 - Moema, São Paulo - SP
+        </div>
+        
+        <div class="btn-group-horizontal">
+          <button class="btn-toggle-map" onclick="toggleMapaLocal(this, 'Avenida Indianópolis, 650, Moema, São Paulo, SP', 'mapa-santos')">
+            📍 Ver Mapa Local
+          </button>
+          <button class="btn-maps" onclick="abrirRotaMaps('Avenida Indianópolis, 650, Moema, São Paulo, SP')">
+            🗺️ Abrir Rota
+          </button>
+        </div>
+        
+        <div class="mapa-embutido-container" id="mapa-santos"></div>
+      </div>
+    </div>
+
+    <!-- Família 2 (UBS Vila Olímpia) -->
+    <div class="card-assistido">
+      <div class="card-assistido-header">
+        <h2>Família Oliveira</h2>
+        <p>Assistida: Maria de Oliveira</p>
+      </div>
+      <div class="card-assistido-body">
+        <div class="address-info">
+          📍 <strong>Endereço (UBS Vila Olímpia):</strong><br>
+          Rua Jacques Félix, 499 - Vila Nova Conceição, São Paulo - SP
+        </div>
+        
+        <div class="btn-group-horizontal">
+          <button class="btn-toggle-map" onclick="toggleMapaLocal(this, 'Rua Jacques Félix, 499, Vila Nova Conceição, São Paulo, SP', 'mapa-oliveira')">
+            📍 Ver Mapa Local
+          </button>
+          <button class="btn-maps" onclick="abrirRotaMaps('Rua Jacques Félix, 499, Vila Nova Conceição, São Paulo, SP')">
+            🗺️ Abrir Rota
+          </button>
+        </div>
+        
+        <div class="mapa-embutido-container" id="mapa-oliveira"></div>
+      </div>
+    </div>
+
+    <!-- Família 3 (UBS Vila Mariana / Clementino) -->
+    <div class="card-assistido">
+      <div class="card-assistido-header">
+        <h2>Família Silva</h2>
+        <p>Assistido: Pedro dos Santos</p>
+      </div>
+      <div class="card-assistido-body">
+        <div class="address-info">
+          📍 <strong>Endereço (UBS Vila Mariana):</strong><br>
+          Rua Dr. Diogo de Faria, 678 - Vila Clementino, São Paulo - SP
+        </div>
+        
+        <div class="btn-group-horizontal">
+          <button class="btn-toggle-map" onclick="toggleMapaLocal(this, 'Rua Dr. Diogo de Faria, 678, Vila Clementino, São Paulo, SP', 'mapa-silva')">
+            📍 Ver Mapa Local
+          </button>
+          <button class="btn-maps" onclick="abrirRotaMaps('Rua Dr. Diogo de Faria, 678, Vila Clementino, São Paulo, SP')">
+            🗺️ Abrir Rota
+          </button>
+        </div>
+        
+        <div class="mapa-embutido-container" id="mapa-silva"></div>
+      </div>
+    </div>
+
+    <!-- Família 4 (UBS Campo Belo) -->
+    <div class="card-assistido">
+      <div class="card-assistido-header">
+        <h2>Família Souza</h2>
+        <p>Assistida: Francisca de Souza</p>
+      </div>
+      <div class="card-assistido-body">
+        <div class="address-info">
+          📍 <strong>Endereço (UBS Campo Belo):</strong><br>
+          Avenida Vieira de Morais, 1752 - Campo Belo, São Paulo - SP
+        </div>
+        
+        <div class="btn-group-horizontal">
+          <button class="btn-toggle-map" onclick="toggleMapaLocal(this, 'Avenida Vieira de Morais, 1752, Campo Belo, São Paulo, SP', 'mapa-souza')">
+            📍 Ver Mapa Local
+          </button>
+          <button class="btn-maps" onclick="abrirRotaMaps('Avenida Vieira de Morais, 1752, Campo Belo, São Paulo, SP')">
+            🗺️ Abrir Rota
+          </button>
+        </div>
+        
+        <div class="mapa-embutido-container" id="mapa-souza"></div>
+      </div>
+    </div>
+
+    <!-- Família 5 (UBS Itaim Bibi) -->
+    <div class="card-assistido">
+      <div class="card-assistido-header">
+        <h2>Família Pereira</h2>
+        <p>Assistido: Antônio Pereira</p>
+      </div>
+      <div class="card-assistido-body">
+        <div class="address-info">
+          📍 <strong>Endereço (UBS Itaim Bibi):</strong><br>
+          Rua Salvador Cardoso, 177 - Itaim Bibi, São Paulo - SP
+        </div>
+        
+        <div class="btn-group-horizontal">
+          <button class="btn-toggle-map" onclick="toggleMapaLocal(this, 'Rua Salvador Cardoso, 177, Itaim Bibi, São Paulo, SP', 'mapa-pereira')">
+            📍 Ver Mapa Local
+          </button>
+          <button class="btn-maps" onclick="abrirRotaMaps('Rua Salvador Cardoso, 177, Itaim Bibi, São Paulo, SP')">
+            🗺️ Abrir Rota
+          </button>
+        </div>
+        
+        <div class="mapa-embutido-container" id="mapa-pereira"></div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // Lógica para expandir/recolher o card de instruções
+    function toggleInstrucoes() {
+      const card = document.getElementById('cardInstrucoes');
+      const wrapper = document.getElementById('contentWrapper');
+      const seta = document.getElementById('setaToggle');
+      
+      const isExpanded = wrapper.classList.toggle('expanded');
+      card.classList.toggle('ativo', isExpanded);
+      
+      // Rotaciona a seta
+      seta.style.transform = isExpanded ? 'rotate(180deg)' : 'rotate(0deg)';
+    }
+
+    // Carregar e exibir o mapa do Google Maps embutido
+    function toggleMapaLocal(buttonElement, enderecoCompleto, containerId) {
+      const container = document.getElementById(containerId);
+      const isVisible = container.style.display === 'block';
+      
+      if (isVisible) {
+        container.style.display = 'none';
+        container.innerHTML = '';
+        buttonElement.innerHTML = '📍 Ver Mapa Local';
+        buttonElement.style.backgroundColor = 'var(--ssvp-white)';
+      } else {
+        // Converte o endereço para URL segura do embed do Google Maps
+        const enderecoFormatado = encodeURIComponent(enderecoCompleto);
+        const embedUrl = `https://maps.google.com/maps?q=${enderecoFormatado}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+        
+        container.innerHTML = `<iframe src="${embedUrl}" allowfullscreen loading="lazy"></iframe>`;
+        container.style.display = 'block';
+        buttonElement.innerHTML = '✕ Fechar Mapa';
+        buttonElement.style.backgroundColor = 'var(--ssvp-light-blue)';
+      }
+    }
+
+    // Lógica de redirecionamento para o Google Maps externo
+    function abrirRotaMaps(enderecoCompleto) {
+      const enderecoFormatado = encodeURIComponent(enderecoCompleto);
+      const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${enderecoFormatado}`;
+      window.open(mapsUrl, '_blank');
+    }
+  </script>
+</body>
+</html>
