@@ -41,10 +41,9 @@
       color: var(--ssvp-text-main);
       line-height: 1.5;
       min-height: 70px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      display: block; /* Alterado de flex para block para estabilidade de quebra no celular */
+      text-align: center;
+      padding: 0.5rem 0;
       word-break: break-word;
     }
     
@@ -340,7 +339,6 @@
       const painel = document.getElementById('painelAcao');
       
       let estabelecimento = "";
-      let realceTermo = "";
       
       // 1. Identificar o tipo de estabelecimento (dicionário semântico)
       if (texto.includes('padaria') || texto.includes('padarias')) {
@@ -378,7 +376,6 @@
       }
 
       // 1. Dividir a transcrição visualmente em até 3 linhas baseadas no termo realçado (Opção 2)
-      // Ajusta para cobrir sinônimos complexos como "posto de saúde" no match de regex
       const regexRealce = new RegExp(`(${estabelecimento}s?|posto\\s+de\\s+saú?de|postos\\s+de\\s+saú?de|ubs)`, 'gi');
       const indexTermo = frase.toLowerCase().search(regexRealce);
       
@@ -446,6 +443,7 @@
       painel.style.display = 'block';
     }
 
+    // Capitalização simples
     function capitalizar(string) {
       return string.charAt(0).toUpperCase() + string.slice(1);
     }

@@ -41,10 +41,9 @@
       color: var(--ssvp-text-main);
       line-height: 1.5;
       min-height: 70px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      display: block; /* Alterado de flex para block para estabilidade de quebra no celular */
+      text-align: center;
+      padding: 0.5rem 0;
       word-break: break-word;
     }
     
@@ -358,8 +357,9 @@
       const matchOrdinal = texto.match(regexOrdinal);
       
       // B) REGRA DE QUANTIDADE (Ex: "3 padarias", "5 postos de saude")
+      // REMOVIDO "uma?" para evitar falsos positivos de "um mapa/maoa" no comando de abertura
       // Exige no mínimo 3 caracteres para o estabelecimento e ignora artigos opcionais
-      const regexQuantidade = /(\d+|uma?|duas?|três|quatro|cinco)\s+(?:as\s+|os\s+|de\s+|das\s+|dos\s+)?([a-zA-Záàâãéèêíïóôõöúçñ]{3,}s?)/i;
+      const regexQuantidade = /(\d+|duas?|três|quatro|cinco)\s+(?:as\s+|os\s+|de\s+|das\s+|dos\s+)?([a-zA-Záàâãéèêíïóôõöúçñ]{3,}s?)/i;
       const matchQuantidade = texto.match(regexQuantidade);
       
       // C) REGRA DE NOME ESPECÍFICO (Ex: "padaria Santa Tereza")
@@ -384,7 +384,7 @@
       }
       else {
         // Fallback
-        const regexFallback = /(?:rota para|ir para|mapa com|buscar|até o|até a|com as|com os|próximos de|próximas de)\s+([a-zA-Záàâãéèêíïóôõöúçñ\s]+)/i;
+        const regexFallback = /(?:rota para|ir para|mapa com|buscar|até o|até a|com as|com os|próximos de|próximas de)\s+([a-zA-Záàâãéèêíïóôõöúçñ]{3,})/i;
         const matchFallback = texto.match(regexFallback);
         if (matchFallback && matchFallback[1]) {
           const termo = matchFallback[1].replace(/(?:mais próximo|mais próxima|próximo|próxima|próximos|próximas|raio|de 2km|de 1km)/gi, "").trim();
