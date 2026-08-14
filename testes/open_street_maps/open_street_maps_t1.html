@@ -23,10 +23,17 @@
       gap: 1rem;
     }
     
+    .form-row {
+      display: flex;
+      gap: 0.75rem;
+      width: 100%;
+    }
+    
     .form-group {
       display: flex;
       flex-direction: column;
       gap: 0.4rem;
+      flex: 1;
     }
     
     .form-label {
@@ -132,7 +139,7 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 75%;
+      max-width: 70%;
     }
     
     .badge-distancia {
@@ -204,7 +211,7 @@
 
   <!-- Cabeçalho com Versão e Card de Destaque da Funcionalidade (Centralizados) -->
   <header class="teste-header">
-    <div class="teste-versao">teste v1.0 [osm]</div>
+    <div class="teste-versao">teste v1.2 [osm]</div>
     <div class="card-funcionalidade">
       <h1 class="teste-funcionalidade">OpenStreetMap</h1>
     </div>
@@ -213,7 +220,7 @@
   <!-- Card de Instruções (Inicia aberto) -->
   <section class="card-instrucoes ativo" id="cardInstrucoes">
     <div class="card-header" onclick="toggleInstrucoes()">
-      <span>Instruções do Teste (Nominatim API)</span>
+      <span>Instruções do Teste (Nominatim API + Filtro de Raio)</span>
       <span class="seta-toggle" id="setaToggle" style="transform: rotate(180deg);">▼</span>
     </div>
     <!-- Wrapper do Grid -->
@@ -221,10 +228,10 @@
       <!-- Container intermediário necessário para colapso total do padding no grid -->
       <div class="card-content">
         <div class="card-body">
-          <p><strong>Objetivo:</strong> Testar o tempo de resposta e a precisão da listagem de estabelecimentos e endereços reais ao seu redor usando a base gratuita do OpenStreetMap.</p>
-          <p>1. Selecione uma categoria de estabelecimento ou digite uma busca específica.</p>
-          <p>2. Clique em <strong>"Buscar Estabelecimentos"</strong> e conceda a permissão de GPS se solicitado.</p>
-          <p>3. Veja a lista dos locais físicos reais encontrados e a distância aproximada deles até você.</p>
+          <p><strong>Objetivo:</strong> Buscar locais físicos reais e seus endereços limitados estritamente ao raio selecionado ao redor do seu GPS atual, evitando falsos positivos distantes.</p>
+          <p>1. Escolha a categoria rápida e defina o **raio limite de busca** (ex: 2 km).</p>
+          <p>2. Clique em <strong>"Buscar Estabelecimentos"</strong> e conceda a permissão de GPS no celular.</p>
+          <p>3. Os resultados trarão os nomes e endereços reais localizados somente dentro do raio estipulado.</p>
         </div>
       </div>
     </div>
@@ -235,16 +242,31 @@
     
     <!-- Painel de Busca -->
     <div class="painel-busca">
-      <div class="form-group">
-        <label for="seletorCategoria" class="form-label">Categoria rápida:</label>
-        <select id="seletorCategoria" class="form-select" onchange="atualizarBuscaLivre(this.value)">
-          <option value="padaria">🍞 Padarias</option>
-          <option value="posto de saúde">🏥 Postos de Saúde (UBS)</option>
-          <option value="supermercado">🛒 Supermercados</option>
-          <option value="farmácia">💊 Farmácias</option>
-          <option value="hospital">🏢 Hospitais</option>
-          <option value="livre">✏️ Busca Personalizada...</option>
-        </select>
+      <div class="form-row">
+        <!-- Categoria -->
+        <div class="form-group" style="flex: 2;">
+          <label for="seletorCategoria" class="form-label">Categoria:</label>
+          <select id="seletorCategoria" class="form-select" onchange="atualizarBuscaLivre(this.value)">
+            <option value="padaria">🍞 Padarias</option>
+            <option value="posto de saúde">🏥 Postos de Saúde (UBS)</option>
+            <option value="supermercado">🛒 Supermercados</option>
+            <option value="farmácia">💊 Farmácias</option>
+            <option value="hospital">🏢 Hospitais</option>
+            <option value="livre">✏️ Busca Personalizada...</option>
+          </select>
+        </div>
+        
+        <!-- Raio de busca -->
+        <div class="form-group" style="flex: 1;">
+          <label for="seletorRaio" class="form-label">Raio Máximo:</label>
+          <select id="seletorRaio" class="form-select">
+            <option value="0.5">500 m</option>
+            <option value="1">1 km</option>
+            <option value="2" selected>2 km</option>
+            <option value="5">5 km</option>
+            <option value="10">10 km</option>
+          </select>
+        </div>
       </div>
       
       <div class="form-group" id="grupoBuscaLivre" style="display: none;">
@@ -329,7 +351,7 @@
       );
     }
 
-    // Executar chamada de geolocalização reversa/busca na API Nominatim
+    // Executar chamada geolocalizada e restrita por viewbox na API Nominatim
     function realizarRequisicaoNominatim(lat, lon) {
       const statusTexto = document.getElementById('statusTexto');
       statusTexto.innerText = 'Buscando estabelecimentos no OpenStreetMap...';
@@ -348,10 +370,22 @@
         termoBusca = categoria;
       }
 
-      // API Nominatim com bounding box flexível centrada nas coordenadas do usuário
-      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(termoBusca)}&lat=${lat}&lon=${lon}&addressdetails=1&limit=8`;
+      // 1. Limita estritamente a pesquisa ao Viewbox geométrico correspondente ao Raio
+      const raioKm = parseFloat(document.getElementById('seletorRaio').value);
+      const delta = raioKm / 111; // 1 grau geográfico é ~111km
 
-      // Nominatim política de uso: Requer identificação do User-Agent (simulada em navegadores pelo header de referer automático)
+      const minLon = lon - delta;
+      const maxLon = lon + delta;
+      const minLat = lat - delta;
+      const maxLat = lat + delta;
+      
+      // Monta a caixa delimitadora (viewbox) para o Nominatim
+      // Sintaxe viewbox: <left>,<top>,<right>,<bottom>
+      const viewbox = `${minLon},${maxLat},${maxLon},${minLat}`;
+
+      // URL com viewbox e bounded=1 para forçar restrição absoluta local
+      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(termoBusca)}&lat=${lat}&lon=${lon}&viewbox=${viewbox}&bounded=1&addressdetails=1&limit=25`;
+
       fetch(url)
         .then(response => {
           if (!response.ok) throw new Error('Falha de resposta do servidor.');
@@ -359,14 +393,26 @@
         })
         .then(dados => {
           if (!dados || dados.length === 0) {
-            exibirErro(`Nenhum estabelecimento próximo de "${termoBusca}" foi localizado.`);
+            exibirErro(`Nenhum estabelecimento próximo de "${termoBusca}" foi localizado no raio de ${raioKm} km.`);
             return;
           }
-          renderizarResultados(dados, lat, lon);
+          
+          // 2. Filtro client-side preciso para eliminar cantos fora do raio circular real
+          const resultadosFiltrados = dados.filter(item => {
+            const distKm = calcularDistanciaLinear(lat, lon, parseFloat(item.lat), parseFloat(item.lon));
+            return distKm <= raioKm;
+          });
+
+          if (resultadosFiltrados.length === 0) {
+            exibirErro(`Nenhum local encontrado estritamente dentro do raio de ${raioKm} km.`);
+            return;
+          }
+
+          renderizarResultados(resultadosFiltrados, lat, lon);
         })
         .catch(err => {
           console.error(err);
-          exibirErro('Erro ao conectar com os servidores do OpenStreetMap. Tente novamente mais tarde.');
+          exibirErro('Erro ao conectar com os servidores do OpenStreetMap. Tente novamente.');
         });
     }
 
@@ -392,7 +438,8 @@
         const lonDestino = parseFloat(item.lon);
 
         // Calcula distância linear do usuário
-        const distancia = calcularDistancia(latUsuario, lonUsuario, latDestino, lonDestino);
+        const distKm = calcularDistanciaLinear(latUsuario, lonUsuario, latDestino, lonDestino);
+        const distanciaTexto = formatarDistanciaTexto(distKm);
 
         // Link de navegação para Google Maps externo
         const urlRota = `https://www.google.com/maps/dir/?api=1&origin=${latUsuario},${lonUsuario}&destination=${encodeURIComponent(enderecoCompleto)}`;
@@ -401,7 +448,7 @@
           <div class="card-resultado">
             <div class="card-resultado-header">
               <span class="card-resultado-title" title="${nome}">${nome}</span>
-              <span class="badge-distancia">a ${distancia}</span>
+              <span class="badge-distancia">a ${distanciaTexto}</span>
             </div>
             <div class="card-resultado-body">
               <div class="address-info">
@@ -430,13 +477,11 @@
       if (rua) {
         return `${rua}, ${numero}${bairro ? ' - ' + bairro : ''}${cidade ? ' - ' + cidade : ''}`;
       }
-      
-      // Se não tiver rua explícita, quebra as 3 primeiras partes do display name
       return displayName.split(',').slice(0, 3).join(',');
     }
 
-    // Calcular distância linear em linha reta (Haversine formula)
-    function calcularDistancia(lat1, lon1, lat2, lon2) {
+    // Calcular distância linear (Fórmula de Haversine)
+    function calcularDistanciaLinear(lat1, lon1, lat2, lon2) {
       const R = 6371; // Raio da Terra em km
       const dLat = (lat2 - lat1) * Math.PI / 180;
       const dLon = (lon2 - lon1) * Math.PI / 180;
@@ -445,12 +490,15 @@
         Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
         Math.sin(dLon/2) * Math.sin(dLon/2);
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-      const d = R * c; // Distância em km
-      
-      if (d < 1) {
-        return `${Math.round(d * 1000)}m`;
+      return R * c; // Retorna em km
+    }
+
+    // Formata o valor numérico da distância em texto legível
+    function formatarDistanciaTexto(distanciaKm) {
+      if (distanciaKm < 1) {
+        return `${Math.round(distanciaKm * 1000)}m`;
       }
-      return `${d.toFixed(1)} km`;
+      return `${distanciaKm.toFixed(1)} km`;
     }
 
     // Exibir painel de erro
@@ -459,7 +507,7 @@
       const statusTexto = document.getElementById('statusTexto');
       
       statusSpinner.style.display = 'none';
-      statusTexto.innerHTML = `<span style="color: var(--ssvp-red); font-weight: 600;">⚠️ Erro:</span> ${msg}`;
+      statusTexto.innerHTML = `<span style="color: var(--ssvp-red); font-weight: 600;">⚠️</span> ${msg}`;
     }
   </script>
 </body>
