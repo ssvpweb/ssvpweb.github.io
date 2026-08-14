@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visita Vicentina - Voz e Mapas T2</title>
+  <!-- Link para o CSS Externo básico -->
+  <link rel="stylesheet" href="../teste_padrao.css">
+  <!-- Fonte Inter para tipografia premium -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Estilos locais complementares para o teste de voz */
+    .painel-feedback {
+      background-color: var(--ssvp-white);
+      border: 1px solid var(--ssvp-gray-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      width: 100%;
+      text-align: center;
+      margin-bottom: 1.25rem;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+    }
+    
+    .status-voz {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--ssvp-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.75rem;
+    }
+    
+    .status-voz.gravando {
+      color: var(--ssvp-red);
+      animation: piscar 1s infinite alternate;
+    }
+    
+    .texto-transcrito {
+      font-size: 1.3rem;
+      font-weight: 500;
+      color: var(--ssvp-text-main);
+      line-height: 1.4;
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      word-break: break-word;
+    }
+    
+    /* Realce visual do termo identificado dentro da frase falada */
+    .realce-voz {
+      color: var(--ssvp-blue);
+      font-weight: 700;
+      border-bottom: 2px dashed var(--ssvp-blue);
+      padding-bottom: 2px;
+    }
+    
+    /* Painel de Ação Sugerida */
+    .painel-acao {
+      display: none; /* Inicia oculto e surge ao interpretar a voz */
+      background-color: var(--ssvp-light-blue);
+      border: 2px solid var(--ssvp-blue);
+      border-radius: 12px;
+      padding: 1.25rem;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0, 127, 255, 0.1);
+      animation: deslizar-para-cima 0.3s ease-out;
+    }
+    
+    .painel-acao-titulo {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--ssvp-navy);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+    
+    /* Tag de Destaque para o termo extraído no card de sugestão */
+    .destaque-termo {
+      background-color: var(--ssvp-navy);
+      color: var(--ssvp-white);
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      display: inline-block;
+      box-shadow: 0 2px 4px var(--ssvp-shadow);
+      margin: 0.25rem 0;
+    }
+    
+    .btn-maps {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      width: 100%;
+      padding: 15px;
+      background-color: var(--ssvp-navy);
+      color: var(--ssvp-white);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 45, 98, 0.2);
+      transition: background-color 0.2s, transform 0.1s;
+      outline: none;
+      margin-top: 0.75rem;
+    }
+    
+    .btn-maps:hover {
+      background-color: #00224a;
+    }
+    
+    .btn-maps:active {
+      transform: scale(0.97);
+    }
+    
+    .btn-maps-success {
+      background-color: var(--ssvp-success);
+      box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
+    }
+    
+    .btn-maps-success:hover {
+      background-color: #0f9f6e;
+    }
+    
+    /* Sugestões de Frases */
+    .frases-sugeridas {
+      width: 100%;
+      margin-top: 1.25rem;
+      border-top: 1px solid var(--ssvp-gray-border);
+      padding-top: 1rem;
+    }
+    
+    .frases-sugeridas-titulo {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--ssvp-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+      text-align: left;
+    }
+    
+    .tag-frase {
+      display: block;
+      font-size: 0.85rem;
+      background-color: var(--ssvp-gray-light);
+      color: var(--ssvp-text-main);
+      padding: 0.5rem 0.75rem;
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+      border: 1px solid var(--ssvp-gray-border);
+      cursor: pointer;
+      transition: background-color 0.2s, border-color 0.2s;
+      text-align: left;
+    }
+    
+    .tag-frase:hover {
+      background-color: var(--ssvp-light-blue);
+      border-color: var(--ssvp-blue);
+    }
+    
+    @keyframes piscar {
+      from { opacity: 0.5; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes deslizar-para-cima {
+      from {
+        opacity: 0;
+        transform: translateY(15px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body class="has-barra-inferior">
+
+  <!-- Cabeçalho com Versão e Card de Destaque da Funcionalidade (Centralizados) -->
+  <header class="teste-header">
+    <div class="teste-versao">teste v1.2 [voz-t2]</div>
+    <div class="card-funcionalidade">
+      <h1 class="teste-funcionalidade">Google Maps Voz</h1>
+    </div>
+  </header>
+
+  <!-- Card de Instruções (Inicia aberto) -->
+  <section class="card-instrucoes ativo" id="cardInstrucoes">
+    <div class="card-header" onclick="toggleInstrucoes()">
+      <span>Instruções do Teste (Versão T2 - Universal de Campo)</span>
+      <span class="seta-toggle" id="setaToggle" style="transform: rotate(180deg);">▼</span>
+    </div>
+    <!-- Wrapper do Grid -->
+    <div class="card-content-wrapper expanded" id="contentWrapper">
+      <!-- Container intermediário necessário para colapso total do padding no grid -->
+      <div class="card-content">
+        <div class="card-body">
+          <p><strong>Universal de Campo:</strong> Este teste extrai dinamicamente as informações e repassa a busca ao Google Maps do aparelho, permitindo o uso real em campo em qualquer bairro ou cidade.</p>
+          <p>1. Toque no botão redondo de microfone na base da tela para iniciar a gravação de áudio.</p>
+          <p>2. Diga um comando refinando por <strong>quantidade</strong>, <strong>nome específico</strong> ou <strong>ordinalidade</strong> (ex: segunda padaria).</p>
+          <p>3. Verifique o realce da palavra na tela e toque no botão para abrir o Google Maps nativo.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Área dedicada para o Teste Específico (Feedback da Voz e Ação Sugerida) -->
+  <main class="teste-container" style="gap: 1rem;">
+    
+    <!-- Painel de Feedback Visual de Voz -->
+    <div class="painel-feedback">
+      <div id="statusVoz" class="status-voz">Aguardando toque no microfone...</div>
+      <div id="textoTranscrito" class="texto-transcrito">
+        "Toque no microfone abaixo e fale..."
+      </div>
+    </div>
+    
+    <!-- Painel de Ação Sugerida (Inicialmente invisível) -->
+    <div class="painel-acao" id="painelAcao">
+      <!-- Será preenchido dinamicamente pelo JS -->
+    </div>
+    
+    <!-- Dicas de frases para facilitar o teste dos vicentinos -->
+    <div class="frases-sugeridas">
+      <div class="frases-sugeridas-titulo">Toque para simular falas de teste (Refinamento):</div>
+      
+      <div style="font-size: 0.75rem; color: var(--ssvp-text-muted); font-weight: 700; margin-bottom: 0.25rem; text-transform: uppercase;">A) Por Quantidade</div>
+      <span class="tag-frase" onclick="simularFrase(this.innerText)">"Abra um mapa com as 3 padarias mais próximas"</span>
+      <span class="tag-frase" onclick="simularFrase(this.innerText)">"Abra um mapa com os 5 postos de saúde mais próximos"</span>
+      
+      <div style="font-size: 0.75rem; color: var(--ssvp-text-muted); font-weight: 700; margin-top: 0.75rem; margin-bottom: 0.25rem; text-transform: uppercase;">B) Por Nome Específico</div>
+      <span class="tag-frase" onclick="simularFrase(this.innerText)">"Abra um mapa com a rota para a Padaria Santa Tereza"</span>
+      <span class="tag-frase" onclick="simularFrase(this.innerText)">"Abra um mapa com a rota para o Supermercado Pão de Açúcar"</span>
+      
+      <div style="font-size: 0.75rem; color: var(--ssvp-text-muted); font-weight: 700; margin-top: 0.75rem; margin-bottom: 0.25rem; text-transform: uppercase;">C) Por Ordinalidade</div>
+      <span class="tag-frase" onclick="simularFrase(this.innerText)">"Abra um mapa com a rota para a segunda padaria mais próxima"</span>
+      <span class="tag-frase" onclick="simularFrase(this.innerText)">"Abra um mapa com a rota para o terceiro posto de saúde mais próximo"</span>
+    </div>
+
+  </main>
+
+  <!-- Barra Inferior de Acessibilidade (Reativada para teste de áudio) -->
+  <div class="barra-inferior">
+    <button class="btn-microfone" id="btnMicrofone" aria-label="Ativar gravação de voz" onclick="toggleMicrofone()">
+      <!-- Ícone de Microfone SVG -->
+      <svg viewBox="0 0 24 24">
+        <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
+      </svg>
+    </button>
+  </div>
+
+  <script>
+    // Lógica para expandir/recolher o card de instruções
+    function toggleInstrucoes() {
+      const card = document.getElementById('cardInstrucoes');
+      const wrapper = document.getElementById('contentWrapper');
+      const seta = document.getElementById('setaToggle');
+      
+      const isExpanded = wrapper.classList.toggle('expanded');
+      card.classList.toggle('ativo', isExpanded);
+      seta.style.transform = isExpanded ? 'rotate(180deg)' : 'rotate(0deg)';
+    }
+
+    // Configuração do Web Speech API (Reconhecimento de Voz nativo)
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+    let gravando = false;
+
+    if (SpeechRecognition) {
+      recognition = new SpeechRecognition();
+      recognition.lang = 'pt-BR';
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.onstart = function() {
+        gravando = true;
+        document.getElementById('statusVoz').innerText = 'Gravando... Fale agora!';
+        document.getElementById('statusVoz').className = 'status-voz gravando';
+        document.getElementById('btnMicrofone').className = 'btn-microfone ativo';
+        document.getElementById('textoTranscrito').innerText = '"Escutando..."';
+        document.getElementById('painelAcao').style.display = 'none';
+      };
+
+      recognition.onresult = function(event) {
+        const transcricao = event.results[0][0].transcript;
+        processarComando(transcricao);
+      };
+
+      recognition.onerror = function(event) {
+        console.error('Erro de gravação:', event.error);
+        document.getElementById('statusVoz').innerText = 'Erro ao escutar. Tente de novo.';
+        pararGravacaoVisual();
+      };
+
+      recognition.onend = function() {
+        pararGravacaoVisual();
+      };
+    } else {
+      console.warn('Speech Recognition não suportado neste navegador.');
+      document.getElementById('statusVoz').innerText = 'Gravação não suportada neste celular.';
+    }
+
+    function toggleMicrofone() {
+      if (!recognition) {
+        alert('Seu navegador ou dispositivo não possui suporte para reconhecimento de voz.');
+        return;
+      }
+      if (gravando) {
+        recognition.stop();
+      } else {
+        recognition.start();
+      }
+    }
+
+    function pararGravacaoVisual() {
+      gravando = false;
+      document.getElementById('statusVoz').innerText = 'Gravação encerrada.';
+      document.getElementById('statusVoz').className = 'status-voz';
+      document.getElementById('btnMicrofone').className = 'btn-microfone';
+    }
+
+    // Simular clique nas tags de frase para testes rápidos
+    function simularFrase(fraseLimpa) {
+      const frase = fraseLimpa.replace(/"/g, "");
+      document.getElementById('statusVoz').innerText = 'Simulado por clique.';
+      processarComando(frase);
+    }
+
+    // Processamento semântico avançado para refinamento em campo (Universal)
+    function processarComando(frase) {
+      const texto = frase.toLowerCase().trim();
+      const painel = document.getElementById('painelAcao');
+      
+      let queryRefinada = "";
+      let tipoComando = ""; // "rota" ou "busca"
+      let realceTermo = "";
+      
+      // 1. Determinar se a intenção é Rota ou Busca Local
+      const ehRota = texto.includes('rota') || texto.includes('ir') || texto.includes('caminho') || texto.includes('chegar') || texto.includes('até');
+      tipoComando = ehRota ? "rota" : "busca";
+
+      // 2. Extrair refinamentos
+      
+      // A) REGRA DE ORDINALIDADE (Ex: "segunda padaria", "terceiro posto")
+      const regexOrdinal = /(primeira?|segunda?|terceira?|quarta?|quinta?|1ª|2ª|3ª|4ª|5ª)\s+([a-zA-Záàâãéèêíïóôõöúçñ]+)/i;
+      const matchOrdinal = texto.match(regexOrdinal);
+      
+      // B) REGRA DE QUANTIDADE (Ex: "3 padarias", "5 postos de saude")
+      const regexQuantidade = /(\d+|uma?|duas?|três|quatro|cinco)\s+([a-zA-Záàâãéèêíïóôõöúçñ]+s?)/i;
+      const matchQuantidade = texto.match(regexQuantidade);
+      
+      // C) REGRA DE NOME ESPECÍFICO (Ex: "padaria Santa Tereza")
+      const regexNomeEspecifico = /(padaria|posto de saúde|supermercado|farmácia|ubs|posto de saude)\s+([a-zA-Záàâãéèêíïóôõöúçñ\s]+)/i;
+      const matchNome = texto.match(regexNomeEspecifico);
+
+      if (matchOrdinal) {
+        const ordinal = matchOrdinal[1];
+        const estabelecimento = matchOrdinal[2].replace(/(?:mais próximo|mais próxima|próximo|próxima)/gi, "").trim();
+        realceTermo = `${ordinal} ${estabelecimento}`;
+        
+        // Query de destino nativa do Google Maps
+        queryRefinada = `${ordinal}+${estabelecimento}+mais+proximo`;
+      } 
+      else if (matchQuantidade) {
+        const quantidade = matchQuantidade[1];
+        const estabelecimento = matchQuantidade[2].replace(/(?:mais próximo|mais próxima|próximo|próxima|próximos|próximas)/gi, "").trim();
+        realceTermo = `${quantidade} ${estabelecimento}`;
+        
+        queryRefinada = `${quantidade}+${estabelecimento}+mais+proximos`;
+      }
+      else if (matchNome && matchNome[2].trim().length > 0 && !matchNome[2].includes('mais') && !matchNome[2].includes('proxim')) {
+        const categoria = matchNome[1];
+        const nomeEspecifico = matchNome[2].trim();
+        realceTermo = `${categoria} ${nomeEspecifico}`;
+        
+        queryRefinada = `${categoria}+${nomeEspecifico}`;
+      }
+      else {
+        // Fallback para termos simples caso não caia em regras de refinamento
+        const regexFallback = /(?:rota para|ir para|mapa com|buscar|até o|até a|com as|com os|próximos de|próximas de)\s+([a-zA-Záàâãéèêíïóôõöúçñ\s]+)/i;
+        const matchFallback = texto.match(regexFallback);
+        if (matchFallback && matchFallback[1]) {
+          const termo = matchFallback[1].replace(/(?:mais próximo|mais próxima|próximo|próxima|próximos|próximas|raio|de 2km|de 1km)/gi, "").trim();
+          realceTermo = termo;
+          queryRefinada = termo;
+        }
+      }
+
+      if (!realceTermo) {
+        document.getElementById('textoTranscrito').innerText = `"${frase}"`;
+        painel.innerHTML = `
+          <div class="painel-acao-titulo" style="color: var(--ssvp-red);">Comando Não Compreendido</div>
+          <p style="font-size: 0.9rem; color: var(--ssvp-text-main); line-height: 1.4;">
+            Não identifiquei o refinamento. Tente dizer: "rota para a <strong>segunda</strong> padaria mais próxima" ou "3 padarias mais próximas".
+          </p>
+        `;
+        painel.style.display = 'block';
+        return;
+      }
+
+      // 1. Realçar dinamicamente a frase falada na tela
+      const regexRealce = new RegExp(`(${realceTermo})`, 'gi');
+      const fraseRealçada = frase.replace(regexRealce, `<span class="realce-voz">$1</span>`);
+      document.getElementById('textoTranscrito').innerHTML = `"${fraseRealçada}"`;
+
+      // 2. Monta o card de ação de acordo com a intenção
+      let html = "";
+      let urlDestino = "";
+      
+      if (tipoComando === "rota") {
+        urlDestino = `https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=${encodeURIComponent(queryRefinada)}`;
+        html = `
+          <div class="painel-acao-titulo">Rota Refinada</div>
+          <p style="font-size: 0.95rem; color: var(--ssvp-text-main); line-height: 1.4; margin-bottom: 0.5rem;">
+            Traçar rota para o estabelecimento extraído:
+          </p>
+          <div style="margin-bottom: 0.75rem;">
+            <span class="destaque-termo">${capitalizar(realceTermo)}</span>
+          </div>
+          <button class="btn-maps" onclick="abrirLink('${urlDestino}')">
+            🚗 Abrir Rota no Google Maps
+          </button>
+        `;
+      } else {
+        urlDestino = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(queryRefinada)}`;
+        html = `
+          <div class="painel-acao-titulo">Busca Refinada</div>
+          <p style="font-size: 0.95rem; color: var(--ssvp-text-main); line-height: 1.4; margin-bottom: 0.5rem;">
+            Buscar locais próximos da categoria:
+          </p>
+          <div style="margin-bottom: 0.75rem;">
+            <span class="destaque-termo">${capitalizar(realceTermo)}</span>
+          </div>
+          <button class="btn-maps btn-maps-success" onclick="abrirLink('${urlDestino}')">
+            🔍 Buscar no Google Maps
+          </button>
+        `;
+      }
+
+      painel.innerHTML = html;
+      painel.style.display = 'block';
+    }
+
+    function capitalizar(string) {
+      return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+
+    function abrirLink(url) {
+      window.open(url, '_blank');
+    }
+  </script>
+</body>
+</html>
