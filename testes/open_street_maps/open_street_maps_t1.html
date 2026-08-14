@@ -42,11 +42,13 @@
       color: var(--ssvp-navy);
       text-transform: uppercase;
       letter-spacing: 0.03em;
+      white-space: nowrap; /* Evita quebra de linha desalinhadora no celular */
     }
     
     .form-select, .form-input {
       width: 100%;
-      padding: 12px;
+      height: 48px; /* Altura ergonômica idêntica e fixa no celular */
+      padding: 0 12px; /* Remove padding vertical */
       font-family: inherit;
       font-size: 0.95rem;
       color: var(--ssvp-text-main);
