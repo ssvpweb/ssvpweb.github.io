@@ -340,6 +340,7 @@
       const painel = document.getElementById('painelAcao');
       
       let estabelecimento = "";
+      let realceTermo = "";
       
       // 1. Identificar o tipo de estabelecimento (dicionário semântico)
       if (texto.includes('padaria') || texto.includes('padarias')) {
@@ -354,7 +355,8 @@
         estabelecimento = "hospital";
       } else {
         // Fallback Inteligente: Tentar extrair o que vem após preposições
-        const regexExtrair = /(?:rota para|ir para|mapa com|buscar|até o|até a|com as|com os|próximos de|próximas de)\s+([a-zA-Záàâãéèêíïóôõöúçñ\s]+)/i;
+        // Exige no mínimo 3 caracteres para o estabelecimento
+        const regexExtrair = /(?:rota para|ir para|mapa com|buscar|até o|até a|com as|com os|próximos de|próximas de)\s+([a-zA-Záàâãéèêíïóôõöúçñ]{3,})/i;
         const match = texto.match(regexExtrair);
         if (match && match[1]) {
           // Limpa termos de proximidade
@@ -376,6 +378,7 @@
       }
 
       // 1. Dividir a transcrição visualmente em até 3 linhas baseadas no termo realçado (Opção 2)
+      // Ajusta para cobrir sinônimos complexos como "posto de saúde" no match de regex
       const regexRealce = new RegExp(`(${estabelecimento}s?|posto\\s+de\\s+saú?de|postos\\s+de\\s+saú?de|ubs)`, 'gi');
       const indexTermo = frase.toLowerCase().search(regexRealce);
       

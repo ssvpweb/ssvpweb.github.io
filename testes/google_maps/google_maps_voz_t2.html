@@ -262,7 +262,6 @@
 
   <script>
     // Lógica para expandir/recolher o card de instruções
-    // ...
     function toggleInstrucoes() {
       const card = document.getElementById('cardInstrucoes');
       const wrapper = document.getElementById('contentWrapper');
@@ -354,11 +353,13 @@
       // 2. Extrair refinamentos
       
       // A) REGRA DE ORDINALIDADE (Ex: "segunda padaria", "terceiro posto")
-      const regexOrdinal = /(primeira?|segunda?|terceira?|quarta?|quinta?|1ª|2ª|3ª|4ª|5ª)\s+([a-zA-Záàâãéèêíïóôõöúçñ]+)/i;
+      // Exige no mínimo 3 caracteres para o estabelecimento e ignora artigos opcionais
+      const regexOrdinal = /(primeira?|segunda?|terceira?|quarta?|quinta?|1ª|2ª|3ª|4ª|5ª)\s+(?:a\s+|o\s+|de\s+|da\s+|do\s+)?([a-zA-Záàâãéèêíïóôõöúçñ]{3,})/i;
       const matchOrdinal = texto.match(regexOrdinal);
       
       // B) REGRA DE QUANTIDADE (Ex: "3 padarias", "5 postos de saude")
-      const regexQuantidade = /(\d+|uma?|duas?|três|quatro|cinco)\s+([a-zA-Záàâãéèêíïóôõöúçñ]+s?)/i;
+      // Exige no mínimo 3 caracteres para o estabelecimento e ignora artigos opcionais
+      const regexQuantidade = /(\d+|uma?|duas?|três|quatro|cinco)\s+(?:as\s+|os\s+|de\s+|das\s+|dos\s+)?([a-zA-Záàâãéèêíïóôõöúçñ]{3,}s?)/i;
       const matchQuantidade = texto.match(regexQuantidade);
       
       // C) REGRA DE NOME ESPECÍFICO (Ex: "padaria Santa Tereza")
@@ -366,16 +367,14 @@
       const matchNome = texto.match(regexNomeEspecifico);
 
       if (matchOrdinal) {
-        const ordinal = matchOrdinal[1];
+        realceTermo = matchOrdinal[0];
         const estabelecimento = matchOrdinal[2].replace(/(?:mais próximo|mais próxima|próximo|próxima)/gi, "").trim();
-        realceTermo = `${ordinal} ${estabelecimento}`;
-        queryRefinada = `${ordinal}+${estabelecimento}+mais+proximo`;
+        queryRefinada = `${matchOrdinal[1]}+${estabelecimento}+mais+proximo`;
       } 
       else if (matchQuantidade) {
-        const quantidade = matchQuantidade[1];
+        realceTermo = matchQuantidade[0];
         const estabelecimento = matchQuantidade[2].replace(/(?:mais próximo|mais próxima|próximo|próxima|próximos|próximas)/gi, "").trim();
-        realceTermo = `${quantidade} ${estabelecimento}`;
-        queryRefinada = `${quantidade}+${estabelecimento}+mais+proximos`;
+        queryRefinada = `${matchQuantidade[1]}+${estabelecimento}+mais+proximos`;
       }
       else if (matchNome && matchNome[2].trim().length > 0 && !matchNome[2].includes('mais') && !matchNome[2].includes('proxim')) {
         const categoria = matchNome[1];
@@ -407,7 +406,6 @@
       }
 
       // 1. Dividir a transcrição visualmente em até 3 linhas (Opção 2)
-      // Ajusta para cobrir sinônimos complexos como "posto de saúde" no match de regex
       const regexRealce = new RegExp(`(${realceTermo}|posto\\s+de\\s+saú?de|postos\\s+de\\s+saú?de|ubs)`, 'gi');
       const indexTermo = frase.toLowerCase().search(regexRealce);
       
