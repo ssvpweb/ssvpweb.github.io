@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Visita Vicentina - Voz e Mapas</title>
+  <title>Visita Vicentina - Voz e Mapas T1</title>
   <!-- Link para o CSS Externo básico -->
   <link rel="stylesheet" href="../teste_padrao.css">
   <!-- Fonte Inter para tipografia premium -->
@@ -126,16 +126,17 @@
     }
     
     .tag-frase {
-      display: inline-block;
+      display: block;
       font-size: 0.85rem;
       background-color: var(--ssvp-gray-light);
       color: var(--ssvp-text-main);
-      padding: 0.4rem 0.75rem;
-      border-radius: 20px;
-      margin: 0.25rem;
+      padding: 0.5rem 0.75rem;
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
       border: 1px solid var(--ssvp-gray-border);
       cursor: pointer;
-      transition: background-color 0.2s;
+      transition: background-color 0.2s, border-color 0.2s;
+      text-align: left;
     }
     
     .tag-frase:hover {
@@ -164,7 +165,7 @@
 
   <!-- Cabeçalho com Versão e Card de Destaque da Funcionalidade (Centralizados) -->
   <header class="teste-header">
-    <div class="teste-versao">teste v1.0 [voz]</div>
+    <div class="teste-versao">teste v1.2 [voz-t1]</div>
     <div class="card-funcionalidade">
       <h1 class="teste-funcionalidade">Google Maps Voz</h1>
     </div>
@@ -173,7 +174,7 @@
   <!-- Card de Instruções (Inicia aberto) -->
   <section class="card-instrucoes ativo" id="cardInstrucoes">
     <div class="card-header" onclick="toggleInstrucoes()">
-      <span>Instruções do Teste</span>
+      <span>Instruções do Teste (Versão T1)</span>
       <span class="seta-toggle" id="setaToggle" style="transform: rotate(180deg);">▼</span>
     </div>
     <!-- Wrapper do Grid -->
@@ -182,8 +183,8 @@
       <div class="card-content">
         <div class="card-body">
           <p>1. Toque no botão redondo de microfone na base da tela para iniciar a gravação de áudio.</p>
-          <p>2. Fale um comando (veja sugestões abaixo). O texto reconhecido aparecerá na tela.</p>
-          <p>3. Verifique a interpretação do sistema e toque no botão sugerido para abrir o Google Maps.</p>
+          <p>2. Fale um comando de busca ou rota para algum estabelecimento próximo (veja exemplos no rodapé).</p>
+          <p>3. Verifique se o texto reconhecido está correto e toque no botão sugerido para abrir o Google Maps.</p>
         </div>
       </div>
     </div>
@@ -207,11 +208,17 @@
     
     <!-- Dicas de frases para facilitar o teste dos vicentinos -->
     <div class="frases-sugeridas">
-      <div class="frases-sugeridas-titulo">Sugestões de frases para falar:</div>
-      <span class="tag-frase" onclick="simularFrase(this.innerText)">"Abra um mapa com as padarias num raio de 2km"</span>
-      <span class="tag-frase" onclick="simularFrase(this.innerText)">"Abra um mapa com a rota até a padaria mais próxima"</span>
-      <span class="tag-frase" onclick="simularFrase(this.innerText)">"Buscar padarias"</span>
-      <span class="tag-frase" onclick="simularFrase(this.innerText)">"Rota para padaria"</span>
+      <div class="frases-sugeridas-titulo">Toque para simular falas de teste:</div>
+      
+      <div style="font-size: 0.75rem; color: var(--ssvp-text-muted); font-weight: 700; margin-bottom: 0.25rem; text-transform: uppercase;">Ação de Rota (Caminho)</div>
+      <span class="tag-frase" onclick="simularFrase(this.innerText)">"Abra um mapa com a rota para a padaria mais próxima"</span>
+      <span class="tag-frase" onclick="simularFrase(this.innerText)">"Abra um mapa com a rota para o posto de saúde mais próximo"</span>
+      <span class="tag-frase" onclick="simularFrase(this.innerText)">"Abra um mapa com a rota para o supermercado mais próximo"</span>
+      
+      <div style="font-size: 0.75rem; color: var(--ssvp-text-muted); font-weight: 700; margin-top: 0.75rem; margin-bottom: 0.25rem; text-transform: uppercase;">Ação de Busca (Locais próximos)</div>
+      <span class="tag-frase" onclick="simularFrase(this.innerText)">"Abra um mapa com padarias próximas"</span>
+      <span class="tag-frase" onclick="simularFrase(this.innerText)">"Abra um mapa com supermercados mais próximos"</span>
+      <span class="tag-frase" onclick="simularFrase(this.innerText)">"Abra um mapa com postos de saúde mais próximos"</span>
     </div>
 
   </main>
@@ -307,50 +314,83 @@
 
     // Processamento e interpretação semântica dos comandos de voz
     function processarComando(frase) {
-      const texto = frase.toLowerCase();
+      const texto = frase.toLowerCase().trim();
       const painel = document.getElementById('painelAcao');
       
+      let estabelecimento = "";
+      
+      // 1. Identificar o tipo de estabelecimento (dicionário semântico)
+      if (texto.includes('padaria') || texto.includes('padarias')) {
+        estabelecimento = "padaria";
+      } else if (texto.includes('posto de saúde') || texto.includes('postos de saúde') || texto.includes('ubs') || texto.includes('posto de saude')) {
+        estabelecimento = "posto de saúde";
+      } else if (texto.includes('supermercado') || texto.includes('supermercados') || texto.includes('mercado') || texto.includes('mercados')) {
+        estabelecimento = "supermercado";
+      } else if (texto.includes('farmácia') || texto.includes('farmácias') || texto.includes('farmacia')) {
+        estabelecimento = "farmácia";
+      } else if (texto.includes('hospital') || texto.includes('hospitais')) {
+        estabelecimento = "hospital";
+      } else {
+        // Fallback Inteligente: Tentar extrair o que vem após preposições
+        const regexExtrair = /(?:rota para|ir para|mapa com|buscar|até o|até a|com as|com os|próximos de|próximas de)\s+([a-zA-Záàâãéèêíïóôõöúçñ\s]+)/i;
+        const match = texto.match(regexExtrair);
+        if (match && match[1]) {
+          // Limpa termos de proximidade
+          estabelecimento = match[1].replace(/(?:mais próximo|mais próxima|próximo|próxima|próximos|próximas|raio|de 2km|de 1km)/gi, "").trim();
+        }
+      }
+
+      // Se não detectar o estabelecimento
+      if (!estabelecimento) {
+        painel.innerHTML = `
+          <div class="painel-acao-titulo" style="color: var(--ssvp-red);">Comando Não Compreendido</div>
+          <p style="font-size: 0.9rem; color: var(--ssvp-text-main); line-height: 1.4;">
+            Não identifiquei o local desejado. Tente dizer: "rota para o <strong>supermercado</strong>" ou "buscar <strong>padarias</strong>".
+          </p>
+        `;
+        painel.style.display = 'block';
+        return;
+      }
+
+      // 2. Determinar a intenção: ROTA ou BUSCA
+      const ehRota = texto.includes('rota') || texto.includes('ir') || texto.includes('caminho') || texto.includes('chegar') || texto.includes('até');
       let html = "";
       let urlDestino = "";
       
-      // Regra 1: "raio de 2km" ou "buscar" ou "lista de padarias"
-      if (texto.includes('padaria') && (texto.includes('raio') || texto.includes('km') || texto.includes('buscar') || texto.includes('mapa com as'))) {
-        urlDestino = "https://www.google.com/maps/search/?api=1&query=padarias+proximas";
+      if (ehRota) {
+        // Direções de Rota no Google Maps
+        urlDestino = `https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=${encodeURIComponent(estabelecimento)}+mais+proximo`;
+        
         html = `
-          <div class="painel-acao-titulo">Ação Sugerida</div>
+          <div class="painel-acao-titulo">Rota Sugerida</div>
           <p style="font-size: 0.95rem; color: var(--ssvp-text-main); line-height: 1.4; margin-bottom: 0.5rem;">
-            O sistema entendeu que você quer <strong>Pesquisar Padarias</strong> próximas no raio de busca.
-          </p>
-          <button class="btn-maps btn-maps-success" onclick="abrirLink('${urlDestino}')">
-            🔍 Buscar Padarias Próximas
-          </button>
-        `;
-      } 
-      // Regra 2: "rota", "ir para" ou "mais próxima"
-      else if (texto.includes('padaria') && (texto.includes('rota') || texto.includes('ir') || texto.includes('proxima') || texto.includes('próxima') || texto.includes('caminho'))) {
-        urlDestino = "https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=padaria+mais+proxima";
-        html = `
-          <div class="painel-acao-titulo">Ação Sugerida</div>
-          <p style="font-size: 0.95rem; color: var(--ssvp-text-main); line-height: 1.4; margin-bottom: 0.5rem;">
-            O sistema entendeu que você deseja <strong>Traçar Rota</strong> até a padaria mais próxima.
+            O sistema sugere traçar rota para o(a) <strong>${estabelecimento}</strong> mais próximo(a).
           </p>
           <button class="btn-maps" onclick="abrirLink('${urlDestino}')">
-            🚗 Traçar Rota para Padaria
+            🚗 Abrir Rota para ${capitalizar(estabelecimento)}
           </button>
         `;
-      } 
-      // Caso não consiga interpretar as intenções do Maps
-      else {
+      } else {
+        // Busca de Estabelecimentos no Google Maps
+        urlDestino = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(estabelecimento)}+proximos`;
+        
         html = `
-          <div class="painel-acao-titulo" style="color: var(--ssvp-red);">Comando Não Compreendido</div>
-          <p style="font-size: 0.9rem; color: var(--ssvp-text-main); line-height: 1.4;">
-            Desculpe, o sistema não identificou a rota ou busca. Fale novamente usando palavras como "padarias" e "rota" ou "raio".
+          <div class="painel-acao-titulo">Busca Sugerida</div>
+          <p style="font-size: 0.95rem; color: var(--ssvp-text-main); line-height: 1.4; margin-bottom: 0.5rem;">
+            O sistema sugere buscar <strong>${estabelecimento}s</strong> próximos na região.
           </p>
+          <button class="btn-maps btn-maps-success" onclick="abrirLink('${urlDestino}')">
+            🔍 Buscar ${capitalizar(estabelecimento)}s
+          </button>
         `;
       }
-      
+
       painel.innerHTML = html;
       painel.style.display = 'block';
+    }
+
+    function capitalizar(string) {
+      return string.charAt(0).toUpperCase() + string.slice(1);
     }
 
     function abrirLink(url) {
