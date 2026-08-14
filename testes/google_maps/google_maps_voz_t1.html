@@ -47,6 +47,14 @@
       word-break: break-word;
     }
     
+    /* Realce visual do termo identificado dentro da frase falada */
+    .realce-voz {
+      color: var(--ssvp-blue);
+      font-weight: 700;
+      border-bottom: 2px dashed var(--ssvp-blue);
+      padding-bottom: 2px;
+    }
+    
     /* Painel de Ação Sugerida */
     .painel-acao {
       display: none; /* Inicia oculto e surge ao interpretar a voz */
@@ -67,6 +75,19 @@
       text-transform: uppercase;
       letter-spacing: 0.05em;
       margin-bottom: 0.5rem;
+    }
+    
+    /* Tag de Destaque para o termo extraído no card de sugestão */
+    .destaque-termo {
+      background-color: var(--ssvp-navy);
+      color: var(--ssvp-white);
+      padding: 0.2rem 0.6rem;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      display: inline-block;
+      box-shadow: 0 2px 4px var(--ssvp-shadow);
+      margin: 0.25rem 0;
     }
     
     .btn-maps {
@@ -267,7 +288,6 @@
 
       recognition.onresult = function(event) {
         const transcricao = event.results[0][0].transcript;
-        document.getElementById('textoTranscrito').innerText = `"${transcricao}"`;
         processarComando(transcricao);
       };
 
@@ -307,12 +327,11 @@
     // Simular clique nas tags de frase para testes rápidos
     function simularFrase(fraseLimpa) {
       const frase = fraseLimpa.replace(/"/g, "");
-      document.getElementById('textoTranscrito').innerText = `"${frase}"`;
       document.getElementById('statusVoz').innerText = 'Simulado por clique.';
       processarComando(frase);
     }
 
-    // Processamento e interpretação semântica dos comandos de voz
+    // Processamento e interpretação semântica dos comandos de voz com realce do termo
     function processarComando(frase) {
       const texto = frase.toLowerCase().trim();
       const painel = document.getElementById('painelAcao');
@@ -342,6 +361,7 @@
 
       // Se não detectar o estabelecimento
       if (!estabelecimento) {
+        document.getElementById('textoTranscrito').innerText = `"${frase}"`;
         painel.innerHTML = `
           <div class="painel-acao-titulo" style="color: var(--ssvp-red);">Comando Não Compreendido</div>
           <p style="font-size: 0.9rem; color: var(--ssvp-text-main); line-height: 1.4;">
@@ -351,6 +371,12 @@
         painel.style.display = 'block';
         return;
       }
+
+      // 1. Realçar dinamicamente a palavra do estabelecimento na frase de feedback da voz
+      // Cria regex para capturar a palavra e flexões de plural (s)
+      const regexRealce = new RegExp(`(${estabelecimento}s?|posto\\s+de\\s+saú?de|postos\\s+de\\s+saú?de|ubs)`, 'gi');
+      const fraseRealçada = frase.replace(regexRealce, `<span class="realce-voz">$1</span>`);
+      document.getElementById('textoTranscrito').innerHTML = `"${fraseRealçada}"`;
 
       // 2. Determinar a intenção: ROTA ou BUSCA
       const ehRota = texto.includes('rota') || texto.includes('ir') || texto.includes('caminho') || texto.includes('chegar') || texto.includes('até');
@@ -364,10 +390,13 @@
         html = `
           <div class="painel-acao-titulo">Rota Sugerida</div>
           <p style="font-size: 0.95rem; color: var(--ssvp-text-main); line-height: 1.4; margin-bottom: 0.5rem;">
-            O sistema sugere traçar rota para o(a) <strong>${estabelecimento}</strong> mais próximo(a).
+            O sistema sugere traçar rota para:
           </p>
+          <div style="margin-bottom: 0.75rem;">
+            <span class="destaque-termo">${capitalizar(estabelecimento)} mais próximo(a)</span>
+          </div>
           <button class="btn-maps" onclick="abrirLink('${urlDestino}')">
-            🚗 Abrir Rota para ${capitalizar(estabelecimento)}
+            🚗 Abrir Rota no Google Maps
           </button>
         `;
       } else {
@@ -377,10 +406,13 @@
         html = `
           <div class="painel-acao-titulo">Busca Sugerida</div>
           <p style="font-size: 0.95rem; color: var(--ssvp-text-main); line-height: 1.4; margin-bottom: 0.5rem;">
-            O sistema sugere buscar <strong>${estabelecimento}s</strong> próximos na região.
+            O sistema sugere buscar:
           </p>
+          <div style="margin-bottom: 0.75rem;">
+            <span class="destaque-termo">${capitalizar(estabelecimento)}s da região</span>
+          </div>
           <button class="btn-maps btn-maps-success" onclick="abrirLink('${urlDestino}')">
-            🔍 Buscar ${capitalizar(estabelecimento)}s
+            🔍 Buscar Estabelecimentos
           </button>
         `;
       }
