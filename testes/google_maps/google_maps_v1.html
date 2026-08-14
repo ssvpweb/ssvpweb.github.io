@@ -4,135 +4,223 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Visita Vicentina - Google Maps</title>
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-
+  <!-- Link para o CSS Externo básico -->
+  <link rel="stylesheet" href="../teste_padrao.css">
+  <!-- Fonte Inter para tipografia premium -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Montserrat', Arial, sans-serif;
-    }
-
-    body {
-      background-color: #f4f6f8;
-      padding: 4px;
-      color: #333333;
-    }
-
-    .card-container {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-
-    .card {
-      background-color: #ffffff;
-      border-radius: 4px;
-      border: 1px solid #dcdfe3;
+    /* Estilos locais complementares para o card de informações dos assistidos */
+    .card-assistido {
+      border: 1px solid var(--ssvp-gray-border);
+      border-radius: 12px;
       overflow: hidden;
+      margin-bottom: 1rem;
+      background-color: var(--ssvp-white);
+      box-shadow: 0 2px 4px var(--ssvp-shadow);
+      width: 100%;
     }
-
-    .card-header {
-      background-color: #003366;
-      color: #ffffff;
-      padding: 12px 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: pointer;
+    
+    .card-assistido:last-child {
+      margin-bottom: 0;
     }
-
-    .card-title {
-      font-size: 1rem;
+    
+    .card-assistido-header {
+      background-color: var(--ssvp-light-blue);
+      color: var(--ssvp-navy);
+      padding: 1rem;
+    }
+    
+    .card-assistido-header h2 {
+      font-size: 1.15rem;
       font-weight: 700;
+      margin-bottom: 0.15rem;
     }
-
-    .card-subtitle {
-      font-size: 0.8rem;
+    
+    .card-assistido-header p {
+      font-size: 0.85rem;
       opacity: 0.9;
-      margin-top: 2px;
     }
-
-    .card-body {
-      padding: 12px 10px;
-      background-color: #ffffff;
+    
+    .card-assistido-body {
+      padding: 1.25rem 1rem;
     }
-
+    
     .address-info {
-      font-size: 0.9rem;
-      color: #444444;
-      margin-bottom: 10px;
-      line-height: 1.3;
+      font-size: 0.95rem;
+      color: var(--ssvp-text-main);
+      margin-bottom: 1.25rem;
+      line-height: 1.4;
     }
-
-    /* BOTÃO PARA ABRIR A ROTA NO GOOGLE MAPS */
+    
+    /* Botão verde ergonômico simplificado para abrir rota */
     .btn-maps {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 0.5rem;
       width: 100%;
-      padding: 12px;
-      background-color: #27ae60; /* Verde destacado para ação de navegação */
-      color: #ffffff;
+      padding: 14px;
+      background-color: var(--ssvp-success);
+      color: var(--ssvp-white);
       text-decoration: none;
       font-weight: 700;
-      font-size: 0.9rem;
-      border-radius: 4px;
-      -webkit-tap-highlight-color: transparent;
+      font-size: 0.95rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
+      transition: background-color 0.2s, transform 0.1s;
+      outline: none;
     }
-
+    
+    .btn-maps:hover {
+      background-color: #0f9f6e;
+    }
+    
     .btn-maps:active {
-      background-color: #219653;
+      transform: scale(0.97);
     }
   </style>
 </head>
 <body>
 
-  <div class="card-container">
+  <!-- Cabeçalho com Versão e Card de Destaque da Funcionalidade (Centralizados) -->
+  <header class="teste-header">
+    <div class="teste-versao">teste v1.2</div>
+    <div class="card-funcionalidade">
+      <h1 class="teste-funcionalidade">Google Maps</h1>
+    </div>
+  </header>
 
-    <!-- CARD DO ASSISTIDO -->
-    <div class="card">
-      <div class="card-header">
-        <div>
-          <div class="card-title">Família Santos</div>
-          <div class="card-subtitle">Assistido: João da Silva</div>
+  <!-- Card de Instruções (Inicia aberto) -->
+  <section class="card-instrucoes ativo" id="cardInstrucoes">
+    <div class="card-header" onclick="toggleInstrucoes()">
+      <span>Instruções do Teste</span>
+      <span class="seta-toggle" id="setaToggle" style="transform: rotate(180deg);">▼</span>
+    </div>
+    <!-- Wrapper do Grid -->
+    <div class="card-content-wrapper expanded" id="contentWrapper">
+      <!-- Container intermediário necessário para colapso total do padding no grid -->
+      <div class="card-content">
+        <div class="card-body">
+          <p><strong>Aviso importante:</strong> Os nomes das famílias e assistidos listados abaixo são fictícios. Os endereços são de Unidades Básicas de Saúde (UBSs) reais e próximas da região de Moema para viabilizar simulações reais de rotas no celular.</p>
+          <p>1. Verifique as informações das famílias listadas na área de testes abaixo.</p>
+          <p>2. Toque no botão verde <strong>"🗺️ Abrir Rota"</strong> na família desejada para iniciar o trajeto no aplicativo de mapas do celular.</p>
         </div>
       </div>
-      
-      <div class="card-body">
-        <div class="address-info">
-          📍 <strong>Endereço:</strong><br>
-          Rua das Flores, 123 - Centro, São Paulo - SP
-        </div>
+    </div>
+  </section>
 
-        <!-- BOTÃO DE ROTA QUE ABRE O GOOGLE MAPS NO CELULAR -->
-        <button class="btn-maps" onclick="abrirRotaMaps('Rua das Flores, 123, Centro, São Paulo, SP')">
-          🗺️ Abrir Rota no Google Maps
+  <!-- Área dedicada para o Teste Específico (5 Famílias com endereços de UBS em Moema) -->
+  <main class="teste-container" style="gap: 1.25rem;">
+    
+    <!-- Família 1 (UBS Sigmund Freud) -->
+    <div class="card-assistido">
+      <div class="card-assistido-header">
+        <h2>Família Santos</h2>
+        <p>Assistido: João da Silva</p>
+      </div>
+      <div class="card-assistido-body">
+        <div class="address-info">
+          📍 <strong>Endereço (UBS Sigmund Freud):</strong><br>
+          Avenida Indianópolis, 650 - Moema, São Paulo - SP
+        </div>
+        <button class="btn-maps" onclick="abrirRotaMaps('Avenida Indianópolis, 650, Moema, São Paulo, SP')">
+          🗺️ Abrir Rota
         </button>
       </div>
     </div>
 
-  </div>
+    <!-- Família 2 (UBS Vila Olímpia) -->
+    <div class="card-assistido">
+      <div class="card-assistido-header">
+        <h2>Família Oliveira</h2>
+        <p>Assistida: Maria de Oliveira</p>
+      </div>
+      <div class="card-assistido-body">
+        <div class="address-info">
+          📍 <strong>Endereço (UBS Vila Olímpia):</strong><br>
+          Rua Jacques Félix, 499 - Vila Nova Conceição, São Paulo - SP
+        </div>
+        <button class="btn-maps" onclick="abrirRotaMaps('Rua Jacques Félix, 499, Vila Nova Conceição, São Paulo, SP')">
+          🗺️ Abrir Rota
+        </button>
+      </div>
+    </div>
+
+    <!-- Família 3 (UBS Vila Mariana / Clementino) -->
+    <div class="card-assistido">
+      <div class="card-assistido-header">
+        <h2>Família Silva</h2>
+        <p>Assistido: Pedro dos Santos</p>
+      </div>
+      <div class="card-assistido-body">
+        <div class="address-info">
+          📍 <strong>Endereço (UBS Vila Mariana):</strong><br>
+          Rua Dr. Diogo de Faria, 678 - Vila Clementino, São Paulo - SP
+        </div>
+        <button class="btn-maps" onclick="abrirRotaMaps('Rua Dr. Diogo de Faria, 678, Vila Clementino, São Paulo, SP')">
+          🗺️ Abrir Rota
+        </button>
+      </div>
+    </div>
+
+    <!-- Família 4 (UBS Campo Belo) -->
+    <div class="card-assistido">
+      <div class="card-assistido-header">
+        <h2>Família Souza</h2>
+        <p>Assistida: Francisca de Souza</p>
+      </div>
+      <div class="card-assistido-body">
+        <div class="address-info">
+          📍 <strong>Endereço (UBS Campo Belo):</strong><br>
+          Avenida Vieira de Morais, 1752 - Campo Belo, São Paulo - SP
+        </div>
+        <button class="btn-maps" onclick="abrirRotaMaps('Avenida Vieira de Morais, 1752, Campo Belo, São Paulo, SP')">
+          🗺️ Abrir Rota
+        </button>
+      </div>
+    </div>
+
+    <!-- Família 5 (UBS Itaim Bibi) -->
+    <div class="card-assistido">
+      <div class="card-assistido-header">
+        <h2>Família Pereira</h2>
+        <p>Assistido: Antônio Pereira</p>
+      </div>
+      <div class="card-assistido-body">
+        <div class="address-info">
+          📍 <strong>Endereço (UBS Itaim Bibi):</strong><br>
+          Rua Salvador Cardoso, 177 - Itaim Bibi, São Paulo - SP
+        </div>
+        <button class="btn-maps" onclick="abrirRotaMaps('Rua Salvador Cardoso, 177, Itaim Bibi, São Paulo, SP')">
+          🗺️ Abrir Rota
+        </button>
+      </div>
+    </div>
+
+  </main>
 
   <script>
-    function abrirRotaMaps(enderecoCompleto) {
-      // Converte o endereço em formato seguro para URL
-      const enderecoFormatado = encodeURIComponent(enderecoCompleto);
+    // Lógica para expandir/recolher o card de instruções
+    function toggleInstrucoes() {
+      const card = document.getElementById('cardInstrucoes');
+      const wrapper = document.getElementById('contentWrapper');
+      const seta = document.getElementById('setaToggle');
       
-      // Monta a URL de direção a partir da localização atual do usuário
-      const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${enderecoFormatado}`;
+      const isExpanded = wrapper.classList.toggle('expanded');
+      card.classList.toggle('ativo', isExpanded);
+      
+      // Rotaciona a seta
+      seta.style.transform = isExpanded ? 'rotate(180deg)' : 'rotate(0deg)';
+    }
 
-      // Abre a URL em uma nova aba (ou diretamente no app do Google Maps no celular)
+    // Lógica de redirecionamento para o Google Maps
+    function abrirRotaMaps(enderecoCompleto) {
+      const enderecoFormatado = encodeURIComponent(enderecoCompleto);
+      const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${enderecoFormatado}`;
       window.open(mapsUrl, '_blank');
     }
   </script>
-
 </body>
 </html>

@@ -30,9 +30,8 @@
       <!-- Container intermediário necessário para colapso total do padding no grid -->
       <div class="card-content">
         <div class="card-body">
-          <p>1. Pressione o botão do microfone na barra inferior para simular o comando de voz.</p>
-          <p>2. A cor do botão mudará para vermelho e começará a pulsar, indicando gravação ativa.</p>
-          <p>3. Utilize a área abaixo para interagir e validar a funcionalidade do teste.</p>
+          <p>1. Verifique as informações da funcionalidade que está sob teste abaixo.</p>
+          <p>2. Utilize a área abaixo para interagir e validar a funcionalidade do teste.</p>
         </div>
       </div>
     </div>
@@ -50,16 +49,6 @@
     </div>
   </main>
 
-  <!-- Barra Inferior de Acessibilidade -->
-  <div class="barra-inferior">
-    <button class="btn-microfone" id="btnMicrofone" aria-label="Ativar comando de voz" onclick="toggleMicrofone()">
-      <!-- Ícone de Microfone SVG -->
-      <svg viewBox="0 0 24 24">
-        <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
-      </svg>
-    </button>
-  </div>
-
   <script>
     // Lógica para expandir/recolher o card de instruções
     function toggleInstrucoes() {
@@ -72,18 +61,6 @@
       
       // Rotaciona a seta
       seta.style.transform = isExpanded ? 'rotate(180deg)' : 'rotate(0deg)';
-    }
-
-    // Lógica para ativar/desativar o estado do microfone
-    function toggleMicrofone() {
-      const btn = document.getElementById('btnMicrofone');
-      const estaAtivo = btn.classList.toggle('ativo');
-      
-      if (estaAtivo) {
-        console.log('Microfone ativado. Gravando áudio...');
-      } else {
-        console.log('Microfone desativado.');
-      }
     }
   </script>
 </body>

@@ -44,9 +44,14 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 1.25rem 1rem 100px 1rem; /* Margem inferior de 100px para evitar sobreposição com a barra */
+  padding: 1.25rem 1rem; /* Modificado: removido o padding fixo de 100px na base */
   line-height: 1.5;
   overflow-x: hidden;
+}
+
+/* Classe utilitária opcional para quando houver barra inferior fixa */
+body.has-barra-inferior {
+  padding-bottom: 100px;
 }
 
 /* Container Principal */
@@ -186,7 +191,7 @@ body {
   padding: 1.5rem;
 }
 
-/* Barra Inferior Fixa */
+/* Barra Inferior Fixa (Mantida estilizada para uso futuro) */
 .barra-inferior {
   position: fixed;
   bottom: 0;
@@ -202,7 +207,7 @@ body {
   z-index: 1000;
 }
 
-/* Botão do Microfone Ergonômico */
+/* Botão do Microfone Ergonômico (Mantido estilizado para uso futuro) */
 .btn-microfone {
   width: 64px;
   height: 64px;
