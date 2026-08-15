@@ -764,7 +764,7 @@
             relato: visita.relato
           };
 
-          const response = await fetch(urlScript, {
+          const response = await fetch(URL_API, {
             method: 'POST',
             redirect: 'follow',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -791,7 +791,7 @@
         
       } catch (err) {
         console.error(err);
-        mostrarFeedback(`Falha na sincronização. ${enviadasComSucesso} relatos enviados. Os pendentes continuam salvos no banco de dados do navegador.`, true);
+        mostrarFeedback(`Falha na sincronização: ${err.message || 'Erro de rede'}. Certifique-se de atualizar o deploy do Apps Script como "Qualquer pessoa" (Anyone) e autorizar as permissões de acesso ao executar no editor.`, true);
       } finally {
         loader.style.display = 'none';
         txtLoad.innerText = 'Consultando planilha no Google Drive...';
