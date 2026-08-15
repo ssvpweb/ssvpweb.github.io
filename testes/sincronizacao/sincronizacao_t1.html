@@ -396,29 +396,8 @@
             </div>
           </div>
           
-          <p><em>Para testar de verdade com sua própria planilha, siga o passo a passo em <a href="CONEXAO_PLANILHA.md" target="_blank">CONEXAO_PLANILHA.md</a> e configure a URL do seu script abaixo.</em></p>
         </div>
       </div>
-    </div>
-  </section>
-
-  <!-- Contêiner de Configuração de API (LocalStorage) -->
-  <section class="teste-container" style="margin-bottom: 0.5rem; flex-grow: 0; min-height: 0;">
-    <div class="painel-config">
-      <div class="form-label" style="border-bottom: 1px solid var(--ssvp-gray-border); padding-bottom: 0.25rem; margin-bottom: 0.25rem;">
-        ⚙️ Configurar Conexão Planilha
-      </div>
-      <div class="form-group">
-        <label for="urlScript" class="form-label" style="font-size: 0.75rem;">URL da API do Google Apps Script:</label>
-        <input type="text" id="urlScript" class="form-input" placeholder="Cole a URL do Apps Script terminada em /exec">
-      </div>
-      <div class="form-group">
-        <label for="urlPlanilha" class="form-label" style="font-size: 0.75rem;">Link Visual da Planilha Google Sheets:</label>
-        <input type="text" id="urlPlanilha" class="form-input" placeholder="Cole o link de visualização da Planilha">
-      </div>
-      <button class="btn-action btn-navy" onclick="abrirPlanilha()">
-        📊 Abrir Planilha Google Sheets
-      </button>
     </div>
   </section>
 
@@ -548,6 +527,10 @@
   </main>
 
   <script>
+    // Configurações Globais da Planilha do Google Sheets (por baixo dos panos)
+    const URL_API = 'https://script.google.com/macros/s/AKfycbylyCV5J-SL0boOBGnTfMkK-b_lZB4wKq-xMhByv61-SiPiLKaHKL9X-90A3ETXbwWNrg/exec';
+    const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/1jGyxX0DN_-rorF7BGj3oSMzPTZOOKDFX-gDTaBne1Qc/edit?gid=838869988#gid=838869988';
+
     // Gerenciador de Card de Instruções
     function toggleInstrucoes() {
       const card = document.getElementById('cardInstrucoes');
@@ -565,29 +548,6 @@
       const hoje = new Date();
       document.getElementById('visitaData').value = hoje.toISOString().split('T')[0];
       
-      // Carrega Configurações salvas de URL
-      let urlScriptSalva = localStorage.getItem('sinc_url_script');
-      if (urlScriptSalva === null || urlScriptSalva === '') {
-        urlScriptSalva = 'https://script.google.com/macros/s/AKfycbylyCV5J-SL0boOBGnTfMkK-b_lZB4wKq-xMhByv61-SiPiLKaHKL9X-90A3ETXbwWNrg/exec';
-        localStorage.setItem('sinc_url_script', urlScriptSalva);
-      }
-      let urlPlanilhaSalva = localStorage.getItem('sinc_url_planilha');
-      if (urlPlanilhaSalva === null || urlPlanilhaSalva === '') {
-        urlPlanilhaSalva = 'https://docs.google.com/spreadsheets/d/1jGyxX0DN_-rorF7BGj3oSMzPTZOOKDFX-gDTaBne1Qc/edit?gid=838869988#gid=838869988';
-        localStorage.setItem('sinc_url_planilha', urlPlanilhaSalva);
-      }
-      
-      document.getElementById('urlScript').value = urlScriptSalva;
-      document.getElementById('urlPlanilha').value = urlPlanilhaSalva;
-      
-      // Adiciona escuta para salvar configurações ao digitar
-      document.getElementById('urlScript').addEventListener('input', (e) => {
-        localStorage.setItem('sinc_url_script', e.target.value.trim());
-      });
-      document.getElementById('urlPlanilha').addEventListener('input', (e) => {
-        localStorage.setItem('sinc_url_planilha', e.target.value.trim());
-      });
-
       atualizarInterface();
     });
 
@@ -611,15 +571,7 @@
       }, 5000);
     }
 
-    // Ação: Abrir Planilha Google Sheets
-    function abrirPlanilha() {
-      const url = document.getElementById('urlPlanilha').value.trim();
-      if (!url) {
-        mostrarFeedback('Por favor, configure e cole o link da planilha no campo de configurações.', true);
-        return;
-      }
-      window.open(url, '_blank');
-    }
+
 
     // Atualiza listagens e calcula consumo de LocalStorage em bytes
     function atualizarInterface() {
@@ -734,17 +686,11 @@
 
     // Ação: Baixar visitas da Planilha por API (GET)
     async function baixarDados() {
-      const urlScript = document.getElementById('urlScript').value.trim();
-      if (!urlScript) {
-        mostrarFeedback('Por favor, configure a URL da API do Apps Script nas configurações para fazer o download.', true);
-        return;
-      }
-
       const loader = document.getElementById('loadingDownload');
       loader.style.display = 'block';
 
       try {
-        const response = await fetch(urlScript, { redirect: 'follow' });
+        const response = await fetch(URL_API, { redirect: 'follow' });
         const res = await response.json();
 
         if (res.status === 'success') {
@@ -785,12 +731,6 @@
 
     // Ação: Sincronizar Fila de Relatos Pendentes para a Planilha (POSTs em Lote)
     async function sincronizarFila() {
-      const urlScript = document.getElementById('urlScript').value.trim();
-      if (!urlScript) {
-        mostrarFeedback('Configure a URL da API do Apps Script nas configurações para sincronizar.', true);
-        return;
-      }
-
       const pendentes = JSON.parse(localStorage.getItem('visitas_locais') || '[]');
       if (pendentes.length === 0) return;
 
