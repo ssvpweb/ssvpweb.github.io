@@ -383,15 +383,15 @@
             <div class="fluxo-container">
               <div class="fluxo-etapa">
                 <span class="etapa-num">1</span>
-                <span class="etapa-texto"><strong>No Escritório (Wi-Fi):</strong> Vicentino escolhe o assistido e baixa visitas recentes para a memória local do celular.</span>
+                <span class="etapa-texto"><strong>No Escritório (Wi-Fi):</strong> Vicentino escolhe o assistido e baixa visitas recentes para o banco de dados do navegador.</span>
               </div>
               <div class="fluxo-etapa">
                 <span class="etapa-num">2</span>
-                <span class="etapa-texto"><strong>Em Campo (Sem Internet):</strong> Realiza a visita e digita o relato no aparelho. O dado é guardado de forma segura no celular.</span>
+                <span class="etapa-texto"><strong>Em Campo (Sem Internet):</strong> Realiza a visita e digita o relato no aparelho. O dado é guardado de forma segura no banco de dados do navegador.</span>
               </div>
               <div class="fluxo-etapa">
                 <span class="etapa-num">3</span>
-                <span class="etapa-texto"><strong>Ao Retornar (Conectado):</strong> Clica em Sincronizar e o celular envia em lote as novas visitas gravadas na planilha.</span>
+                <span class="etapa-texto"><strong>Ao Retornar (Conectado):</strong> Clica em Sincronizar e o navegador envia em lote as novas visitas gravadas na planilha.</span>
               </div>
             </div>
           </div>
@@ -466,7 +466,7 @@
     <!-- Seção 2: Monitor de Armazenamento Local -->
     <div class="monitor-armazenamento">
       <div class="monitor-header">
-        <span class="monitor-titulo">Banco Local do Aparelho (Celular)</span>
+        <span class="monitor-titulo">Banco de dados do navegador</span>
         <span id="txtUsoBytes" class="monitor-valores">0 bytes / 5.0 MB</span>
       </div>
       <div class="barra-progresso-container">
@@ -474,7 +474,7 @@
       </div>
       <div>
         <span id="txtPorcentagem" style="font-size: 0.75rem; color: var(--ssvp-text-muted); font-weight: 600;">0.00% ocupado</span>
-        <button class="btn-limpar" onclick="limparBancoLocal()">Limpar Banco Local</button>
+        <button class="btn-limpar" onclick="limparBancoLocal()">Limpar banco de dados do navegador</button>
       </div>
     </div>
 
@@ -512,7 +512,7 @@
       </div>
       
       <button class="btn-action btn-green" onclick="salvarRelatoLocal()">
-        💾 Salvar Relato no Celular (Local)
+        💾 Salvar no banco de dados do navegador
       </button>
     </div>
 
@@ -637,7 +637,7 @@
       // 1. Renderiza Aba Pendentes
       const listaPendentes = document.getElementById('listaPendentes');
       if (pendentes.length === 0) {
-        listaPendentes.innerHTML = '<div class="empty-state" style="text-align:center; padding:1.5rem; color:var(--ssvp-text-muted); font-style:italic;">Sem relatos pendentes no celular.</div>';
+        listaPendentes.innerHTML = '<div class="empty-state" style="text-align:center; padding:1.5rem; color:var(--ssvp-text-muted); font-style:italic;">Sem relatos pendentes no banco de dados do navegador.</div>';
       } else {
         listaPendentes.innerHTML = '';
         pendentes.forEach(visita => {
@@ -727,7 +727,7 @@
       // Limpa formulário mantendo vicentino e data padrão
       document.getElementById('visitaRelato').value = '';
 
-      mostrarFeedback('Relato salvo localmente no celular! Pendente de sincronização.');
+      mostrarFeedback('Relato salvo no banco de dados do navegador! Pendente de sincronização.');
       atualizarInterface();
       mudarAba('pendentes');
     }
@@ -836,12 +836,12 @@
         mostrarFeedback(`Sincronização concluída! ${enviadasComSucesso} relatos enviados para a planilha.`);
         
         // Atualiza a tabela baixada forçando um redownload automático
-        txtLoad.innerText = 'Sincronizado! Atualizando banco local...';
+        txtLoad.innerText = 'Sincronizado! Atualizando banco de dados do navegador...';
         await baixarDados();
         
       } catch (err) {
         console.error(err);
-        mostrarFeedback(`Falha na sincronização. ${enviadasComSucesso} relatos enviados. Os pendentes continuam salvos no celular.`, true);
+        mostrarFeedback(`Falha na sincronização. ${enviadasComSucesso} relatos enviados. Os pendentes continuam salvos no banco de dados do navegador.`, true);
       } finally {
         loader.style.display = 'none';
         txtLoad.innerText = 'Consultando planilha no Google Drive...';
@@ -849,14 +849,14 @@
       }
     }
 
-    // Limpar Banco Local (Zerar visitas da tela)
+    // Limpar Banco de Dados do Navegador (Zerar visitas da tela)
     function limparBancoLocal() {
-      if (!confirm('Deseja limpar todos os relatos armazenados no celular? Isso apagará as visitas baixadas e relatos pendentes que ainda não foram sincronizados.')) return;
+      if (!confirm('Deseja limpar todos os relatos armazenados no banco de dados do navegador? Isso apagará as visitas baixadas e relatos pendentes que ainda não foram sincronizados.')) return;
       
       localStorage.removeItem('visitas_locais');
       localStorage.removeItem('visitas_baixadas');
       
-      mostrarFeedback('Banco local limpo.');
+      mostrarFeedback('Banco de dados do navegador limpo.');
       atualizarInterface();
     }
 
