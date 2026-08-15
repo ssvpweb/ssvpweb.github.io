@@ -401,6 +401,13 @@
     </div>
   </section>
 
+  <!-- Botão de Acesso Rápido à Planilha Real (Configurada em Background) -->
+  <section class="teste-container" style="margin-bottom: 0.5rem; flex-grow: 0; min-height: 0; padding-top: 0; padding-bottom: 0;">
+    <button class="btn-action btn-navy" onclick="abrirPlanilha()">
+      📊 Abrir Planilha Google Sheets
+    </button>
+  </section>
+
   <!-- Área de Ações do Teste (Download / Upload / Armazenamento) -->
   <main class="teste-container">
     
@@ -571,7 +578,10 @@
       }, 5000);
     }
 
-
+    // Ação: Abrir Planilha Google Sheets
+    function abrirPlanilha() {
+      window.open(URL_PLANILHA, '_blank');
+    }
 
     // Atualiza listagens e calcula consumo de LocalStorage em bytes
     function atualizarInterface() {
