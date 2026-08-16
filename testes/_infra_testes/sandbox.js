@@ -24,19 +24,28 @@ function inicializarSandbox(config) {
     sandboxValores = {};
   }
 
-  // 2. Garantir que a estrutura do Card de Cabeçalho Unificado exista no DOM
+  // 2. Garantir que a versão externa e o Card de Cabeçalho existam no DOM
+  const versao = config.versao || 'teste v1.0';
+  const titulo = config.titulo || 'Teste de UX';
+
+  let tagVersao = document.getElementById('testeTagVersao');
+  if (!tagVersao) {
+    tagVersao = document.createElement('div');
+    tagVersao.id = 'testeTagVersao';
+    tagVersao.className = 'teste-versao-topo';
+    document.body.insertBefore(tagVersao, document.body.firstChild);
+  }
+  tagVersao.innerText = versao;
+
   let cardCabecalho = document.getElementById('cardCabecalho');
   if (!cardCabecalho) {
     cardCabecalho = document.createElement('header');
     cardCabecalho.id = 'cardCabecalho';
     cardCabecalho.className = 'card-cabecalho-teste';
-    document.body.insertBefore(cardCabecalho, document.body.firstChild);
+    document.body.insertBefore(cardCabecalho, tagVersao.nextSibling);
   }
 
   // 3. Renderizar a estrutura interna do Cabeçalho Unificado
-  const versao = config.versao || 'teste v1.0';
-  const titulo = config.titulo || 'Teste de UX';
-  
   let instrucoesHtml = '';
   if (config.instrucoes && config.instrucoes.length > 0) {
     instrucoesHtml = `
@@ -50,7 +59,6 @@ function inicializarSandbox(config) {
   cardCabecalho.innerHTML = `
     <div class="cabecalho-header" id="cabecalhoHeader">
       <div class="cabecalho-titulo-area">
-        <span class="teste-versao">${versao}</span>
         <h1 class="teste-funcionalidade">${titulo}</h1>
       </div>
       <span class="seta-toggle" id="setaToggle">+</span>
