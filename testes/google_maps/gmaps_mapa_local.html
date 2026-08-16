@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Visita Vicentina - Google Maps T2</title>
   <!-- Link para o CSS Externo básico -->
-  <link rel="stylesheet" href="../padroes/teste_padrao.css">
+  <link rel="stylesheet" href="../_infra_testes/teste_padrao.css">
   <!-- Fonte Inter para tipografia premium -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
@@ -14,7 +14,7 @@
       border: 1px solid var(--ssvp-gray-border);
       border-radius: 12px;
       overflow: hidden;
-      margin-bottom: 1rem;
+      margin-bottom: var(--card-margin-bottom, 1rem);
       background-color: var(--ssvp-white);
       box-shadow: 0 2px 4px var(--ssvp-shadow);
       width: 100%;
@@ -65,7 +65,7 @@
       align-items: center;
       justify-content: center;
       gap: 0.5rem;
-      padding: 14px 10px;
+      padding: var(--btn-padding, 14px) 10px;
       background-color: var(--ssvp-success);
       color: var(--ssvp-white);
       text-decoration: none;
@@ -93,7 +93,7 @@
       align-items: center;
       justify-content: center;
       gap: 0.5rem;
-      padding: 14px 10px;
+      padding: var(--btn-padding, 14px) 10px;
       background-color: var(--ssvp-white);
       color: var(--ssvp-navy);
       font-weight: 600;
@@ -110,20 +110,15 @@
       border-color: var(--ssvp-blue);
     }
     
-    .btn-toggle-map:active {
-      transform: scale(0.97);
-    }
-    
-    /* Painel do Mapa Embutido (Iframe) */
+    /* Container do Mapa Embutido */
     .mapa-embutido-container {
       display: none;
       width: 100%;
-      height: 250px;
+      height: var(--map-height, 250px);
       margin-top: 1rem;
+      border: 1px solid var(--ssvp-gray-border);
       border-radius: 8px;
       overflow: hidden;
-      border: 1px solid var(--ssvp-gray-border);
-      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
     }
     
     .mapa-embutido-container iframe {
@@ -134,34 +129,6 @@
   </style>
 </head>
 <body>
-
-  <!-- Cabeçalho com Versão e Card de Destaque da Funcionalidade (Centralizados) -->
-  <header class="teste-header">
-    <div class="teste-versao">teste v1.2 [T2]</div>
-    <div class="card-funcionalidade">
-      <h1 class="teste-funcionalidade">Google Maps</h1>
-    </div>
-  </header>
-
-  <!-- Card de Instruções (Inicia aberto) -->
-  <section class="card-instrucoes ativo" id="cardInstrucoes">
-    <div class="card-header" onclick="toggleInstrucoes()">
-      <span>Instruções do Teste (Abordagem T2)</span>
-      <span class="seta-toggle" id="setaToggle" style="transform: rotate(180deg);">▼</span>
-    </div>
-    <!-- Wrapper do Grid -->
-    <div class="card-content-wrapper expanded" id="contentWrapper">
-      <!-- Container intermediário necessário para colapso total do padding no grid -->
-      <div class="card-content">
-        <div class="card-body">
-          <p><strong>Aviso importante:</strong> Os nomes das famílias e assistidos listados abaixo são fictícios. Os endereços são de Unidades Básicas de Saúde (UBSs) reais e próximas da região de Moema para viabilizar simulações reais de rotas no celular.</p>
-          <p>1. Verifique as informações das famílias listadas na área de testes abaixo.</p>
-          <p>2. Toque em <strong>"📍 Ver Mapa Local"</strong> para carregar o mapa do local embutido diretamente na própria página, sem sair do aplicativo.</p>
-          <p>3. Toque em <strong>"🗺️ Abrir Rota"</strong> para iniciar a navegação por GPS no app externo do Google Maps.</p>
-        </div>
-      </div>
-    </div>
-  </section>
 
   <!-- Área dedicada para o Teste Específico (5 Famílias com endereços de UBS em Moema) -->
   <main class="teste-container" style="gap: 1.25rem;">
@@ -293,19 +260,25 @@
 
   </main>
 
+  <!-- Script do Motor do Sandbox -->
+  <script src="../_infra_testes/sandbox.js"></script>
   <script>
-    // Lógica para expandir/recolher o card de instruções
-    function toggleInstrucoes() {
-      const card = document.getElementById('cardInstrucoes');
-      const wrapper = document.getElementById('contentWrapper');
-      const seta = document.getElementById('setaToggle');
-      
-      const isExpanded = wrapper.classList.toggle('expanded');
-      card.classList.toggle('ativo', isExpanded);
-      
-      // Rotaciona a seta
-      seta.style.transform = isExpanded ? 'rotate(180deg)' : 'rotate(0deg)';
-    }
+    // Inicializa a Sandbox
+    inicializarSandbox({
+      id_teste: "gmaps_mapa_local",
+      titulo: "Google Maps - Mapa Local",
+      versao: "teste v1.2",
+      instrucoes: [
+        "Toque em '📍 Ver Mapa Local' para carregar dinamicamente um mapa simplificado da região no card.",
+        "Ajuste os sliders no painel acima para calibrar a altura do mapa embutido e os paddings dos botões.",
+        "Toque em '🗺️ Abrir Rota' para abrir o direcionamento de trânsito em tela cheia no Google Maps externo."
+      ],
+      controles: [
+        { variavel: "--btn-padding", label: "Padding dos Botões", tipo: "range", min: 8, max: 24, padrao: 14, unit: "px" },
+        { variavel: "--map-height", label: "Altura do Mapa Local", tipo: "range", min: 150, max: 400, padrao: 250, unit: "px" },
+        { variavel: "--card-margin-bottom", label: "Margem entre Cards", tipo: "range", min: 8, max: 32, padrao: 16, unit: "px" }
+      ]
+    });
 
     // Carregar e exibir o mapa do Google Maps embutido
     function toggleMapaLocal(buttonElement, enderecoCompleto, containerId) {

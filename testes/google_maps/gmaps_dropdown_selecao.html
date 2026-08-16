@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visita Vicentina - Google Maps T4</title>
+  <!-- Link para o CSS Externo básico -->
+  <link rel="stylesheet" href="../_infra_testes/teste_padrao.css">
+  <!-- Fonte Inter para tipografia premium -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Estilos locais complementares para o card de informações dos assistidos */
+    .card-assistido {
+      border: 1px solid var(--ssvp-gray-border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: var(--card-margin-bottom, 1rem);
+      background-color: var(--ssvp-white);
+      box-shadow: 0 2px 4px var(--ssvp-shadow);
+      width: 100%;
+      /* Usaremos transição para quando for exibida */
+      transition: all 0.3s ease;
+    }
+    
+    .card-assistido:last-child {
+      margin-bottom: 0;
+    }
+    
+    .card-assistido-header {
+      background-color: var(--ssvp-light-blue);
+      color: var(--ssvp-navy);
+      padding: 1rem;
+    }
+    
+    .card-assistido-header h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 0.15rem;
+    }
+    
+    .card-assistido-header p {
+      font-size: 0.85rem;
+      opacity: 0.9;
+    }
+    
+    .card-assistido-body {
+      padding: 1.25rem 1rem;
+    }
+    
+    .address-info {
+      font-size: 0.95rem;
+      color: var(--ssvp-text-main);
+      margin-bottom: 1.25rem;
+      line-height: 1.4;
+    }
+    
+    /* Botão verde ergonômico simplificado para abrir rota */
+    .btn-maps {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      width: 100%;
+      padding: var(--btn-padding, 14px);
+      background-color: var(--ssvp-success);
+      color: var(--ssvp-white);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.95rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
+      transition: background-color 0.2s, transform 0.1s;
+      outline: none;
+    }
+    
+    .btn-maps:hover {
+      background-color: #0f9f6e;
+    }
+    
+    .btn-maps:active {
+      transform: scale(0.97);
+    }
+    
+    /* Estilo do Seletor Dropdown Acessível */
+    .seletor-container {
+      width: 100%;
+      background-color: var(--ssvp-white);
+      border: 1px solid var(--ssvp-gray-border);
+      border-radius: 12px;
+      padding: 1rem;
+      box-shadow: 0 2px 4px var(--ssvp-shadow);
+      margin-bottom: 1rem;
+    }
+    
+    .seletor-label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--ssvp-navy);
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    
+    .seletor-dropdown {
+      width: 100%;
+      padding: var(--dropdown-padding, 12px);
+      border: 1px solid var(--ssvp-gray-border);
+      background-color: var(--ssvp-gray-light);
+      color: var(--ssvp-text-main);
+      font-weight: 600;
+      font-size: 1rem;
+      border-radius: 8px;
+      outline: none;
+      cursor: pointer;
+      transition: border-color 0.2s, background-color 0.2s;
+    }
+    
+    .seletor-dropdown:focus {
+      border-color: var(--ssvp-blue);
+      background-color: var(--ssvp-white);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Área dedicada para o Teste Específico (Foco por Dropdown) -->
+  <main class="teste-container" style="gap: 1.25rem;">
+    
+    <!-- Seletor Dropdown para focar em apenas uma família de cada vez -->
+    <div class="seletor-container">
+      <label class="seletor-label" for="selectFamilia">Selecione a Família para Visita:</label>
+      <select class="seletor-dropdown" id="selectFamilia" onchange="alterarFocoFamilia(this.value)">
+        <option value="mostrar-todas">Mostrar Todas (Visão Geral)</option>
+        <option value="familia-santos">Família Santos (UBS Sigmund Freud)</option>
+        <option value="familia-oliveira">Família Oliveira (UBS Vila Olímpia)</option>
+        <option value="familia-silva">Família Silva (UBS Vila Mariana)</option>
+        <option value="familia-souza">Família Souza (UBS Campo Belo)</option>
+        <option value="familia-pereira">Família Pereira (UBS Itaim Bibi)</option>
+      </select>
+    </div>
+
+    <div class="lista-assistidos" style="display: flex; flex-direction: column;">
+      
+      <!-- Família 1 (UBS Sigmund Freud) -->
+      <div class="card-assistido" id="familia-santos">
+        <div class="card-assistido-header">
+          <h2>Família Santos</h2>
+          <p>Assistido: João da Silva</p>
+        </div>
+        <div class="card-assistido-body">
+          <div class="address-info">
+            📍 <strong>Endereço (UBS Sigmund Freud):</strong><br>
+            Avenida Indianópolis, 650 - Moema, São Paulo - SP
+          </div>
+          <button class="btn-maps" onclick="abrirRotaMaps('Avenida Indianópolis, 650, Moema, São Paulo, SP')">
+            🗺️ Abrir Rota
+          </button>
+        </div>
+      </div>
+
+      <!-- Família 2 (UBS Vila Olímpia) -->
+      <div class="card-assistido" id="familia-oliveira">
+        <div class="card-assistido-header">
+          <h2>Família Oliveira</h2>
+          <p>Assistida: Maria de Oliveira</p>
+        </div>
+        <div class="card-assistido-body">
+          <div class="address-info">
+            📍 <strong>Endereço (UBS Vila Olímpia):</strong><br>
+            Rua Jacques Félix, 499 - Vila Nova Conceição, São Paulo - SP
+          </div>
+          <button class="btn-maps" onclick="abrirRotaMaps('Rua Jacques Félix, 499, Vila Nova Conceição, São Paulo, SP')">
+            🗺️ Abrir Rota
+          </button>
+        </div>
+      </div>
+
+      <!-- Família 3 (UBS Vila Mariana / Clementino) -->
+      <div class="card-assistido" id="familia-silva">
+        <div class="card-assistido-header">
+          <h2>Família Silva</h2>
+          <p>Assistido: Pedro dos Santos</p>
+        </div>
+        <div class="card-assistido-body">
+          <div class="address-info">
+            📍 <strong>Endereço (UBS Vila Mariana):</strong><br>
+            Rua Dr. Diogo de Faria, 678 - Vila Clementino, São Paulo - SP
+          </div>
+          <button class="btn-maps" onclick="abrirRotaMaps('Rua Dr. Diogo de Faria, 678, Vila Clementino, São Paulo, SP')">
+            🗺️ Abrir Rota
+          </button>
+        </div>
+      </div>
+
+      <!-- Família 4 (UBS Campo Belo) -->
+      <div class="card-assistido" id="familia-souza">
+        <div class="card-assistido-header">
+          <h2>Família Souza</h2>
+          <p>Assistida: Francisca de Souza</p>
+        </div>
+        <div class="card-assistido-body">
+          <div class="address-info">
+            📍 <strong>Endereço (UBS Campo Belo):</strong><br>
+            Avenida Vieira de Morais, 1752 - Campo Belo, São Paulo - SP
+          </div>
+          <button class="btn-maps" onclick="abrirRotaMaps('Avenida Vieira de Morais, 1752, Campo Belo, São Paulo, SP')">
+            🗺️ Abrir Rota
+          </button>
+        </div>
+      </div>
+
+      <!-- Família 5 (UBS Itaim Bibi) -->
+      <div class="card-assistido" id="familia-pereira">
+        <div class="card-assistido-header">
+          <h2>Família Pereira</h2>
+          <p>Assistido: Antônio Pereira</p>
+        </div>
+        <div class="card-assistido-body">
+          <div class="address-info">
+            📍 <strong>Endereço (UBS Itaim Bibi):</strong><br>
+            Rua Salvador Cardoso, 177 - Itaim Bibi, São Paulo - SP
+          </div>
+          <button class="btn-maps" onclick="abrirRotaMaps('Rua Salvador Cardoso, 177, Itaim Bibi, São Paulo, SP')">
+            🗺️ Abrir Rota
+          </button>
+        </div>
+      </div>
+      
+    </div>
+
+  </main>
+
+  <!-- Script do Motor do Sandbox -->
+  <script src="../_infra_testes/sandbox.js"></script>
+  <script>
+    // Inicializa a Sandbox
+    inicializarSandbox({
+      id_teste: "gmaps_dropdown_selecao",
+      titulo: "Google Maps - Dropdown Seleção",
+      versao: "teste v1.2",
+      instrucoes: [
+        "Utilize o menu dropdown abaixo para selecionar apenas uma família e evitar a rolagem no celular.",
+        "Toque no botão verde '🗺️ Abrir Rota' para abrir o direcionamento no Google Maps do celular.",
+        "Calibre os sliders do painel de ajustes acima para calibrar o padding do dropdown e dos botões ergonômicos."
+      ],
+      controles: [
+        { variavel: "--btn-padding", label: "Padding dos Botões", tipo: "range", min: 8, max: 24, padrao: 14, unit: "px" },
+        { variavel: "--dropdown-padding", label: "Padding do Dropdown", tipo: "range", min: 6, max: 24, padrao: 12, unit: "px" },
+        { variavel: "--card-margin-bottom", label: "Margem entre Cards", tipo: "range", min: 8, max: 32, padrao: 16, unit: "px" }
+      ]
+    });
+
+    // Gerenciar visibilidade de acordo com a seleção no dropdown
+    function alterarFocoFamilia(valorSelecao) {
+      const cards = document.querySelectorAll('.card-assistido');
+      
+      cards.forEach(card => {
+        if (valorSelecao === 'mostrar-todas') {
+          card.style.display = 'block';
+        } else {
+          if (card.id === valorSelecao) {
+            card.style.display = 'block';
+          } else {
+            card.style.display = 'none';
+          }
+        }
+      });
+    }
+
+    // Lógica de redirecionamento para o Google Maps externo
+    function abrirRotaMaps(enderecoCompleto) {
+      const enderecoFormatado = encodeURIComponent(enderecoCompleto);
+      const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${enderecoFormatado}`;
+      window.open(mapsUrl, '_blank');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,377 @@
+/* 
+   ==========================================================================
+   ESTILO PADRÃO COMPARTILHADO (TESTES SSVP)
+   Identidade Visual: Sociedade de São Vicente de Paulo (SSVP)
+   Otimizado para: Dispositivos Móveis (largura mínima de 360px)
+   ========================================================================== 
+*/
+
+:root {
+  /* Cores Institucionais SSVP */
+  --ssvp-navy: #002d62;         /* Azul Escuro Principal */
+  --ssvp-blue: #007fff;         /* Azul Royal de Destaque */
+  --ssvp-light-blue: #e6f0fa;   /* Azul Muito Claro */
+  --ssvp-white: #ffffff;
+  
+  /* Tons Neutros e Fundo */
+  --ssvp-gray-light: #f8fafc;    /* Fundo Geral */
+  --ssvp-gray-border: #e2e8f0;   /* Bordas de painéis/cards */
+  --ssvp-text-main: #1e293b;     /* Texto Principal */
+  --ssvp-text-muted: #64748b;    /* Texto Secundário */
+  
+  /* Cores de Ação e Status */
+  --ssvp-success: #10b981;       /* Verde Sucesso */
+  --ssvp-red: #d32f2f;           /* Vermelho Escuro (Microfone Ativo) */
+  --ssvp-shadow: rgba(0, 45, 98, 0.08);
+  
+  /* Tipografia */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Reset Universal */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--ssvp-gray-light);
+  color: var(--ssvp-text-main);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.25rem 1rem;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+/* Espaçamento inferior caso exista barra fixa ergonômica */
+body.has-barra-inferior {
+  padding-bottom: 100px;
+}
+
+/* Container Principal da Funcionalidade */
+.teste-container {
+  width: 100%;
+  max-width: 600px;
+  background-color: var(--ssvp-white);
+  border: 1px solid var(--ssvp-gray-border);
+  border-radius: 16px;
+  padding: 1.25rem;
+  box-shadow: 0 4px 6px -1px var(--ssvp-shadow), 0 2px 4px -1px var(--ssvp-shadow);
+  margin-top: 1rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ==========================================================================
+   CABEÇALHO UNIFICADO E EXPANSÍVEL (SANDBOX & INSTRUÇÕES)
+   ========================================================================== */
+
+.card-cabecalho-teste {
+  width: 100%;
+  max-width: 600px;
+  background-color: var(--ssvp-white);
+  border: 1px solid var(--ssvp-gray-border);
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px var(--ssvp-shadow), 0 2px 4px -1px var(--ssvp-shadow);
+  overflow: hidden;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.card-cabecalho-teste.ativo {
+  border-color: var(--ssvp-blue);
+  box-shadow: 0 6px 12px rgba(0, 127, 255, 0.1);
+}
+
+/* Barra Superior de Toggle */
+.cabecalho-header {
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+  background-color: var(--ssvp-navy);
+  color: var(--ssvp-white);
+  transition: background-color 0.2s ease;
+}
+
+.cabecalho-header:hover {
+  background-color: #00224a;
+}
+
+.cabecalho-titulo-area {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.teste-versao {
+  font-size: 0.72rem;
+  color: var(--ssvp-light-blue);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  opacity: 0.85;
+}
+
+.teste-funcionalidade {
+  font-size: 1.3rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.seta-toggle {
+  font-size: 0.85rem;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: var(--ssvp-light-blue);
+}
+
+/* Efeito de expansão suave usando CSS Grid */
+.cabecalho-content-wrapper {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  background-color: var(--ssvp-white);
+}
+
+.cabecalho-content-wrapper.expanded {
+  grid-template-rows: 1fr;
+}
+
+.cabecalho-content {
+  min-height: 0;
+}
+
+.cabecalho-body {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  border-top: 1px solid var(--ssvp-gray-border);
+}
+
+/* Seção de Instruções */
+.teste-instrucoes h3,
+.teste-sandbox-controles h3 {
+  font-size: 0.95rem;
+  color: var(--ssvp-navy);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border-left: 3px solid var(--ssvp-blue);
+  padding-left: 8px;
+}
+
+.teste-instrucoes p {
+  font-size: 0.9rem;
+  color: var(--ssvp-text-main);
+  margin-bottom: 0.35rem;
+  line-height: 1.4;
+}
+
+.teste-instrucoes p:last-child {
+  margin-bottom: 0;
+}
+
+/* Seção do Sandbox (Controles) */
+.controles-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-top: 0.75rem;
+}
+
+.controle-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  background-color: var(--ssvp-gray-light);
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--ssvp-gray-border);
+}
+
+.controle-label-area {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.controle-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ssvp-text-muted);
+}
+
+.controle-valor {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--ssvp-navy);
+  background-color: var(--ssvp-light-blue);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+/* Inputs da Sandbox */
+.input-range-ux {
+  width: 100%;
+  height: 6px;
+  background: var(--ssvp-gray-border);
+  border-radius: 3px;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.input-range-ux::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--ssvp-blue);
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 127, 255, 0.2);
+  transition: transform 0.1s;
+}
+
+.input-range-ux::-webkit-slider-thumb:active {
+  transform: scale(1.2);
+}
+
+.input-color-ux {
+  -webkit-appearance: none;
+  border: none;
+  width: 100%;
+  height: 36px;
+  border-radius: 6px;
+  cursor: pointer;
+  background: none;
+}
+
+.input-color-ux::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.input-color-ux::-webkit-color-swatch {
+  border: 1px solid var(--ssvp-gray-border);
+  border-radius: 6px;
+}
+
+.input-select-ux {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid var(--ssvp-gray-border);
+  background-color: var(--ssvp-white);
+  color: var(--ssvp-text-main);
+  font-size: 0.85rem;
+  outline: none;
+}
+
+/* Botões de Ação */
+.btn-exportar-ux {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: var(--ssvp-blue);
+  color: var(--ssvp-white);
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  box-shadow: 0 2px 4px rgba(0, 127, 255, 0.15);
+}
+
+.btn-exportar-ux:hover {
+  background-color: #0066cc;
+}
+
+.btn-exportar-ux:active {
+  transform: scale(0.98);
+}
+
+/* ==========================================================================
+   ELEMENTOS DE INTERFACE PADRÃO (PLACEHOLDERS E AUXILIARES)
+   ========================================================================== */
+
+.teste-placeholder {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  border: 2px dashed var(--ssvp-gray-border);
+  border-radius: 12px;
+  color: var(--ssvp-text-muted);
+  font-size: 0.95rem;
+  text-align: center;
+  padding: 1.5rem;
+}
+
+/* Barra Inferior Fixa (Mantida para testes ergonômicos) */
+.barra-inferior {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background-color: var(--ssvp-white);
+  border-top: 1px solid var(--ssvp-gray-border);
+  box-shadow: 0 -4px 10px rgba(0, 45, 98, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.btn-microfone {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: none;
+  background-color: var(--ssvp-navy);
+  color: var(--ssvp-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 45, 98, 0.25);
+  transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+  outline: none;
+}
+
+.btn-microfone:hover {
+  background-color: #00224a;
+}
+
+.btn-microfone:active {
+  transform: scale(0.92);
+}
+
+.btn-microfone.ativo {
+  background-color: var(--ssvp-red);
+  box-shadow: 0 4px 16px rgba(211, 47, 47, 0.4);
+  animation: pulsar-gravacao 1.5s infinite;
+}
+
+.btn-microfone svg {
+  width: 28px;
+  height: 28px;
+  fill: currentColor;
+}
+
+@keyframes pulsar-gravacao {
+  0% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(211, 47, 47, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0); }
+}

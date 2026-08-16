@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Visita Vicentina - Google Maps T3</title>
   <!-- Link para o CSS Externo básico -->
-  <link rel="stylesheet" href="../padroes/teste_padrao.css">
+  <link rel="stylesheet" href="../_infra_testes/teste_padrao.css">
   <!-- Fonte Inter para tipografia premium -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <!-- Leaflet CSS para Mapas Interativos -->
@@ -14,7 +14,7 @@
     /* Estilo local para o mapa interativo no topo */
     #map {
       width: 100%;
-      height: 280px;
+      height: var(--map-height, 280px);
       border-radius: 12px;
       border: 1px solid var(--ssvp-gray-border);
       box-shadow: 0 4px 6px var(--ssvp-shadow);
@@ -27,7 +27,7 @@
       border: 1px solid var(--ssvp-gray-border);
       border-radius: 12px;
       overflow: hidden;
-      margin-bottom: 1rem;
+      margin-bottom: var(--card-margin-bottom, 1rem);
       background-color: var(--ssvp-white);
       box-shadow: 0 2px 4px var(--ssvp-shadow);
       width: 100%;
@@ -79,7 +79,7 @@
       justify-content: center;
       gap: 0.5rem;
       width: 100%;
-      padding: 14px;
+      padding: var(--btn-padding, 14px);
       background-color: var(--ssvp-success);
       color: var(--ssvp-white);
       text-decoration: none;
@@ -101,29 +101,23 @@
       transform: scale(0.97);
     }
     
-    /* Ajustes específicos do popup do Leaflet */
-    .leaflet-popup-content-wrapper {
-      border-radius: 8px;
-      font-family: var(--font-sans);
-    }
-    
+    /* Popup Customização do Leaflet */
     .popup-title {
       font-weight: 700;
       color: var(--ssvp-navy);
-      margin-bottom: 0.25rem;
-      font-size: 0.9rem;
+      margin-bottom: 2px;
     }
     
     .popup-text {
       font-size: 0.8rem;
-      color: var(--ssvp-text-main);
-      margin-bottom: 0.5rem;
+      color: var(--ssvp-text-muted);
+      margin-bottom: 6px;
     }
     
     .popup-link {
       display: inline-block;
       font-size: 0.8rem;
-      font-weight: bold;
+      font-weight: 700;
       color: var(--ssvp-success);
       text-decoration: none;
     }
@@ -131,41 +125,14 @@
 </head>
 <body>
 
-  <!-- Cabeçalho com Versão e Card de Destaque da Funcionalidade (Centralizados) -->
-  <header class="teste-header">
-    <div class="teste-versao">teste v1.2 [T3]</div>
-    <div class="card-funcionalidade">
-      <h1 class="teste-funcionalidade">Google Maps</h1>
-    </div>
-  </header>
-
-  <!-- Card de Instruções (Inicia aberto) -->
-  <section class="card-instrucoes ativo" id="cardInstrucoes">
-    <div class="card-header" onclick="toggleInstrucoes()">
-      <span>Instruções do Teste (Abordagem T3)</span>
-      <span class="seta-toggle" id="setaToggle" style="transform: rotate(180deg);">▼</span>
-    </div>
-    <!-- Wrapper do Grid -->
-    <div class="card-content-wrapper expanded" id="contentWrapper">
-      <!-- Container intermediário necessário para colapso total do padding no grid -->
-      <div class="card-content">
-        <div class="card-body">
-          <p><strong>Aviso importante:</strong> Os nomes das famílias e assistidos listados abaixo são fictícios. Os endereços são de Unidades Básicas de Saúde (UBSs) reais e próximas da região de Moema para viabilizar simulações reais de rotas no celular.</p>
-          <p>1. O mapa no topo exibe a localização de <strong>todas as 5 famílias</strong> simultaneamente (pins azuis).</p>
-          <p>2. Toque em qualquer pin no mapa para ver detalhes rápidos ou toque na lista de famílias abaixo para focar o mapa nela.</p>
-          <p>3. Toque em <strong>"🗺️ Abrir Rota"</strong> no card ou popup para iniciar a navegação por GPS no app externo do Google Maps.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Área dedicada para o Teste Específico (Mapa + Lista de Famílias) -->
-  <main class="teste-container">
+  <!-- Área dedicada para o Teste Específico (5 Famílias com Leaflet.js) -->
+  <main class="teste-container" style="gap: 1.25rem;">
     
-    <!-- Mapa interativo do Leaflet -->
+    <!-- Div do Mapa do Leaflet -->
     <div id="map"></div>
     
-    <div style="display: flex; flex-direction: column; gap: 1.25rem; width: 100%;">
+    <div class="lista-assistidos" style="display: flex; flex-direction: column;">
+      
       <!-- Família 1 (UBS Sigmund Freud) -->
       <div class="card-assistido" onclick="focarNoAssistido(-23.6062, -46.6575, 0)">
         <div class="card-assistido-header">
@@ -256,19 +223,25 @@
 
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Script do Motor do Sandbox -->
+  <script src="../_infra_testes/sandbox.js"></script>
   <script>
-    // Lógica para expandir/recolher o card de instruções
-    function toggleInstrucoes() {
-      const card = document.getElementById('cardInstrucoes');
-      const wrapper = document.getElementById('contentWrapper');
-      const seta = document.getElementById('setaToggle');
-      
-      const isExpanded = wrapper.classList.toggle('expanded');
-      card.classList.toggle('ativo', isExpanded);
-      
-      // Rotaciona a seta
-      seta.style.transform = isExpanded ? 'rotate(180deg)' : 'rotate(0deg)';
-    }
+    // Inicializa a Sandbox
+    inicializarSandbox({
+      id_teste: "gmaps_leaflet_geral",
+      titulo: "Google Maps - Leaflet Geral",
+      versao: "teste v1.2",
+      instrucoes: [
+        "Toque em qualquer card de família na lista para focar e abrir o balão informativo correspondente no mapa Leaflet do topo.",
+        "Toque no botão verde '🗺️ Abrir Rota' para iniciar a navegação de trânsito.",
+        "Calibre os sliders do painel de ajustes acima para ajustar a altura do mapa do topo e o padding dos botões ergonômicos."
+      ],
+      controles: [
+        { variavel: "--btn-padding", label: "Padding dos Botões", tipo: "range", min: 8, max: 24, padrao: 14, unit: "px" },
+        { variavel: "--map-height", label: "Altura do Mapa Leaflet", tipo: "range", min: 180, max: 400, padrao: 280, unit: "px" },
+        { variavel: "--card-margin-bottom", label: "Margem entre Cards", tipo: "range", min: 8, max: 32, padrao: 16, unit: "px" }
+      ]
+    });
 
     // Inicialização do Mapa
     const map = L.map('map').setView([-23.6000, -46.6620], 13); // Centrado em Moema

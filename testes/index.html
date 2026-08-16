@@ -258,6 +258,29 @@
     // Banco de Dados Local Estático de Redundância (fallback para offline / rate limits do GitHub)
     const fallbackTestes = [
       {
+        folder: "google_maps",
+        files: [
+          { name: "gmaps_botoes_lista.html" },
+          { name: "gmaps_dropdown_selecao.html" },
+          { name: "gmaps_leaflet_geral.html" },
+          { name: "gmaps_mapa_local.html" },
+          { name: "gmaps_voz_comandos.html" },
+          { name: "gmaps_voz_feedback.html" }
+        ]
+      },
+      {
+        folder: "open_street_maps",
+        files: [
+          { name: "osm_busca_raio.html" }
+        ]
+      },
+      {
+        folder: "sincronizacao",
+        files: [
+          { name: "sinc_fila_offline.html" }
+        ]
+      },
+      {
         folder: "voz",
         files: [
           { name: "LEIA_ME.html" },
@@ -269,24 +292,6 @@
         folder: "spa",
         files: [
           { name: "index.html" }
-        ]
-      },
-      {
-        folder: "google_maps",
-        files: [
-          { name: "LEIA_ME.html" }
-        ]
-      },
-      {
-        folder: "google_sheets",
-        files: [
-          { name: "LEIA_ME.html" }
-        ]
-      },
-      {
-        folder: "UX(User eXperience)",
-        files: [
-          { name: "LEIA_ME.html" }
         ]
       }
     ];
