@@ -128,9 +128,10 @@ body.has-barra-inferior {
 }
 
 .seta-toggle {
-  font-size: 0.85rem;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 1.3rem;
+  font-weight: 700;
   color: var(--ssvp-light-blue);
+  line-height: 1;
 }
 
 /* Efeito de expansão suave usando CSS Grid */

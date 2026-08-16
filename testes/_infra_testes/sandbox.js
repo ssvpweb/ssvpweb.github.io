@@ -53,7 +53,7 @@ function inicializarSandbox(config) {
         <span class="teste-versao">${versao}</span>
         <h1 class="teste-funcionalidade">${titulo}</h1>
       </div>
-      <span class="seta-toggle" id="setaToggle" style="transform: rotate(0deg);">▼</span>
+      <span class="seta-toggle" id="setaToggle">+</span>
     </div>
     <div class="cabecalho-content-wrapper" id="cabecalhoWrapper">
       <div class="cabecalho-content">
@@ -81,7 +81,7 @@ function inicializarSandbox(config) {
   cabecalhoHeader.addEventListener('click', () => {
     const isExpanded = cabecalhoWrapper.classList.toggle('expanded');
     cardCabecalho.classList.toggle('ativo', isExpanded);
-    setaToggle.style.transform = isExpanded ? 'rotate(180deg)' : 'rotate(0deg)';
+    setaToggle.innerText = isExpanded ? '−' : '+';
   });
 
   // Adiciona a classe no body caso exista a necessidade de espaçamento inferior (barra fixa)
