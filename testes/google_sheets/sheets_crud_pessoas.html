@@ -214,7 +214,7 @@
             <th>Nome</th>
             <th>Telefone</th>
             <th>E-mail</th>
-            <th style="width: 140px;">Ações</th>
+            <th style="width: 180px;">Ações</th>
           </tr>
         </thead>
         <tbody id="tableBody">
@@ -302,9 +302,11 @@
           <td>${item.nome || ''}</td>
           <td>${item.telefone || ''}</td>
           <td>${item.email || ''}</td>
-          <td class="td-acoes">
-            <button class="btn-edit" onclick="setupEdit('${item.id}')">Editar</button>
-            <button class="btn-delete" onclick="deletePerson('${item.id}')">Excluir</button>
+          <td>
+            <div class="td-acoes">
+              <button class="btn-edit" onclick="setupEdit('${item.id}')">Editar</button>
+              <button class="btn-delete" onclick="deletePerson('${item.id}')">Excluir</button>
+            </div>
           </td>
         `;
         tableBody.appendChild(tr);
