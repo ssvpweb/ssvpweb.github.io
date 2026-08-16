@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerenciador de Pessoas - CRUD Planilha</title>
+  <!-- Link para o CSS Externo básico -->
+  <link rel="stylesheet" href="../_infra_testes/teste_padrao.css">
+  <!-- Fonte Inter para tipografia premium -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Estilos locais complementares para o CRUD */
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      width: 100%;
+    }
+    
+    .form-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--ssvp-navy);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    
+    input[type="text"], input[type="email"], input[type="tel"] {
+      width: 100%;
+      padding: 0 12px;
+      border: 1px solid var(--ssvp-gray-border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      color: var(--ssvp-text-main);
+      background-color: var(--ssvp-white);
+      height: var(--input-height, 40px);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    
+    input[type="text"]:focus, input[type="email"]:focus, input[type="tel"]:focus {
+      border-color: var(--ssvp-blue);
+    }
+    
+    .actions-btn {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    
+    button {
+      padding: var(--btn-padding, 10px) 18px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      color: white;
+      background-color: var(--ssvp-blue);
+      transition: background-color 0.2s, transform 0.1s;
+      outline: none;
+    }
+    
+    button:hover { background-color: #0066cc; }
+    button:active { transform: scale(0.98); }
+    button:disabled { background-color: var(--ssvp-text-muted); cursor: not-allowed; }
+    
+    .btn-secondary {
+      background-color: var(--ssvp-navy);
+    }
+    .btn-secondary:hover { background-color: #001f44; }
+    
+    .td-acoes {
+      display: flex;
+      gap: var(--action-btn-gap, 8px);
+      align-items: center;
+      min-width: 170px;
+    }
+
+    .btn-edit {
+      background-color: #d69e2e;
+      padding: var(--action-btn-padding, 8px 12px);
+      font-size: var(--action-btn-font-size, 0.85rem);
+      min-height: var(--action-btn-min-height, 44px);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-edit:hover { background-color: #b7791f; }
+    
+    .btn-delete {
+      background-color: var(--ssvp-red);
+      padding: var(--action-btn-padding, 8px 12px);
+      font-size: var(--action-btn-font-size, 0.85rem);
+      min-height: var(--action-btn-min-height, 44px);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-delete:hover { background-color: #b91c1c; }
+    
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--ssvp-navy);
+      margin: 28px 0 12px 0;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--ssvp-gray-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    /* Tabela Responsiva com rolagem lateral no mobile */
+    .tabela-responsiva {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      border: 1px solid var(--ssvp-gray-border);
+      border-radius: 8px;
+      margin-top: 12px;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 500px; /* Garante estrutura legível na rolagem lateral */
+    }
+    
+    th, td {
+      text-align: left;
+      padding: 12px;
+      border-bottom: 1px solid var(--ssvp-gray-border);
+      font-size: var(--table-font-size, 14px);
+    }
+    
+    th {
+      background-color: var(--ssvp-light-blue);
+      color: var(--ssvp-navy);
+      font-weight: 700;
+    }
+    
+    tr:last-child td {
+      border-bottom: none;
+    }
+    
+    tr:hover { background-color: var(--ssvp-gray-light); }
+    
+    .status-msg {
+      margin-top: 12px;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-align: center;
+      display: none;
+    }
+    .status-msg.sucesso { background-color: #c6f6d5; color: #22543d; display: block; }
+    .status-msg.erro { background-color: #fed7d7; color: #742a2a; display: block; }
+    
+    .empty-state { text-align: center; padding: 24px; color: var(--ssvp-text-muted); font-style: italic; }
+  </style>
+</head>
+<body>
+
+  <!-- Área dedicada para o Teste Específico (CRUD Planilha) -->
+  <main class="teste-container">
+    
+    <!-- Formulário de Cadastro -->
+    <form id="personForm">
+      <input type="hidden" id="personId" value="">
+
+      <div class="grid-3">
+        <div class="form-group">
+          <label for="nome" class="form-label">Nome</label>
+          <input type="text" id="nome" required placeholder="Ex: Maria Silva">
+        </div>
+        <div class="form-group">
+          <label for="telefone" class="form-label">Telefone</label>
+          <input type="tel" id="telefone" required placeholder="Ex: (11) 99999-8888">
+        </div>
+        <div class="form-group">
+          <label for="email" class="form-label">E-mail</label>
+          <input type="email" id="email" required placeholder="Ex: maria@email.com">
+        </div>
+      </div>
+
+      <div class="actions-btn">
+        <button type="submit" id="btnSubmit">Cadastrar Pessoa</button>
+        <button type="button" id="btnCancel" class="btn-secondary" style="display: none;">Cancelar Edição</button>
+      </div>
+    </form>
+
+    <div id="statusMsg" class="status-msg"></div>
+
+    <!-- Tabela de Cadastrados -->
+    <div class="section-title">
+      <span>Pessoas Cadastradas</span>
+      <button type="button" id="btnRefresh" class="btn-secondary">Atualizar Lista</button>
+    </div>
+
+    <div class="tabela-responsiva">
+      <table>
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Telefone</th>
+            <th>E-mail</th>
+            <th style="width: 140px;">Ações</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <tr>
+            <td colspan="4" class="empty-state">Carregando dados...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+
+  <!-- Script do Motor do Sandbox -->
+  <script src="../_infra_testes/sandbox.js"></script>
+  <script>
+    // Inicializa a Sandbox
+    inicializarSandbox({
+      id_teste: "sheets_crud_pessoas",
+      titulo: "Google Sheets - CRUD Pessoas",
+      versao: "teste v2.0",
+      instrucoes: [
+        "Este teste se conecta à API real do Google Apps Script configurada para ler e gravar dados em tempo real no Google Sheets.",
+        "Cadastre uma nova pessoa preenchendo o formulário e clicando em 'Cadastrar'.",
+        "Use as ações de 'Editar' e 'Excluir' na lista abaixo para gerenciar os dados da planilha.",
+        "Calibre os sliders de acessibilidade acima para ajustar a área de toque e o espaçamento dos botões de ação para idosos."
+      ],
+      controles: [
+        { variavel: "--btn-padding", label: "Padding Form (Enviar)", tipo: "range", min: 6, max: 24, padrao: 10, unit: "px" },
+        { variavel: "--input-height", label: "Altura dos Inputs Form", tipo: "range", min: 30, max: 60, padrao: 40, unit: "px" },
+        { variavel: "--table-font-size", label: "Tamanho da Letra Tabela", tipo: "range", min: 11, max: 20, padrao: 14, unit: "px" },
+        { variavel: "--action-btn-min-height", label: "(Idoso) Altura Botão Tabela", tipo: "range", min: 36, max: 64, padrao: 44, unit: "px" },
+        { variavel: "--action-btn-font-size", label: "(Idoso) Letra Botão Tabela", tipo: "range", min: 0.7, max: 1.2, padrao: 0.85, unit: "rem" },
+        { variavel: "--action-btn-gap", label: "(Idoso) Espaço entre Botões", tipo: "range", min: 4, max: 24, padrao: 8, unit: "px" }
+      ]
+    });
+
+    // API real do Google Apps Script de Produção para o CRUD de Pessoas
+    const URL_API = "https://script.google.com/macros/s/AKfycbzCb6_U5FHSRztf3Twrqr-6qGec7La4t1paGb7qIpmk1ZzICVQWVvxLZ_9KrzJWk0z5/exec";
+
+    const form = document.getElementById('personForm');
+    const personIdInput = document.getElementById('personId');
+    const btnSubmit = document.getElementById('btnSubmit');
+    const btnCancel = document.getElementById('btnCancel');
+    const btnRefresh = document.getElementById('btnRefresh');
+    const tableBody = document.getElementById('tableBody');
+    const statusMsg = document.getElementById('statusMsg');
+
+    let listData = []; // Armazena a lista atual em memória para facilitar edição
+
+    function showStatus(text, isError = false) {
+      statusMsg.innerText = text;
+      statusMsg.className = `status-msg ${isError ? 'erro' : 'sucesso'}`;
+      setTimeout(() => { statusMsg.className = 'status-msg'; }, 5000);
+    }
+
+    // Carregar Dados (GET)
+    async function loadData() {
+      tableBody.innerHTML = '<tr><td colspan="4" class="empty-state">Carregando dados...</td></tr>';
+      try {
+        const response = await fetch(URL_API, { redirect: 'follow' });
+        const res = await response.json();
+
+        if (res.status === 'success') {
+          listData = res.data;
+          renderTable(listData);
+        } else {
+          showStatus('Erro ao carregar dados: ' + res.message, true);
+        }
+      } catch (err) {
+        showStatus('Erro de conexão/CORS: ' + err.message, true);
+      }
+    }
+
+    // Renderizar Tabela
+    function renderTable(data) {
+      if (!data || data.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="4" class="empty-state">Nenhuma pessoa cadastrada.</td></tr>';
+        return;
+      }
+
+      tableBody.innerHTML = '';
+      data.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${item.nome || ''}</td>
+          <td>${item.telefone || ''}</td>
+          <td>${item.email || ''}</td>
+          <td class="td-acoes">
+            <button class="btn-edit" onclick="setupEdit('${item.id}')">Editar</button>
+            <button class="btn-delete" onclick="deletePerson('${item.id}')">Excluir</button>
+          </td>
+        `;
+        tableBody.appendChild(tr);
+      });
+    }
+
+    // Preencher formulário para Edição
+    window.setupEdit = function(id) {
+      const item = listData.find(p => String(p.id) === String(id));
+      if (!item) return;
+
+      personIdInput.value = item.id;
+      document.getElementById('nome').value = item.nome;
+      document.getElementById('telefone').value = item.telefone;
+      document.getElementById('email').value = item.email;
+
+      btnSubmit.innerText = 'Salvar Alterações';
+      btnCancel.style.display = 'inline-block';
+    };
+
+    // Resetar Formulário
+    function resetForm() {
+      personIdInput.value = '';
+      form.reset();
+      btnSubmit.innerText = 'Cadastrar Pessoa';
+      btnCancel.style.display = 'none';
+    }
+
+    btnCancel.addEventListener('click', resetForm);
+
+    // Submeter (Criar ou Atualizar)
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = personIdInput.value;
+      const isUpdate = Boolean(id);
+
+      const payload = {
+        action: isUpdate ? 'update' : 'create',
+        id: id,
+        nome: document.getElementById('nome').value,
+        telefone: document.getElementById('telefone').value,
+        email: document.getElementById('email').value
+      };
+
+      btnSubmit.disabled = true;
+      btnSubmit.innerText = isUpdate ? 'Salvando...' : 'Cadastrando...';
+
+      try {
+        const response = await fetch(URL_API, {
+          method: 'POST',
+          redirect: 'follow',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        });
+
+        const res = await response.json();
+
+        if (res.status === 'success') {
+          showStatus(res.message);
+          resetForm();
+          loadData();
+        } else {
+          showStatus('Erro: ' + res.message, true);
+        }
+      } catch (err) {
+        showStatus('Erro ao enviar dados: ' + err.message, true);
+      } finally {
+        btnSubmit.disabled = false;
+        if (!personIdInput.value) btnSubmit.innerText = 'Cadastrar Pessoa';
+      }
+    });
+
+    // Excluir Pessoa
+    window.deletePerson = async function(id) {
+      if (!confirm('Tem certeza que deseja excluir este registro?')) return;
+
+      try {
+        const response = await fetch(URL_API, {
+          method: 'POST',
+          redirect: 'follow',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'delete', id: id })
+        });
+
+        const res = await response.json();
+
+        if (res.status === 'success') {
+          showStatus(res.message);
+          loadData();
+        } else {
+          showStatus('Erro ao excluir: ' + res.message, true);
+        }
+      } catch (err) {
+        showStatus('Erro ao excluir: ' + err.message, true);
+      }
+    };
+
+    btnRefresh.addEventListener('click', loadData);
+
+    // Carregar dados assim que abrir a página
+    loadData();
+  </script>
+</body>
+</html>
