@@ -451,9 +451,9 @@
   <script>
     // 1. Inicializar Sandbox
     inicializarSandbox({
-      id_teste: "gmaps_simulador_visita",
-      titulo: "Google Maps - Simulador de Visita",
-      versao: "teste v1.0",
+      id_teste: "gmaps_simulador_visita_inicio",
+      titulo: "Google Maps - Simulador de Visita (Início)",
+      versao: "teste v1.1",
       instrucoes: [
         "Este simulador apoia a preparação de visitas residenciais vicentinas organizando a rota de carro e contatos rápidos.",
         "Passo 1: Selecione os companheiros que vão com você na visita de carro (Nenhum, um ou mais).",
@@ -697,8 +697,6 @@
       }
 
       const vicSelecionados = vicentinos.filter(v => v.selecionado);
-      
-      const origin = "My+Location";
       const destination = encodeURIComponent(fam.endereco);
       
       let waypoints = '';
@@ -706,11 +704,11 @@
         waypoints = '&waypoints=' + vicSelecionados.map(v => encodeURIComponent(v.endereco)).join('|');
       }
 
-      // URL de rota do Google Maps
-      const gmapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}${waypoints}`;
+      // URL de rota do Google Maps (omitimos origin para usar o local atual do GPS de forma universal)
+      const gmapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${destination}${waypoints}`;
       
-      // Abrir Maps nativo
-      window.open(gmapsUrl, '_blank');
+      // Abre o Google Maps nativo redirecionando a página atual (evita bloqueador de pop-ups no mobile)
+      window.location.href = gmapsUrl;
 
       // Avança para a tela de trânsito
       irParaPasso(4);
