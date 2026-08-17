@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulador de Visita - Voz e POIs</title>
+  
+  <!-- CSS comum do laboratório -->
+  <link rel="stylesheet" href="../_infra_testes/teste_padrao.css">
+  <!-- Fonte Inter para tipografia premium -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* Prevenção de seleção acidental de texto (evita o Touch to Search do Chrome) */
+    body {
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    input, textarea {
+      -webkit-user-select: text;
+      user-select: text;
+    }
+
+    /* Estilos locais para o Wizard */
+    .wizard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid var(--ssvp-gray-border);
+    }
+    
+    .wizard-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--ssvp-navy);
+    }
+
+    .wizard-badge {
+      font-size: 0.75rem;
+      background-color: var(--ssvp-light-blue);
+      color: var(--ssvp-navy);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-weight: 700;
+    }
+
+    .wizard-step {
+      display: none;
+    }
+
+    .wizard-step.active {
+      display: block;
+    }
+
+    /* Rodapé do Wizard */
+    .wizard-footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 1.5rem;
+      width: 100%;
+    }
+
+    .wizard-footer button {
+      flex: 1;
+      min-width: 110px;
+      height: var(--input-height, 44px);
+      flex-shrink: 0;
+    }
+
+    /* Neutraliza distorções de altura quando os botões são empilhados verticalmente */
+    .wizard-footer[style*="column"] button {
+      flex: none;
+      width: 100%;
+      height: var(--input-height, 44px);
+    }
+
+    /* Seletor de Modo de Transporte (Tabs) */
+    .transport-selector {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 1.25rem;
+      width: 100%;
+    }
+
+    .transport-tab {
+      flex: 1;
+      height: var(--input-height, 48px);
+      border-radius: 10px;
+      border: 2px solid var(--ssvp-gray-border);
+      background-color: var(--ssvp-white);
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--ssvp-text-main);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .transport-tab.active {
+      border-color: var(--ssvp-blue);
+      background-color: #e6f0fa;
+      color: var(--ssvp-navy);
+    }
+
+    /* Barra de Voz Inferior Fixa (Design Ergonômico) */
+    .barra-voz-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background-color: var(--ssvp-navy);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px 0;
+      padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 10px);
+      box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+    }
+
+    .btn-mic-rodape {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background-color: var(--ssvp-red);
+      color: white;
+      border: none;
+      font-size: 1.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(211, 47, 47, 0.4);
+      transition: transform 0.1s, background-color 0.2s;
+      outline: none;
+    }
+
+    .btn-mic-rodape:active {
+      transform: scale(0.92);
+    }
+
+    .btn-mic-rodape.gravando {
+      background-color: #ff3b30;
+      animation: pulseMic 1.5s infinite alternate;
+    }
+
+    @keyframes pulseMic {
+      from { box-shadow: 0 0 0 rgba(255, 59, 48, 0.4); }
+      to { box-shadow: 0 0 18px rgba(255, 59, 48, 0.8); }
+    }
+
+    /* Status de Gravação de Voz */
+    .status-voz-banner {
+      background-color: #fff9db;
+      border: 1px solid #f59e0b;
+      color: #744210;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+      text-align: center;
+      display: none;
+    }
+
+    .status-voz-banner.ativo {
+      display: block;
+    }
+
+    /* Cards de Resultados de Busca por POIs */
+    .poi-card {
+      display: flex;
+      flex-direction: column;
+      padding: 12px;
+      border: 1px solid var(--ssvp-gray-border);
+      border-radius: 12px;
+      background-color: var(--ssvp-white);
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 8px;
+    }
+
+    .poi-card:hover {
+      border-color: var(--ssvp-blue);
+      background-color: var(--ssvp-gray-light);
+    }
+
+    .poi-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--ssvp-navy);
+      margin-bottom: 2px;
+    }
+
+    .poi-address {
+      font-size: 0.75rem;
+      color: var(--ssvp-text-muted);
+    }
+
+    /* Ajuste de espaçamento inferior no contêiner para não sobrepor a barra fixa */
+    .teste-container {
+      margin-bottom: 100px;
+    }
+
+    /* Cards Selecionados da Lista */
+    .item-card {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid var(--ssvp-gray-border);
+      border-radius: 12px;
+      background-color: var(--ssvp-white);
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+    }
+
+    .item-card-checkbox {
+      width: 22px;
+      height: 22px;
+      margin-right: 12px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .item-card-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .item-card-title {
+      font-weight: 600;
+      color: var(--ssvp-text-main);
+    }
+
+    .item-card-subtitle {
+      font-size: 0.75rem;
+      color: var(--ssvp-text-muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .btn-remover-item {
+      background-color: var(--ssvp-red);
+      height: 32px;
+      padding: 0 10px;
+      font-size: 0.75rem;
+      border-radius: 6px;
+      margin-left: 10px;
+    }
+
+    /* Alerta de Retorno do WhatsApp */
+    .guia-retorno-alerta {
+      background-color: #fff9db;
+      border: 1px solid #f59e0b;
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 1.5rem;
+      color: #744210;
+      font-size: 0.85rem;
+      line-height: 1.4;
+      display: none;
+    }
+
+    .guia-retorno-alerta.ativo {
+      display: block;
+    }
+
+    /* Botão de Enviar WhatsApp com estilo específico */
+    .btn-whatsapp-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border: 1px solid var(--ssvp-gray-border);
+      border-radius: 12px;
+      background-color: var(--ssvp-white);
+      margin-bottom: 10px;
+    }
+
+    .btn-whatsapp-row button {
+      height: var(--input-height, 44px);
+      flex: 1;
+    }
+
+    .btn-whatsapp-status {
+      font-size: 1.3rem;
+      font-weight: 700;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .status-checked {
+      color: var(--ssvp-success);
+    }
+
+    .status-pending {
+      color: var(--ssvp-text-muted);
+    }
+
+    .transito-container {
+      text-align: center;
+      padding: 24px 16px;
+      border: 2px solid var(--ssvp-blue);
+      background-color: #f0f7ff;
+      border-radius: 16px;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Padrão estrito de cores de botões */
+    .btn-confirmar {
+      background-color: var(--ssvp-success);
+    }
+    .btn-confirmar:hover {
+      background-color: #0f9f6e;
+    }
+
+    .btn-cancelar {
+      background-color: #f59e0b; /* Amarelo Ouro Acessível */
+      color: var(--ssvp-navy);
+    }
+    .btn-cancelar:hover {
+      background-color: #d97706;
+    }
+
+    .btn-excluir {
+      background-color: var(--ssvp-red);
+    }
+    .btn-excluir:hover {
+      background-color: #b91c1c;
+    }
+
+    /* Ajustes ergonômicos */
+    input[type="text"] {
+      width: 100%;
+      padding: 0 12px;
+      border: 1px solid var(--ssvp-gray-border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 1rem;
+      color: var(--ssvp-text-main);
+      background-color: var(--ssvp-white);
+      height: var(--input-height, 44px);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--ssvp-blue);
+    }
+    
+    button {
+      padding: 0 var(--btn-padding, 18px);
+      font-weight: 600;
+      font-size: 0.95rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      color: white;
+      background-color: var(--ssvp-blue);
+      transition: background-color 0.2s, transform 0.1s;
+      outline: none;
+      height: var(--input-height, 44px);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    
+    button:active { transform: scale(0.98); }
+    button:disabled { background-color: var(--ssvp-text-muted); cursor: not-allowed; }
+  </style>
+</head>
+<body>
+
+  <!-- Contêiner do Teste -->
+  <main class="teste-container">
+    
+    <!-- Wizard do Simulador -->
+    <div id="visitaWizard">
+      
+      <!-- Cabeçalho do Wizard -->
+      <div class="wizard-header">
+        <span class="wizard-title" id="wizardStepTitle">Selecionar Companheiros (Passo 1)</span>
+        <span class="wizard-badge" id="wizardStepBadge">Passo 1 de 4</span>
+      </div>
+
+      <!-- Alerta de Privacidade LGPD -->
+      <div id="lgpdAlert" style="background-color: #ebf8ff; border: 1px solid #bee3f8; border-radius: 12px; padding: 12px; margin-bottom: 1.5rem; color: #2b6cb0; font-size: 0.8rem; line-height: 1.4;">
+        🔒 <strong>Privacidade LGPD:</strong> Simulador público. Envio de WhatsApp seguro (autoenvio para si mesmo). Sem salvar dados.
+      </div>
+
+      <!-- Banner de Status da Voz -->
+      <div id="statusVoz" class="status-voz-banner">
+        🎤 Escutando... Fale o nome do ponto de interesse (Ex: Drogasil, Carrefour).
+      </div>
+
+      <!-- Banner de Retorno de WhatsApp -->
+      <div id="guiaRetorno" class="guia-retorno-alerta">
+        <strong>Para prosseguir no simulador:</strong> Após enviar a mensagem no WhatsApp, use o botão físico <strong>"Voltar"</strong> do celular (ou o link <strong>"◀ Safari"</strong> / <strong>"◀ Chrome"</strong> no canto superior do iPhone) para retornar a esta tela.
+      </div>
+
+      <!-- ==================== PASSO 1: COMPANHEIROS ==================== -->
+      <div id="step1" class="wizard-step active">
+        <p style="font-size: 0.9rem; color: var(--ssvp-text-main); margin-bottom: 1rem;">
+          Fale ou digite os <strong>pontos de referência</strong> (POIs) onde você vai buscar os companheiros caronas.
+        </p>
+
+        <!-- Campo de Busca por POIs -->
+        <div class="form-group" style="margin-bottom: 12px; display: flex; gap: 8px;">
+          <input type="text" id="buscaVicPOI" placeholder="Busque local (Ex: Carrefour, Drogasil)">
+          <button type="button" id="btnBuscaVic" style="height: var(--input-height, 44px);">Buscar</button>
+        </div>
+
+        <!-- Lista de Resultados de Busca do OSM -->
+        <div id="buscaVicResultados" style="margin-bottom: 1.25rem;"></div>
+
+        <!-- Lista de Companheiros Selecionados na Visita -->
+        <div style="font-weight: 700; font-size: 0.85rem; color: var(--ssvp-navy); margin-bottom: 8px; text-transform: uppercase;">
+          Companheiros na Visita (Paradas na Rota):
+        </div>
+        <div class="list-container" id="vicentinosSelecionados">
+          <!-- Dinâmico -->
+        </div>
+
+        <div class="wizard-footer">
+          <div></div> <!-- Vazio para alinhar avançar à direita -->
+          <button type="button" id="btnStep1Avancar" class="btn-confirmar">Avançar</button>
+        </div>
+      </div>
+
+      <!-- ==================== PASSO 2: DESTINO (FAMÍLIA) ==================== -->
+      <div id="step2" class="wizard-step">
+        <p style="font-size: 0.9rem; color: var(--ssvp-text-main); margin-bottom: 1rem;">
+          Fale ou digite o <strong>ponto de referência</strong> comercial/público (ex: padaria, mercado) próximo à casa da família assistida.
+        </p>
+
+        <!-- Campo de Busca de Destino -->
+        <div class="form-group" style="margin-bottom: 12px; display: flex; gap: 8px;">
+          <input type="text" id="buscaFamPOI" placeholder="Busque local de referência (Ex: Padaria Bella)">
+          <button type="button" id="btnBuscaFam" style="height: var(--input-height, 44px);">Buscar</button>
+        </div>
+
+        <!-- Lista de Resultados de Busca do OSM -->
+        <div id="buscaFamResultados" style="margin-bottom: 1.25rem;"></div>
+
+        <!-- Destino Selecionado -->
+        <div style="font-weight: 700; font-size: 0.85rem; color: var(--ssvp-navy); margin-bottom: 8px; text-transform: uppercase;">
+          Destino Selecionado da Família:
+        </div>
+        <div class="list-container" id="familiaSelecionada">
+          <!-- Dinâmico -->
+        </div>
+
+        <div class="wizard-footer">
+          <button type="button" id="btnStep2Voltar" class="btn-cancelar">Voltar</button>
+          <button type="button" id="btnStep2Avancar" class="btn-confirmar">Avançar</button>
+        </div>
+      </div>
+
+      <!-- ==================== PASSO 3: PARTIDA ==================== -->
+      <div id="step3" class="wizard-step">
+        <p style="font-size: 0.9rem; color: var(--ssvp-text-main); margin-bottom: 1rem;">
+          Escolha como deseja abrir a rota e envie as mensagens privadas de partida para si mesmo.
+        </p>
+
+        <!-- Seletor de Modo de Transporte Ergonômico (Tabs) -->
+        <div style="font-weight: 700; font-size: 0.85rem; color: var(--ssvp-navy); margin-bottom: 8px; text-transform: uppercase;">
+          Modo de Transporte:
+        </div>
+        <div class="transport-selector">
+          <button type="button" class="transport-tab active" id="tabCarro">
+            🚗 De Carro
+          </button>
+          <button type="button" class="transport-tab" id="tabPe">
+            🚶 A Pé
+          </button>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="mensagemPartida">Mensagem de Saída (Editável)</label>
+          <input type="text" id="mensagemPartida" value="estou saindo de casa!">
+        </div>
+
+        <div style="font-weight: 700; font-size: 0.85rem; color: var(--ssvp-navy); margin: 1.25rem 0 0.5rem 0; text-transform: uppercase;">
+          Fila de Envio (WhatsApp Seguro - Para Si Mesmo):
+        </div>
+
+        <div id="whatsappPartidaFila">
+          <!-- Dinâmico -->
+        </div>
+
+        <div class="wizard-footer" style="flex-direction: column; gap: 8px;">
+          <button type="button" id="btnIniciarRotaMaps" style="width: 100%; background-color: var(--ssvp-blue);">
+            Iniciar Rota no Google Maps
+          </button>
+          <button type="button" id="btnStep3Voltar" class="btn-cancelar" style="width: 100%;">
+            Voltar
+          </button>
+        </div>
+      </div>
+
+      <!-- ==================== PASSO 4: EM TRÂNSITO ==================== -->
+      <div id="step4" class="wizard-step">
+        <div class="transito-container">
+          <span style="font-size: 3rem; margin-bottom: 10px; display: block;" id="transitoIcone">🚗</span>
+          <h4 style="color: var(--ssvp-navy); font-weight: 700; margin-bottom: 8px;" id="transitoTitulo">Viagem em Andamento</h4>
+          <p style="font-size: 0.85rem; color: var(--ssvp-text-main); white-space: pre-line;" id="transitoDetalhes">
+            Maps iniciado.
+          </p>
+        </div>
+
+        <p style="font-size: 0.9rem; color: var(--ssvp-text-main); margin-bottom: 1rem; text-align: center;">
+          Ao chegar próximo ao ponto de referência da família, envie a mensagem de aproximação:
+        </p>
+
+        <div class="form-group">
+          <label class="form-label" for="mensagemChegando">Mensagem de Chegada (Editável)</label>
+          <input type="text" id="mensagemChegando" value="estamos chegando!">
+        </div>
+
+        <button type="button" id="btnAvisarChegada" class="btn-cancelar" style="width: 100%; height: var(--input-height, 48px); font-size: 1.05rem; margin-bottom: 1.5rem;">
+          Avisar Chegada (WhatsApp para Si Mesmo)
+        </button>
+
+        <div class="wizard-footer">
+          <button type="button" id="btnResetarVisita" class="btn-excluir" style="width: 100%;">
+            Concluir / Resetar Simulador
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Barra Inferior Fixa para Acionamento de Voz -->
+  <footer class="barra-voz-footer" id="barraVoz">
+    <button type="button" class="btn-mic-rodape" id="btnMicVoz" title="Falar Ponto de Referência">
+      🎤
+    </button>
+  </footer>
+
+  <!-- Script Sandbox e Roteamento -->
+  <script src="../_infra_testes/sandbox.js"></script>
+  <script>
+    // 1. Inicializar Sandbox
+    inicializarSandbox({
+      id_teste: "gmaps_simulador_visita_voz_pois",
+      titulo: "Google Maps - Simulador de Visita (Voz/POIs)",
+      versao: "teste v1.0",
+      instrucoes: [
+        "Este simulador usa reconhecimento de voz e pesquisa geolocalizada no OpenStreetMap (Nominatim).",
+        "Passo 1: Fale ou digite nomes de referências (Ex: Drogasil, Carrefour) onde buscará os companheiros e adicione na rota.",
+        "Passo 2: Defina o destino da família buscando por um ponto de referência próximo a ela.",
+        "Passo 3: Escolha o meio de transporte (Carro ou Caminhada), faça os autoenvios seguros de WhatsApp e abra o Google Maps nativo.",
+        "Passo 4: Dispare a mensagem de aproximação direto para o seu WhatsApp (autoenvio) na simulação."
+      ],
+      controles: [
+        { variavel: "--btn-padding", label: "Padding lateral Botões", tipo: "range", min: 6, max: 24, padrao: 18, unit: "px" },
+        { variavel: "--input-height", label: "Altura de Inputs/Botões", tipo: "range", min: 36, max: 64, padrao: 44, unit: "px" }
+      ]
+    });
+
+    // 2. Dados de Roteamento em Memória
+    let vicentinosSelecionados = [];
+    let destinoFamilia = null;
+    let modoTransporte = 'driving'; // driving ou walking
+    let whatsappEnviadosStatus = {};
+
+    let userCoordinates = { lat: -23.5505, lon: -46.6333 }; // Fallback SP Central
+    let activeSearchInputId = 'buscaVicPOI'; // Controla qual input a voz vai preencher
+
+    // 3. Obter Geolocalização GPS Inicial para buscas locais precisas
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          userCoordinates.lat = position.coords.latitude;
+          userCoordinates.lon = position.coords.longitude;
+          console.log("GPS obtido:", userCoordinates);
+        },
+        (error) => {
+          console.warn("GPS negado/erro. Usando São Paulo central como fallback:", error.message);
+        }
+      );
+    }
+
+    // 4. Reconhecimento de Voz (Speech Recognition API)
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+    let gravando = false;
+
+    if (SpeechRecognition) {
+      recognition = new SpeechRecognition();
+      recognition.lang = 'pt-BR';
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.onstart = () => {
+        gravando = true;
+        document.getElementById('btnMicVoz').classList.add('gravando');
+        document.getElementById('statusVoz').classList.add('ativo');
+      };
+
+      recognition.onend = () => {
+        gravando = false;
+        document.getElementById('btnMicVoz').classList.remove('gravando');
+        document.getElementById('statusVoz').classList.remove('ativo');
+      };
+
+      recognition.onerror = (e) => {
+        console.error("Erro no reconhecimento de voz:", e.error);
+        gravando = false;
+        document.getElementById('btnMicVoz').classList.remove('gravando');
+        document.getElementById('statusVoz').classList.remove('ativo');
+      };
+
+      recognition.onresult = (event) => {
+        const text = event.results[0][0].transcript;
+        console.log("Voz capturada:", text);
+        
+        // Coloca o texto no campo ativo e dispara a busca
+        const input = document.getElementById(activeSearchInputId);
+        if (input) {
+          input.value = text;
+          if (activeSearchInputId === 'buscaVicPOI') {
+            buscarNominatim(text, 'buscaVicResultados', adicionarCompanheiro);
+          } else {
+            buscarNominatim(text, 'buscaFamResultados', definirDestino);
+          }
+        }
+      };
+    } else {
+      document.getElementById('btnMicVoz').style.backgroundColor = '#718096';
+      document.getElementById('btnMicVoz').title = "Voz não suportada neste navegador";
+      console.warn("Reconhecimento de voz não suportado pelo navegador.");
+    }
+
+    // Acionar gravação física pelo clique no botão inferior
+    document.getElementById('btnMicVoz').addEventListener('click', () => {
+      if (!recognition) {
+        alert("O reconhecimento de voz não é suportado pelo seu navegador atual. Use o campo de digitação.");
+        return;
+      }
+
+      if (gravando) {
+        recognition.stop();
+      } else {
+        // Define o input ativo com base no passo atual
+        activeSearchInputId = (passoAtual === 1) ? 'buscaVicPOI' : 'buscaFamPOI';
+        recognition.start();
+      }
+    });
+
+    // 5. Integração com a API de Busca Geolocalizada do OpenStreetMap (Nominatim)
+    async function buscarNominatim(query, resultsContainerId, selectionCallback) {
+      const container = document.getElementById(resultsContainerId);
+      container.innerHTML = '<p style="font-size: 0.85rem; color: var(--ssvp-text-muted); font-style: italic;">Pesquisando locais próximos...</p>';
+
+      // Monta caixa de bounding box aproximada de 10km ao redor do motorista para priorizar resultados locais
+      const delta = 0.09; // aprox 10km em graus geográficos
+      const viewbox = `${userCoordinates.lon - delta},${userCoordinates.lat + delta},${userCoordinates.lon + delta},${userCoordinates.lat - delta}`;
+
+      const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=3&viewbox=${viewbox}&bounded=0&addressdetails=1`;
+
+      try {
+        const response = await fetch(url, {
+          headers: { 'Accept-Language': 'pt-BR,pt;q=0.9' }
+        });
+        const data = await response.json();
+
+        container.innerHTML = '';
+
+        if (!data || data.length === 0) {
+          container.innerHTML = '<p style="font-size: 0.85rem; color: var(--ssvp-red); font-style: italic;">Nenhum ponto de referência encontrado próximo. Tente outro termo.</p>';
+          return;
+        }
+
+        data.forEach(item => {
+          const card = document.createElement('div');
+          card.className = 'poi-card';
+          
+          // Formata endereço legível
+          const name = item.display_name.split(',')[0];
+          const address = item.display_name.split(',').slice(1).join(',').trim();
+
+          card.innerHTML = `
+            <div class="poi-name">${name}</div>
+            <div class="poi-address">${address}</div>
+          `;
+
+          // Ao clicar no resultado, dispara o callback de seleção
+          card.addEventListener('click', () => {
+            selectionCallback({
+              id: item.place_id,
+              nome: name,
+              endereco: item.display_name,
+              lat: item.lat,
+              lon: item.lon
+            });
+            container.innerHTML = '';
+            const input = document.getElementById(activeSearchInputId);
+            if (input) input.value = '';
+          });
+
+          container.appendChild(card);
+        });
+
+      } catch (err) {
+        console.error("Erro na busca do OSM:", err);
+        container.innerHTML = '<p style="font-size: 0.85rem; color: var(--ssvp-red); font-style: italic;">Erro de conexão com o OpenStreetMap.</p>';
+      }
+    }
+
+    // Ações manuais de clique em Buscar
+    document.getElementById('btnBuscaVic').addEventListener('click', () => {
+      const val = document.getElementById('buscaVicPOI').value.trim();
+      if (val) {
+        activeSearchInputId = 'buscaVicPOI';
+        buscarNominatim(val, 'buscaVicResultados', adicionarCompanheiro);
+      }
+    });
+
+    document.getElementById('btnBuscaFam').addEventListener('click', () => {
+      const val = document.getElementById('buscaFamPOI').value.trim();
+      if (val) {
+        activeSearchInputId = 'buscaFamPOI';
+        buscarNominatim(val, 'buscaFamResultados', definirDestino);
+      }
+    });
+
+    // 6. Manipulação de Itens da Rota (Companheiros e Destino)
+    function adicionarCompanheiro(local) {
+      // Evita duplicatas
+      if (vicentinosSelecionados.some(v => v.id === local.id)) return;
+      
+      vicentinosSelecionados.push(local);
+      renderVicentinosSelecionados();
+    }
+
+    function removerCompanheiro(id) {
+      vicentinosSelecionados = vicentinosSelecionados.filter(v => v.id !== id);
+      renderVicentinosSelecionados();
+    }
+
+    function renderVicentinosSelecionados() {
+      const container = document.getElementById('vicentinosSelecionados');
+      container.innerHTML = '';
+
+      if (vicentinosSelecionados.length === 0) {
+        container.innerHTML = '<p style="font-size: 0.8rem; color: var(--ssvp-text-muted); font-style: italic;">Nenhum local de carona adicionado. Clique acima para buscar.</p>';
+        return;
+      }
+
+      vicentinosSelecionados.forEach(v => {
+        const card = document.createElement('div');
+        card.className = 'item-card';
+        card.innerHTML = `
+          <div class="item-card-info">
+            <div class="item-card-title">🚗 Carona em: ${v.nome}</div>
+            <div class="item-card-subtitle">${v.endereco}</div>
+          </div>
+          <button type="button" class="btn-remover-item" onclick="removerCompanheiro(${v.id})">Remover</button>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function definirDestino(local) {
+      destinoFamilia = local;
+      renderDestinoFamilia();
+    }
+
+    function removerDestino() {
+      destinoFamilia = null;
+      renderDestinoFamilia();
+    }
+
+    function renderDestinoFamilia() {
+      const container = document.getElementById('familiaSelecionada');
+      container.innerHTML = '';
+
+      if (!destinoFamilia) {
+        container.innerHTML = '<p style="font-size: 0.8rem; color: var(--ssvp-text-muted); font-style: italic;">Nenhum destino de família selecionado.</p>';
+        return;
+      }
+
+      const card = document.createElement('div');
+      card.className = 'item-card';
+      card.innerHTML = `
+        <div class="item-card-info">
+          <div class="item-card-title">🏠 Destino: ${destinoFamilia.nome}</div>
+          <div class="item-card-subtitle">${destinoFamilia.endereco}</div>
+        </div>
+        <button type="button" class="btn-remover-item" onclick="removerDestino()">Remover</button>
+      `;
+      container.appendChild(card);
+    }
+
+    // 7. Navegação e Wizard do Simulador
+    const wizardStepTitle = document.getElementById('wizardStepTitle');
+    const wizardStepBadge = document.getElementById('wizardStepBadge');
+    const guiaRetorno = document.getElementById('guiaRetorno');
+    const barraVoz = document.getElementById('barraVoz');
+
+    const steps = [
+      { id: 'step1', title: 'Selecionar Companheiros (Passo 1)' },
+      { id: 'step2', title: 'Destino da Família (Passo 2)' },
+      { id: 'step3', title: 'Partida & Rota (Passo 3)' },
+      { id: 'step4', title: 'Viagem em Trânsito (Passo 4)' }
+    ];
+
+    let passoAtual = 1;
+
+    function irParaPasso(numero) {
+      passoAtual = numero;
+
+      steps.forEach((step, idx) => {
+        const div = document.getElementById(step.id);
+        if (idx + 1 === numero) {
+          div.classList.add('active');
+          wizardStepTitle.innerText = step.title;
+          wizardStepBadge.innerText = `Passo ${numero} de 4`;
+        } else {
+          div.classList.remove('active');
+        }
+      });
+
+      // Gerencia visualizações de elementos fixos de rodapé
+      if (passoAtual === 3) {
+        renderFilaWhatsApp();
+        guiaRetorno.classList.add('ativo');
+        barraVoz.style.display = 'none'; // Oculta voz nas telas finais
+      } else if (passoAtual === 4) {
+        guiaRetorno.classList.remove('ativo');
+        barraVoz.style.display = 'none';
+        atualizarTelaTransito();
+      } else {
+        guiaRetorno.classList.remove('ativo');
+        barraVoz.style.display = 'flex'; // Exibe barra de microfone no Passo 1 e 2
+      }
+    }
+
+    // Alternar Abas de Transporte
+    const tabCarro = document.getElementById('tabCarro');
+    const tabPe = document.getElementById('tabPe');
+
+    tabCarro.addEventListener('click', () => {
+      modoTransporte = 'driving';
+      tabCarro.classList.add('active');
+      tabPe.classList.remove('active');
+    });
+
+    tabPe.addEventListener('click', () => {
+      modoTransporte = 'walking';
+      tabPe.classList.add('active');
+      tabCarro.classList.remove('active');
+    });
+
+    // 8. Lógica de Mensagens e Inicialização de Rota (Passo 3)
+    function renderFilaWhatsApp() {
+      const container = document.getElementById('whatsappPartidaFila');
+      container.innerHTML = '';
+
+      const baseMsg = document.getElementById('mensagemPartida').value.trim();
+      
+      const contatos = [];
+
+      // Monta fila de whatsapps para si mesmo (simulação de contatos)
+      vicentinosSelecionados.forEach((v, idx) => {
+        const nomeDest = `vicentino ${idx + 1}`;
+        const textoMsg = `Olá ${nomeDest}, ${baseMsg}`;
+        contatos.push({ 
+          id: `vic-${v.id}`, 
+          display: `Autoenvio ${idx+1}: Parada em ${v.nome}`,
+          texto: textoMsg
+        });
+      });
+
+      if (destinoFamilia) {
+        const textoMsg = `Olá assistido, ${baseMsg}`;
+        contatos.push({ 
+          id: `fam-${destinoFamilia.id}`, 
+          display: `Autoenvio Destino: Família em ${destinoFamilia.nome}`,
+          texto: textoMsg
+        });
+      }
+
+      if (contatos.length === 0) {
+        container.innerHTML = '<p style="color: var(--ssvp-text-muted); font-style: italic; text-align: center; padding: 10px;">Nenhum ponto selecionado.</p>';
+        return;
+      }
+
+      contatos.forEach(c => {
+        const row = document.createElement('div');
+        row.className = 'btn-whatsapp-row';
+        
+        const isSent = whatsappEnviadosStatus[c.id];
+        
+        row.innerHTML = `
+          <span class="btn-whatsapp-status ${isSent ? 'status-checked' : 'status-pending'}">
+            ${isSent ? '✓' : '•'}
+          </span>
+          <button type="button" class="btn-cancelar" style="font-size: 0.85rem;" title="${c.texto}">
+            ${c.display}
+          </button>
+        `;
+
+        // Clique abre WhatsApp sem telefone (autoenvio seguro)
+        row.querySelector('button').addEventListener('click', () => {
+          whatsappEnviadosStatus[c.id] = true;
+          renderFilaWhatsApp();
+          const encodedMsg = encodeURIComponent(c.texto);
+          window.open(`https://api.whatsapp.com/send?text=${encodedMsg}`, '_blank');
+        });
+
+        container.appendChild(row);
+      });
+    }
+
+    // Iniciar Rota com Waypoints e Travel Mode
+    document.getElementById('btnIniciarRotaMaps').addEventListener('click', () => {
+      if (!destinoFamilia) {
+        alert("Sem destino definido.");
+        return;
+      }
+
+      // Converte coordenadas geográficas decimais para strings
+      const destCoords = `${destinoFamilia.lat},${destinoFamilia.lon}`;
+      
+      let waypoints = '';
+      if (vicentinosSelecionados.length > 0) {
+        waypoints = '&waypoints=' + vicentinosSelecionados.map(v => `${v.lat},${v.lon}`).join('|');
+      }
+
+      // Monta URL de Direções do Maps nativa (sem origin para usar a localização atual)
+      const gmapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${destCoords}${waypoints}&travelmode=${modoTransporte}`;
+
+      // Redireciona na página atual (evita bloqueador de pop-ups)
+      window.location.href = gmapsUrl;
+
+      // Atraso de 500ms para o navegador do celular disparar a navegação externa antes de alterar a div síncrona
+      setTimeout(() => {
+        irParaPasso(4);
+      }, 500);
+    });
+
+    // 9. Tela de Trânsito e Chegada (Passo 4)
+    function atualizarTelaTransito() {
+      const listNomes = vicentinosSelecionados.map(v => v.nome).join(', ');
+      
+      document.getElementById('transitoIcone').innerText = (modoTransporte === 'driving') ? '🚗' : '🚶';
+      document.getElementById('transitoTitulo').innerText = `Roteando para ${destinoFamilia ? destinoFamilia.nome : 'Família'}`;
+      
+      document.getElementById('transitoDetalhes').innerText = `Modo: ${(modoTransporte === 'driving') ? 'Condução (Carro)' : 'Caminhada (A Pé)'}.\nParadas carona em: ${listNomes || 'Nenhuma (Direto)'}.\nDestino Final: ${destinoFamilia ? destinoFamilia.nome : ''}`;
+    }
+
+    // Enviar aviso de chegada (Autoenvio para si mesmo)
+    document.getElementById('btnAvisarChegada').addEventListener('click', () => {
+      const baseMsg = document.getElementById('mensagemChegando').value.trim();
+      const msgCompleta = `Olá assistido, ${baseMsg}`;
+      const encodedMsg = encodeURIComponent(msgCompleta);
+      window.open(`https://api.whatsapp.com/send?text=${encodedMsg}`, '_blank');
+    });
+
+    // Botões lineares básicos do Wizard
+    document.getElementById('btnStep1Avancar').addEventListener('click', () => irParaPasso(2));
+
+    document.getElementById('btnStep2Voltar').addEventListener('click', () => irParaPasso(1));
+    document.getElementById('btnStep2Avancar').addEventListener('click', () => {
+      if (!destinoFamilia) {
+        alert("Por favor, busque e selecione um destino de família antes de avançar.");
+        return;
+      }
+      irParaPasso(3);
+    });
+
+    document.getElementById('btnStep3Voltar').addEventListener('click', () => irParaPasso(2));
+
+    // Resetar
+    document.getElementById('btnResetarVisita').addEventListener('click', () => {
+      vicentinosSelecionados = [];
+      destinoFamilia = null;
+      whatsappEnviadosStatus = {};
+      modoTransporte = 'driving';
+      
+      tabCarro.classList.add('active');
+      tabPe.classList.remove('active');
+      
+      renderVicentinosSelecionados();
+      renderDestinoFamilia();
+      
+      irParaPasso(1);
+    });
+
+    // 10. Inicialização
+    renderVicentinosSelecionados();
+    renderDestinoFamilia();
+    irParaPasso(1);
+  </script>
+</body>
+</html>
