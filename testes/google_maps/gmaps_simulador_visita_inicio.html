@@ -710,8 +710,11 @@
       // Abre o Google Maps nativo redirecionando a página atual (evita bloqueador de pop-ups no mobile)
       window.location.href = gmapsUrl;
 
-      // Avança para a tela de trânsito
-      irParaPasso(4);
+      // Usamos um pequeno atraso para avançar de passo, evitando que o navegador cancele a navegação
+      // ao ocultar a div do botão clicado na mesma thread de execução.
+      setTimeout(() => {
+        irParaPasso(4);
+      }, 500);
     });
 
     // 8. Lógica do Passo 4 (Em trânsito)
