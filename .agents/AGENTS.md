@@ -14,3 +14,8 @@
 ## Organização de Planos de Implementação
 * **Planos Gerais e Funcionalidades:** Os planos de implementação (específicos de features, conjuntos de features ou o plano geral do webapp) devem ser salvos na pasta `dev/implement/` para subirem para o repositório público.
 * **Segurança e Privacidade de Dados:** Qualquer plano de implementação que envolva segurança de dados, autenticação, criptografia, chaves de API, senhas ou privacidade de dados (LGPD) deve ser mantido estritamente na pasta `dev_local/` (evitando a exposição pública via `.gitignore`).
+
+## Compatibilidade Multiplataforma (Android & iOS)
+* **Prevenção de Zoom Automático (iPhone):** Todos os campos de formulário (`input`, `textarea`, `select`) devem ter tamanho de fonte mínimo de `16px` (ou `1rem`) em visualizações móveis para evitar que o Safari dê zoom de foco indesejado.
+* **Margens de Segurança (Safe Areas):** Elementos fixados nas extremidades da tela (barras inferiores ou superiores) devem usar variáveis CSS `env(safe-area-inset-...)` para não serem cobertos pela barra de navegação virtual ou pelo entalhe (Notch) do iOS.
+* **Políticas de Captura/Execução de Mídia:** Funcionalidades de Speech Recognition (Reconhecimento de Voz) ou áudio retorno (Speech Synthesis) devem ser acionadas estritamente de dentro de um evento de clique ou interação física ativa do usuário na tela, suportando os prefixos `window.webkitSpeechRecognition`.

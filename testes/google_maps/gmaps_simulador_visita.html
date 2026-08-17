@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulador de Visita - Google Maps</title>
+  
+  <!-- Link para o CSS Externo comum do laboratório -->
+  <link rel="stylesheet" href="../_infra_testes/teste_padrao.css">
+  <!-- Fonte Inter para tipografia moderna e limpa -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* Estilos locais para o fluxo de Wizard */
+    .wizard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid var(--ssvp-gray-border);
+    }
+    
+    .wizard-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--ssvp-navy);
+    }
+
+    .wizard-badge {
+      font-size: 0.75rem;
+      background-color: var(--ssvp-light-blue);
+      color: var(--ssvp-navy);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-weight: 700;
+    }
+
+    .wizard-step {
+      display: none;
+    }
+
+    .wizard-step.active {
+      display: block;
+    }
+
+    /* Lista de itens selecionáveis (Cards compactos) */
+    .list-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 1.5rem;
+    }
+
+    .item-card {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      border: 1px solid var(--ssvp-gray-border);
+      border-radius: 12px;
+      background-color: var(--ssvp-white);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      min-height: 48px;
+    }
+
+    .item-card:hover {
+      border-color: var(--ssvp-blue);
+      background-color: var(--ssvp-gray-light);
+    }
+
+    .item-card.selected {
+      border-color: var(--ssvp-blue);
+      background-color: #e6f0fa;
+      box-shadow: 0 0 0 1px var(--ssvp-blue);
+    }
+
+    .item-card-checkbox {
+      margin-right: 14px;
+      width: 22px;
+      height: 22px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .item-card-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .item-card-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--ssvp-text-main);
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .item-card-subtitle {
+      font-size: 0.75rem;
+      color: var(--ssvp-text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Grid de formulário de cadastro rápido */
+    .cadastro-rapido {
+      background-color: var(--ssvp-gray-light);
+      border: 1px dashed var(--ssvp-gray-border);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 1.5rem;
+    }
+
+    .cadastro-rapido-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--ssvp-navy);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Rodapé do Wizard com botões e barra de progresso */
+    .wizard-footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 1.5rem;
+      width: 100%;
+    }
+
+    .wizard-footer button {
+      flex: 1;
+      min-width: 110px;
+      height: var(--input-height, 44px);
+    }
+
+    /* Botão de Enviar WhatsApp com estilo específico */
+    .btn-whatsapp-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border: 1px solid var(--ssvp-gray-border);
+      border-radius: 12px;
+      background-color: var(--ssvp-white);
+      margin-bottom: 10px;
+    }
+
+    .btn-whatsapp-row button {
+      height: var(--input-height, 44px);
+      flex: 1;
+    }
+
+    .btn-whatsapp-status {
+      font-size: 1.3rem;
+      font-weight: 700;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .status-checked {
+      color: var(--ssvp-success);
+    }
+
+    .status-pending {
+      color: var(--ssvp-text-muted);
+    }
+
+    /* Banner informativo para ajudar no atrito de voltar de app */
+    .guia-retorno-alerta {
+      background-color: #fff9db;
+      border: 1px solid #f59e0b;
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 1.5rem;
+      color: #744210;
+      font-size: 0.85rem;
+      line-height: 1.4;
+      display: none;
+    }
+
+    .guia-retorno-alerta.ativo {
+      display: block;
+      animation: pulseAlert 2s infinite alternate;
+    }
+
+    @keyframes pulseAlert {
+      from { border-color: #f59e0b; box-shadow: 0 0 0 rgba(245, 158, 11, 0); }
+      to { border-color: #d97706; box-shadow: 0 0 8px rgba(245, 158, 11, 0.4); }
+    }
+
+    /* Estilização para o Passo 4 (Em trânsito) */
+    .transito-container {
+      text-align: center;
+      padding: 24px 16px;
+      border: 2px solid var(--ssvp-blue);
+      background-color: #f0f7ff;
+      border-radius: 16px;
+      margin-bottom: 1.5rem;
+    }
+
+    .car-icon {
+      font-size: 3rem;
+      margin-bottom: 10px;
+      display: block;
+      animation: driveCar 2s infinite ease-in-out;
+    }
+
+    @keyframes driveCar {
+      0% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      100% { transform: translateX(-5px); }
+    }
+
+    /* Padrão estrito de cores de botões para os CRUDs/Fluxos */
+    .btn-confirmar {
+      background-color: var(--ssvp-success);
+    }
+    .btn-confirmar:hover {
+      background-color: #0f9f6e;
+    }
+
+    .btn-cancelar {
+      background-color: #f59e0b; /* Amarelo Ouro Acessível */
+      color: var(--ssvp-navy);
+    }
+    .btn-cancelar:hover {
+      background-color: #d97706;
+    }
+
+    .btn-excluir {
+      background-color: var(--ssvp-red);
+    }
+    .btn-excluir:hover {
+      background-color: #b91c1c;
+    }
+
+    /* Ajustes ergonômicos de fonte e input */
+    input[type="text"], input[type="tel"] {
+      width: 100%;
+      padding: 0 12px;
+      border: 1px solid var(--ssvp-gray-border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 1rem; /* Mínimo 16px para iOS zoom */
+      color: var(--ssvp-text-main);
+      background-color: var(--ssvp-white);
+      height: var(--input-height, 44px);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus, input[type="tel"]:focus {
+      border-color: var(--ssvp-blue);
+    }
+    
+    button {
+      padding: 0 var(--btn-padding, 18px);
+      font-weight: 600;
+      font-size: 0.95rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      color: white;
+      background-color: var(--ssvp-blue);
+      transition: background-color 0.2s, transform 0.1s;
+      outline: none;
+      height: var(--input-height, 44px);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    
+    button:active { transform: scale(0.98); }
+    button:disabled { background-color: var(--ssvp-text-muted); cursor: not-allowed; }
+  </style>
+</head>
+<body>
+
+  <!-- Contêiner do Teste -->
+  <main class="teste-container">
+    
+    <!-- Formulário do Simulador de Visitas (Wizard) -->
+    <div id="visitaWizard">
+      
+      <!-- Cabeçalho do Wizard -->
+      <div class="wizard-header">
+        <span class="wizard-title" id="wizardStepTitle">Companheiros</span>
+        <span class="wizard-badge" id="wizardStepBadge">Passo 1 de 4</span>
+      </div>
+
+      <!-- Alerta de Privacidade LGPD -->
+      <div id="lgpdAlert" style="background-color: #ebf8ff; border: 1px solid #bee3f8; border-radius: 12px; padding: 12px; margin-bottom: 1.5rem; color: #2b6cb0; font-size: 0.8rem; line-height: 1.4;">
+        🔒 <strong>Privacidade LGPD:</strong> Este simulador roda 100% no seu aparelho de forma local. Nenhum dado inserido é salvo no servidor ou compartilhado.
+      </div>
+
+      <!-- Banner de Ajuda sobre como voltar ao App -->
+      <div id="guiaRetorno" class="guia-retorno-alerta">
+        <strong>Para prosseguir no simulador:</strong> Após enviar a mensagem no WhatsApp, use o botão físico <strong>"Voltar"</strong> do celular (ou o link <strong>"◀ Safari"</strong> / <strong>"◀ Chrome"</strong> no canto superior do iPhone) para retornar a esta tela.
+      </div>
+
+      <!-- ==================== PASSO 1: COMPANHEIROS ==================== -->
+      <div id="step1" class="wizard-step active">
+        <p style="font-size: 0.9rem; color: var(--ssvp-text-main); margin-bottom: 1rem;">
+          Selecione quem vai de carro com você na visita. Você pode marcar nenhum, um ou mais vicentinos.
+        </p>
+
+        <div class="list-container" id="vicentinosList">
+          <!-- Gerado dinamicamente -->
+        </div>
+
+        <!-- Cadastro rápido de Vicentino de Teste -->
+        <div class="cadastro-rapido">
+          <div class="cadastro-rapido-title">Adicionar Companheiro de Teste</div>
+          <div class="grid-2" style="margin-bottom: 10px;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <input type="text" id="novoVicNome" placeholder="Nome do Vicentino">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <input type="tel" id="novoVicTelefone" placeholder="Telefone com DDD (ex: 11999998888)">
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom: 10px;">
+            <input type="text" id="novoVicEndereco" placeholder="Endereço de partida (Ex: Av. Paulista, 1000, SP)">
+          </div>
+          <button type="button" id="btnAdicionarVic" style="width: 100%; height: 36px; font-size: 0.85rem;">Incluir na Lista</button>
+        </div>
+
+        <div class="wizard-footer">
+          <div></div> <!-- Vazio para alinhar avançar à direita -->
+          <button type="button" id="btnStep1Avancar" class="btn-confirmar">Avançar</button>
+        </div>
+      </div>
+
+      <!-- ==================== PASSO 2: FAMÍLIA ==================== -->
+      <div id="step2" class="wizard-step">
+        <p style="font-size: 0.9rem; color: var(--ssvp-text-main); margin-bottom: 1rem;">
+          Selecione qual família você vai visitar hoje.
+        </p>
+
+        <div class="list-container" id="familiasList">
+          <!-- Gerado dinamicamente -->
+        </div>
+
+        <!-- Cadastro rápido de Família de Teste -->
+        <div class="cadastro-rapido">
+          <div class="cadastro-rapido-title">Adicionar Família de Teste</div>
+          <div class="grid-2" style="margin-bottom: 10px;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <input type="text" id="novaFamNome" placeholder="Nome da Família">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <input type="tel" id="novaFamTelefone" placeholder="Telefone do Assistido">
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom: 10px;">
+            <input type="text" id="novaFamEndereco" placeholder="Endereço de destino (Ex: Rua Vergueiro, 3000, SP)">
+          </div>
+          <button type="button" id="btnAdicionarFam" style="width: 100%; height: 36px; font-size: 0.85rem;">Incluir na Lista</button>
+        </div>
+
+        <div class="wizard-footer">
+          <button type="button" id="btnStep2Voltar" class="btn-cancelar">Voltar</button>
+          <button type="button" id="btnStep2Avancar" class="btn-confirmar">Avançar</button>
+        </div>
+      </div>
+
+      <!-- ==================== PASSO 3: PARTIDA ==================== -->
+      <div id="step3" class="wizard-step">
+        <p style="font-size: 0.9rem; color: var(--ssvp-text-main); margin-bottom: 1rem;">
+          Mande a mensagem de partida no WhatsApp para cada participante e inicie a rota de GPS.
+        </p>
+
+        <div class="form-group">
+          <label class="form-label" for="mensagemPartida">Mensagem de Saída (Editável)</label>
+          <input type="text" id="mensagemPartida" value="Estou saindo de casa agora para nossa visita!">
+        </div>
+
+        <div style="font-weight: 700; font-size: 0.85rem; color: var(--ssvp-navy); margin: 1.25rem 0 0.5rem 0; text-transform: uppercase;">
+          Fila de Mensagens do WhatsApp:
+        </div>
+
+        <div id="whatsappPartidaFila">
+          <!-- Gerado dinamicamente -->
+        </div>
+
+        <div class="wizard-footer" style="flex-direction: column; gap: 8px;">
+          <button type="button" id="btnIniciarRotaMaps" style="width: 100%; background-color: var(--ssvp-blue);" disabled>
+            Iniciar Rota no Google Maps
+          </button>
+          <button type="button" id="btnStep3Voltar" class="btn-cancelar" style="width: 100%;">
+            Voltar
+          </button>
+        </div>
+      </div>
+
+      <!-- ==================== PASSO 4: EM TRÂNSITO ==================== -->
+      <div id="step4" class="wizard-step">
+        <div class="transito-container">
+          <span class="car-icon">🚗</span>
+          <h4 style="color: var(--ssvp-navy); font-weight: 700; margin-bottom: 8px;" id="transitoTitulo">Viagem em Andamento</h4>
+          <p style="font-size: 0.85rem; color: var(--ssvp-text-main);" id="transitoDetalhes">
+            Google Maps aberto em segundo plano com a rota calculada.
+          </p>
+        </div>
+
+        <p style="font-size: 0.9rem; color: var(--ssvp-text-main); margin-bottom: 1rem; text-align: center;">
+          Ao chegar próximo ao endereço da família, envie a mensagem de aproximação:
+        </p>
+
+        <div class="form-group">
+          <label class="form-label" for="mensagemChegando">Mensagem de Chegada</label>
+          <input type="text" id="mensagemChegando" value="Estamos chegando à sua casa!">
+        </div>
+
+        <button type="button" id="btnAvisarChegada" class="btn-cancelar" style="width: 100%; height: var(--input-height, 48px); font-size: 1.05rem; margin-bottom: 1.5rem;">
+          Avisar Chegada (WhatsApp)
+        </button>
+
+        <div class="wizard-footer">
+          <button type="button" id="btnResetarVisita" class="btn-excluir" style="width: 100%;">
+            Concluir / Resetar Simulador
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Script da Sandbox e Logica de Roteamento -->
+  <script src="../_infra_testes/sandbox.js"></script>
+  <script>
+    // 1. Inicializar Sandbox
+    inicializarSandbox({
+      id_teste: "gmaps_simulador_visita",
+      titulo: "Google Maps - Simulador de Visita",
+      versao: "teste v1.0",
+      instrucoes: [
+        "Este simulador apoia a preparação de visitas residenciais vicentinas organizando a rota de carro e contatos rápidos.",
+        "Passo 1: Selecione os companheiros que vão com você na visita de carro (Nenhum, um ou mais).",
+        "Passo 2: Selecione a família a ser visitada.",
+        "Passo 3: Mande a mensagem no WhatsApp de saída e inicie a rota com waypoints gerada para o Google Maps nativo.",
+        "Passo 4: Quando o carro estiver chegando no destino, envie o alerta 'Estamos chegando' pelo WhatsApp."
+      ],
+      controles: [
+        { variavel: "--btn-padding", label: "Padding lateral Botões", tipo: "range", min: 6, max: 24, padrao: 18, unit: "px" },
+        { variavel: "--input-height", label: "Altura de Inputs/Botões", tipo: "range", min: 36, max: 64, padrao: 44, unit: "px" }
+      ]
+    });
+
+    // 2. Dados de Simulação (Fictícios Iniciais)
+    let vicentinos = [
+      { id: 1, nome: "Pedro Oliveira", telefone: "5511987654321", endereco: "Av. Paulista, 1000, São Paulo, SP", selecionado: false },
+      { id: 2, nome: "Lucas Souza", telefone: "5511976543210", endereco: "Av. Brigadeiro Luís Antônio, 2500, São Paulo, SP", selecionado: false },
+      { id: 3, nome: "Ana Costa", telefone: "5511965432109", endereco: "Rua Augusta, 1500, São Paulo, SP", selecionado: false }
+    ];
+
+    let familias = [
+      { id: 1, nome: "Família Santos", telefone: "5511954321098", endereco: "Rua Domingos de Morais, 500, Vila Mariana, São Paulo, SP" },
+      { id: 2, nome: "Família Silva", telefone: "5511943210987", endereco: "Rua Vergueiro, 3000, Paraíso, São Paulo, SP" }
+    ];
+
+    let familiaSelecionadaId = null;
+    let whatsappEnviadosStatus = {}; // Rastreia quais mensagens já foram clicadas
+
+    // 3. Seletores de Elementos
+    const wizardStepTitle = document.getElementById('wizardStepTitle');
+    const wizardStepBadge = document.getElementById('wizardStepBadge');
+    const guiaRetorno = document.getElementById('guiaRetorno');
+    
+    const steps = [
+      { id: 'step1', title: 'Companheiros (Passo 1)' },
+      { id: 'step2', title: 'Família (Passo 2)' },
+      { id: 'step3', title: 'Partida (Passo 3)' },
+      { id: 'step4', title: 'Trânsito (Passo 4)' }
+    ];
+
+    let passoAtual = 1;
+
+    // 4. Lógica de Navegação do Wizard
+    function irParaPasso(numero) {
+      passoAtual = numero;
+      
+      // Ocultar todos os passos e ativar o correto
+      steps.forEach((step, idx) => {
+        const div = document.getElementById(step.id);
+        if (idx + 1 === numero) {
+          div.classList.add('active');
+          wizardStepTitle.innerText = step.title;
+          wizardStepBadge.innerText = `Passo ${numero} de 4`;
+        } else {
+          div.classList.remove('active');
+        }
+      });
+
+      // Gerenciar alertas específicos de passo
+      if (passoAtual === 3) {
+        renderFilaWhatsApp();
+        guiaRetorno.classList.add('ativo');
+      } else {
+        guiaRetorno.classList.remove('ativo');
+      }
+
+      if (passoAtual === 4) {
+        atualizarTelaTransito();
+      }
+    }
+
+    // 5. Renderizar Listas do Passo 1 e 2
+    function renderVicentinos() {
+      const container = document.getElementById('vicentinosList');
+      container.innerHTML = '';
+      
+      vicentinos.forEach(vic => {
+        const card = document.createElement('div');
+        card.className = `item-card ${vic.selecionado ? 'selected' : ''}`;
+        card.innerHTML = `
+          <input type="checkbox" class="item-card-checkbox" ${vic.selecionado ? 'checked' : ''}>
+          <div class="item-card-info">
+            <div class="item-card-title">${vic.nome}</div>
+            <div class="item-card-subtitle">${vic.endereco}</div>
+          </div>
+        `;
+        
+        // Clique ativa/desativa checkbox
+        card.addEventListener('click', (e) => {
+          if (e.target.type !== 'checkbox') {
+            vic.selecionado = !vic.selecionado;
+          } else {
+            vic.selecionado = e.target.checked;
+          }
+          renderVicentinos();
+        });
+
+        container.appendChild(card);
+      });
+    }
+
+    function renderFamilias() {
+      const container = document.getElementById('familiasList');
+      container.innerHTML = '';
+
+      familias.forEach(fam => {
+        const card = document.createElement('div');
+        card.className = `item-card ${familiaSelecionadaId === fam.id ? 'selected' : ''}`;
+        card.innerHTML = `
+          <div class="item-card-info">
+            <div class="item-card-title">${fam.nome}</div>
+            <div class="item-card-subtitle">${fam.endereco}</div>
+          </div>
+        `;
+
+        card.addEventListener('click', () => {
+          familiaSelecionadaId = fam.id;
+          renderFamilias();
+        });
+
+        container.appendChild(card);
+      });
+    }
+
+    // 6. Cadastros Rápidos (Testes Locais)
+    document.getElementById('btnAdicionarVic').addEventListener('click', () => {
+      const nome = document.getElementById('novoVicNome').value.trim();
+      const telefone = document.getElementById('novoVicTelefone').value.trim().replace(/\D/g, '');
+      const endereco = document.getElementById('novoVicEndereco').value.trim();
+
+      if (!nome || !telefone || !endereco) {
+        alert("Preencha todos os campos do vicentino.");
+        return;
+      }
+
+      vicentinos.push({
+        id: Date.now(),
+        nome: nome,
+        telefone: telefone.startsWith('55') ? telefone : '55' + telefone,
+        endereco: endereco,
+        selecionado: true
+      });
+
+      document.getElementById('novoVicNome').value = '';
+      document.getElementById('novoVicTelefone').value = '';
+      document.getElementById('novoVicEndereco').value = '';
+
+      renderVicentinos();
+    });
+
+    document.getElementById('btnAdicionarFam').addEventListener('click', () => {
+      const nome = document.getElementById('novaFamNome').value.trim();
+      const telefone = document.getElementById('novaFamTelefone').value.trim().replace(/\D/g, '');
+      const endereco = document.getElementById('novaFamEndereco').value.trim();
+
+      if (!nome || !telefone || !endereco) {
+        alert("Preencha todos os campos da família.");
+        return;
+      }
+
+      const novaFam = {
+        id: Date.now(),
+        nome: nome,
+        telefone: telefone.startsWith('55') ? telefone : '55' + telefone,
+        endereco: endereco
+      };
+
+      familias.push(novaFam);
+      familiaSelecionadaId = novaFam.id;
+
+      document.getElementById('novaFamNome').value = '';
+      document.getElementById('novaFamTelefone').value = '';
+      document.getElementById('novaFamEndereco').value = '';
+
+      renderFamilias();
+    });
+
+    // 7. Lógica do Passo 3 (Mensagens de WhatsApp & Rota)
+    function renderFilaWhatsApp() {
+      const container = document.getElementById('whatsappPartidaFila');
+      container.innerHTML = '';
+
+      const vicSelecionados = vicentinos.filter(v => v.selecionado);
+      const famSelecionada = familias.find(f => f.id === familiaSelecionadaId);
+
+      const msg = encodeURIComponent(document.getElementById('mensagemPartida').value);
+      
+      const contatos = [];
+
+      // Monta contatos que receberão a mensagem de saída
+      vicSelecionados.forEach(v => {
+        contatos.push({ tipo: 'Vicentino', id: `vic-${v.id}`, nome: v.nome, telefone: v.telefone });
+      });
+
+      if (famSelecionada) {
+        contatos.push({ tipo: 'Família', id: `fam-${famSelecionada.id}`, nome: famSelecionada.nome, telefone: famSelecionada.telefone });
+      }
+
+      if (contatos.length === 0) {
+        container.innerHTML = '<p style="color: var(--ssvp-text-muted); font-style: italic; text-align: center; padding: 10px;">Nenhum participante ou família selecionada.</p>';
+        document.getElementById('btnIniciarRotaMaps').disabled = false; // Pode abrir direto
+        return;
+      }
+
+      contatos.forEach(c => {
+        const row = document.createElement('div');
+        row.className = 'btn-whatsapp-row';
+        
+        const isSent = whatsappEnviadosStatus[c.id];
+        
+        row.innerHTML = `
+          <span class="btn-whatsapp-status ${isSent ? 'status-checked' : 'status-pending'}">
+            ${isSent ? '✓' : '•'}
+          </span>
+          <button type="button" class="btn-cancelar" style="font-size: 0.85rem;">
+            Enviar para ${c.tipo}: ${c.nome}
+          </button>
+        `;
+
+        // Clique no botão abre WhatsApp
+        row.querySelector('button').addEventListener('click', () => {
+          whatsappEnviadosStatus[c.id] = true;
+          renderFilaWhatsApp();
+          window.open(`https://wa.me/${c.telefone}?text=${msg}`, '_blank');
+        });
+
+        container.appendChild(row);
+      });
+
+      // Só ativa o botão do Maps quando todos os whatsapps da fila tiverem sido clicados!
+      const totalEnviados = contatos.every(c => whatsappEnviadosStatus[c.id]);
+      document.getElementById('btnIniciarRotaMaps').disabled = !totalEnviados;
+    }
+
+    // Botão de Rota do Maps com Waypoints
+    document.getElementById('btnIniciarRotaMaps').addEventListener('click', () => {
+      const fam = familias.find(f => f.id === familiaSelecionadaId);
+      if (!fam) {
+        alert("Nenhuma família selecionada!");
+        return;
+      }
+
+      const vicSelecionados = vicentinos.filter(v => v.selecionado);
+      
+      const origin = "My+Location";
+      const destination = encodeURIComponent(fam.endereco);
+      
+      let waypoints = '';
+      if (vicSelecionados.length > 0) {
+        waypoints = '&waypoints=' + vicSelecionados.map(v => encodeURIComponent(v.endereco)).join('|');
+      }
+
+      // URL de rota do Google Maps
+      const gmapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}${waypoints}`;
+      
+      // Abrir Maps nativo
+      window.open(gmapsUrl, '_blank');
+
+      // Avança para a tela de trânsito
+      irParaPasso(4);
+    });
+
+    // 8. Lógica do Passo 4 (Em trânsito)
+    function atualizarTelaTransito() {
+      const fam = familias.find(f => f.id === familiaSelecionadaId);
+      const vicSelecionados = vicentinos.filter(v => v.selecionado);
+
+      const listNomes = vicSelecionados.map(v => v.nome).join(', ');
+      
+      document.getElementById('transitoTitulo').innerText = `Rota para a ${fam ? fam.nome : 'Família'}`;
+      document.getElementById('transitoDetalhes').innerText = `Carro com: ${listNomes || 'Apenas o motorista'}.\nDestino: ${fam ? fam.endereco : ''}`;
+    }
+
+    // Botão Avisar Chegada
+    document.getElementById('btnAvisarChegada').addEventListener('click', () => {
+      const fam = familias.find(f => f.id === familiaSelecionadaId);
+      if (!fam) return;
+
+      const msg = encodeURIComponent(document.getElementById('mensagemChegando').value);
+      window.open(`https://wa.me/${fam.telefone}?text=${msg}`, '_blank');
+    });
+
+    // Botões de Navegação Básica do Wizard
+    document.getElementById('btnStep1Avancar').addEventListener('click', () => irParaPasso(2));
+    
+    document.getElementById('btnStep2Voltar').addEventListener('click', () => irParaPasso(1));
+    document.getElementById('btnStep2Avancar').addEventListener('click', () => {
+      if (!familiaSelecionadaId) {
+        alert("Por favor, selecione uma família antes de avançar.");
+        return;
+      }
+      irParaPasso(3);
+    });
+    
+    document.getElementById('btnStep3Voltar').addEventListener('click', () => irParaPasso(2));
+
+    // Resetar Simulador
+    document.getElementById('btnResetarVisita').addEventListener('click', () => {
+      // Limpa seleções e status de envio
+      vicentinos.forEach(v => v.selecionado = false);
+      familiaSelecionadaId = null;
+      whatsappEnviadosStatus = {};
+      
+      renderVicentinos();
+      renderFamilias();
+      irParaPasso(1);
+    });
+
+    // 9. Inicialização da View
+    renderVicentinos();
+    renderFamilias();
+    irParaPasso(1);
+  </script>
+</body>
+</html>
