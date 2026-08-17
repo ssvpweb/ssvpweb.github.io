@@ -137,6 +137,14 @@
       flex: 1;
       min-width: 110px;
       height: var(--input-height, 44px);
+      flex-shrink: 0;
+    }
+
+    /* Neutraliza distorções de altura quando os botões são empilhados verticalmente */
+    .wizard-footer[style*="column"] button {
+      flex: none;
+      width: 100%;
+      height: var(--input-height, 44px);
     }
 
     /* Botão de Enviar WhatsApp com estilo específico */
