@@ -1,6 +1,6 @@
-# Planejamento - Simulador de Visita (Voz e POIs)
+# Planejamento - Simulador de Visita (Voz e Referências)
 
-Este documento registra os requisitos, fluxos de funcionamento e decisões de design para o desenvolvimento do **Teste 2 do Simulador de Visita**, focado em **Busca por Voz e Pontos de Interesse (POIs)** no OpenStreetMap (OSM) e comunicação privada via WhatsApp.
+Este documento registra os requisitos, fluxos de funcionamento e decisões de design para o desenvolvimento do **Teste 2 do Simulador de Visita**, focado em **Busca por Voz e Pontos de Referência** no OpenStreetMap (OSM) e comunicação privada via WhatsApp.
 
 ---
 
@@ -20,7 +20,7 @@ Este documento registra os requisitos, fluxos de funcionamento e decisões de de
 
 ---
 
-## 🛠️ Funcionamento do Reconhecimento de Voz & Roteamento por POIs
+## 🛠️ Funcionamento do Reconhecimento de Voz & Roteamento por Pontos de Referência
 
 ```mermaid
 graph TD
