@@ -558,7 +558,7 @@
     inicializarSandbox({
       id_teste: "gmaps_simulador_visita_voz_referencias",
       titulo: "Google Maps - Simulador de Visita (Voz/Referências)",
-      versao: "teste v1.0",
+      versao: "teste v1.1",
       instrucoes: [
         "Este simulador usa reconhecimento de voz e pesquisa geolocalizada no OpenStreetMap (Nominatim).",
         "Passo 1: Fale ou digite nomes de referências (Ex: Drogasil, Carrefour) onde buscará os companheiros e adicione na rota.",
@@ -579,6 +579,7 @@
     let whatsappEnviadosStatus = {};
 
     let userCoordinates = { lat: -23.5505, lon: -46.6333 }; // Fallback SP Central
+    let gpsSucesso = false; // Flag para rastrear se a geolocalização do usuário foi obtida com sucesso
     let activeSearchInputId = 'buscaVicPOI'; // Controla qual input a voz vai preencher
 
     // 3. Obter Geolocalização GPS Inicial para buscas locais precisas
@@ -587,10 +588,12 @@
         (position) => {
           userCoordinates.lat = position.coords.latitude;
           userCoordinates.lon = position.coords.longitude;
-          console.log("GPS obtido:", userCoordinates);
+          gpsSucesso = true;
+          console.log("GPS obtido com sucesso:", userCoordinates);
         },
         (error) => {
           console.warn("GPS negado/erro. Usando São Paulo central como fallback:", error.message);
+          gpsSucesso = false;
         }
       );
     }
@@ -940,11 +943,15 @@
       
       let waypoints = '';
       if (vicentinosSelecionados.length > 0) {
-        waypoints = '&waypoints=' + vicentinosSelecionados.map(v => `${v.lat},${v.lon}`).join('|');
+        // Correção: Codificação do caractere pipe (|) para %7C para evitar truncamento e mal parser no mobile
+        waypoints = '&waypoints=' + vicentinosSelecionados.map(v => `${v.lat},${v.lon}`).join('%7C');
       }
 
-      // Monta URL de Direções do Maps nativa (sem origin para usar a localização atual)
-      const gmapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${destCoords}${waypoints}&travelmode=${modoTransporte}`;
+      // Correção: Definir origem explícita para evitar que o Google Maps mobile perca a rota dos waypoints até o destino
+      const originParam = gpsSucesso ? `${userCoordinates.lat},${userCoordinates.lon}` : 'My+Location';
+
+      // Monta URL de Direções do Maps nativa (com origem e destinos estruturados)
+      const gmapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${originParam}&destination=${destCoords}${waypoints}&travelmode=${modoTransporte}`;
 
       // Redireciona na página atual (evita bloqueador de pop-ups)
       window.location.href = gmapsUrl;
