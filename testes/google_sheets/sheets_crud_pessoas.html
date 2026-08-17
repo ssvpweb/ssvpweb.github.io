@@ -59,6 +59,13 @@
       transition: all 0.25s ease;
     }
 
+    form.modo-edicao #btnSubmit {
+      background-color: var(--ssvp-success);
+    }
+    form.modo-edicao #btnSubmit:hover {
+      background-color: #0f9f6e;
+    }
+
     .actions-btn {
       display: flex;
       flex-wrap: wrap;
@@ -96,9 +103,10 @@
     button:disabled { background-color: var(--ssvp-text-muted); cursor: not-allowed; }
     
     .btn-secondary {
-      background-color: var(--ssvp-navy);
+      background-color: #f59e0b; /* Amarelo Ouro Acessível */
+      color: var(--ssvp-navy);
     }
-    .btn-secondary:hover { background-color: #001f44; }
+    .btn-secondary:hover { background-color: #d97706; }
 
     .btn-delete {
       background-color: var(--ssvp-red);
@@ -207,7 +215,7 @@
 
       <div class="actions-btn">
         <button type="submit" id="btnSubmit">Cadastrar Pessoa</button>
-        <button type="button" id="btnDelete" class="btn-delete" style="display: none;">⚠️ Excluir Registro</button>
+        <button type="button" id="btnDelete" class="btn-delete" style="display: none;">Excluir Registro</button>
         <button type="button" id="btnCancel" class="btn-secondary" style="display: none;">Cancelar Edição</button>
       </div>
     </form>
@@ -433,7 +441,7 @@
         showStatus('Erro ao excluir: ' + err.message, true);
       } finally {
         btnDelete.disabled = false;
-        btnDelete.innerText = '⚠️ Excluir Registro';
+        btnDelete.innerText = 'Excluir Registro';
       }
     });
 
