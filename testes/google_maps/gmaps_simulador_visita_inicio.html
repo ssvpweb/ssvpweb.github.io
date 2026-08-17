@@ -11,6 +11,16 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
+    /* Prevenção de seleção acidental de texto (evita o Touch to Search do Chrome) */
+    body {
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    input, textarea {
+      -webkit-user-select: text;
+      user-select: text;
+    }
+
     /* Estilos locais para o fluxo de Wizard */
     .wizard-header {
       display: flex;
@@ -403,7 +413,7 @@
         </div>
 
         <div class="wizard-footer" style="flex-direction: column; gap: 8px;">
-          <button type="button" id="btnIniciarRotaMaps" style="width: 100%; background-color: var(--ssvp-blue);" disabled>
+          <button type="button" id="btnIniciarRotaMaps" style="width: 100%; background-color: var(--ssvp-blue);">
             Iniciar Rota no Google Maps
           </button>
           <button type="button" id="btnStep3Voltar" class="btn-cancelar" style="width: 100%;">
@@ -453,7 +463,7 @@
     inicializarSandbox({
       id_teste: "gmaps_simulador_visita_inicio",
       titulo: "Google Maps - Simulador de Visita (Início)",
-      versao: "teste v1.2",
+      versao: "teste v1.3",
       instrucoes: [
         "Este simulador apoia a preparação de visitas residenciais vicentinas organizando a rota de carro e contatos rápidos.",
         "Passo 1: Selecione os companheiros que vão com você na visita de carro (Nenhum, um ou mais).",
@@ -683,9 +693,8 @@
         container.appendChild(row);
       });
 
-      // Só ativa o botão do Maps quando todos os whatsapps da fila tiverem sido clicados!
-      const totalEnviados = contatos.every(c => whatsappEnviadosStatus[c.id]);
-      document.getElementById('btnIniciarRotaMaps').disabled = !totalEnviados;
+      // O botão do Maps agora fica sempre habilitado (o envio de whatsapps da fila passa a ser opcional para usabilidade)
+      document.getElementById('btnIniciarRotaMaps').disabled = false;
     }
 
     // Botão de Rota do Maps com Waypoints
