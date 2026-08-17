@@ -558,7 +558,7 @@
     inicializarSandbox({
       id_teste: "gmaps_simulador_visita_voz_referencias",
       titulo: "Google Maps - Simulador de Visita (Voz/Referências)",
-      versao: "teste v1.1",
+      versao: "teste v1.2",
       instrucoes: [
         "Este simulador usa reconhecimento de voz e pesquisa geolocalizada no OpenStreetMap (Nominatim).",
         "Passo 1: Fale ou digite nomes de referências (Ex: Drogasil, Carrefour) onde buscará os companheiros e adicione na rota.",
@@ -670,11 +670,12 @@
       const container = document.getElementById(resultsContainerId);
       container.innerHTML = '<p style="font-size: 0.85rem; color: var(--ssvp-text-muted); font-style: italic;">Pesquisando locais próximos...</p>';
 
-      // Monta caixa de bounding box aproximada de 10km ao redor do motorista para priorizar resultados locais
-      const delta = 0.09; // aprox 10km em graus geográficos
+      // Monta caixa de bounding box aproximada de 5km ao redor do motorista para restringir resultados locais
+      const delta = 0.045; // aprox 5km em graus geográficos
       const viewbox = `${userCoordinates.lon - delta},${userCoordinates.lat + delta},${userCoordinates.lon + delta},${userCoordinates.lat - delta}`;
 
-      const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=3&viewbox=${viewbox}&bounded=0&addressdetails=1`;
+      // countrycodes=br para limitar ao Brasil e bounded=1 para limitar estritamente à viewbox de 5km
+      const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=3&viewbox=${viewbox}&bounded=1&countrycodes=br&addressdetails=1`;
 
       try {
         const response = await fetch(url, {
@@ -734,6 +735,7 @@
       }
     });
 
+    // Ações manuais de clique em Buscar
     document.getElementById('btnBuscaFam').addEventListener('click', () => {
       const val = document.getElementById('buscaFamPOI').value.trim();
       if (val) {
