@@ -105,28 +105,27 @@
     }
     
     .sim-nav-btn {
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
-      background: var(--sim-btn-bg, var(--ssvp-light-blue));
-      color: var(--sim-btn-color, var(--ssvp-text-muted));
-      border: none;
+      width: 60px;
+      height: 50px;
+      border-radius: 14px;
+      background: var(--sim-btn-bg, #ffffff);
+      color: var(--sim-btn-color, #3b82f6);
+      border: 2px solid var(--sim-btn-border, #e2e8f0);
       display: flex;
       justify-content: center;
       align-items: center;
       cursor: pointer;
-      font-size: 1.5rem;
-      font-weight: 700;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all var(--transition-duration, 350ms) cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
       box-sizing: border-box;
-      padding: 12px;
+      padding: 10px;
     }
     
     /* O microfone central com tamanho igual */
     .sim-nav-btn.mic-btn {
-      background: var(--sim-btn-bg, var(--ssvp-blue));
-      color: var(--sim-btn-color, white);
+      background: var(--sim-btn-bg, #3b82f6);
+      color: var(--sim-btn-color, #ffffff);
+      border-color: var(--sim-btn-bg, #3b82f6);
     }
     
     .sim-nav-btn.active {
@@ -151,7 +150,7 @@
       background: rgba(15, 23, 42, 0.6); /* Backdrop escuro */
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.3s ease;
+      transition: opacity var(--transition-duration, 350ms) ease;
       z-index: 10;
     }
     
@@ -180,7 +179,7 @@
       opacity: 0;
       pointer-events: none;
       transform: translate(-50%, -50%) scale(0.1);
-      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition: all var(--transition-duration, 350ms) cubic-bezier(0.34, 1.56, 0.64, 1);
     }
     
     .morphing-card.active {
@@ -196,6 +195,11 @@
       border-bottom: 1px solid var(--ssvp-gray-border);
       padding-bottom: 0.5rem;
       margin-bottom: 0.75rem;
+      
+      /* Oculta inicialmente e revela por sequenciamento */
+      opacity: 0;
+      transition: opacity 0.25s ease;
+      transition-delay: 0s;
     }
     
     .card-title {
@@ -213,6 +217,18 @@
       font-size: 0.85rem;
       color: var(--ssvp-text-main);
       line-height: 1.45;
+      
+      /* Oculta inicialmente e revela por sequenciamento */
+      opacity: 0;
+      transition: opacity 0.25s ease;
+      transition-delay: 0s;
+    }
+    
+    /* Quando ativo, aplica o delay para revelar depois que o card crescer */
+    .morphing-card.active .card-header,
+    .morphing-card.active .card-body {
+      opacity: 1;
+      transition-delay: var(--transition-duration, 350ms);
     }
     
     .close-btn-x {
@@ -265,29 +281,36 @@
 
   <main class="container">
     
-    <!-- Painel de Customização de Cores (SSVP) -->
+    <!-- Painel de Customização de Cores e Velocidade (SSVP) -->
     <section class="panel" style="margin-bottom: 1.5rem; border-left: 4px solid var(--ssvp-blue); background: var(--ssvp-light-blue); padding: 1rem;">
       <h3 style="font-size: 0.95rem; font-weight: 700; color: var(--ssvp-navy); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
-        🎨 Simulador de Cores SSVP (Teste de Contraste)
+        🎨 Calibrador de Visual & Animação (SSVP)
       </h3>
       <div class="color-select-grid">
         <div style="display: flex; flex-direction: column; gap: 0.25rem;">
           <label for="select-btn-bg" style="font-size: 0.8rem; font-weight: 600; color: var(--ssvp-text-main);">Cor de Fundo dos Botões:</label>
           <select id="select-btn-bg" style="padding: 0.5rem; border-radius: 8px; border: 1px solid var(--ssvp-gray-border); background: var(--ssvp-white); color: var(--ssvp-text-main); font-size: 0.85rem; font-weight: 600;">
-            <option value="var(--ssvp-light-blue)" selected>Azul Gelo/Claro (Padrão)</option>
+            <option value="#ffffff" selected>Branco (#ffffff - Padrão)</option>
+            <option value="var(--ssvp-light-blue)">Azul Gelo/Claro</option>
             <option value="#1e293b">Azul Marinho SSVP (#1e293b)</option>
             <option value="#3b82f6">Azul Royal SSVP (#3b82f6)</option>
-            <option value="#ffffff">Branco (#ffffff)</option>
           </select>
         </div>
         <div style="display: flex; flex-direction: column; gap: 0.25rem;">
           <label for="select-btn-color" style="font-size: 0.8rem; font-weight: 600; color: var(--ssvp-text-main);">Cor dos Ícones/Desenho:</label>
           <select id="select-btn-color" style="padding: 0.5rem; border-radius: 8px; border: 1px solid var(--ssvp-gray-border); background: var(--ssvp-white); color: var(--ssvp-text-main); font-size: 0.85rem; font-weight: 600;">
-            <option value="var(--ssvp-text-muted)">Cinza Médio (Padrão)</option>
-            <option value="#ffffff" selected>Branco (#ffffff)</option>
+            <option value="#3b82f6" selected>Azul Royal (#3b82f6 - Padrão)</option>
             <option value="#1e293b">Azul Marinho (#1e293b)</option>
-            <option value="#3b82f6">Azul Royal (#3b82f6)</option>
+            <option value="#ffffff">Branco (#ffffff)</option>
+            <option value="var(--ssvp-text-muted)">Cinza Médio</option>
           </select>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 0.25rem; grid-column: 1 / -1; margin-top: 0.5rem;">
+          <label for="input-speed" style="font-size: 0.8rem; font-weight: 600; color: var(--ssvp-text-main); display: flex; justify-content: space-between;">
+            <span>Velocidade da Transição (Morphing):</span>
+            <span id="speed-val-display" style="color: var(--ssvp-blue); font-weight: 700;">350ms</span>
+          </label>
+          <input type="range" id="input-speed" min="100" max="2000" step="50" value="350" style="width: 100%; cursor: pointer;">
         </div>
       </div>
     </section>
@@ -340,9 +363,12 @@
             <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg>
           </button>
           
-          <!-- Botão Direito (Ajuda - Question Mark SVG sem círculo externo) -->
+          <!-- Botão Direito (Ajuda - Question Mark SVG sem círculo externo - Traço Grosso) -->
           <button id="btn-ajuda" class="sim-nav-btn" data-type="ajuda" aria-label="Central de Ajuda e Tutoriais">
-            <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2c-3.86 0-7 3.14-7 7h2c0-2.76 2.24-5 5-5s5 2.24 5 5c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-3.86-3.14-7-7-7zm-1 16h2v2h-2v-2z"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
           </button>
           
         </nav>
@@ -486,14 +512,36 @@
       simBottomBar.style.setProperty('--sim-btn-bg', bg);
       simBottomBar.style.setProperty('--sim-btn-color', color);
       
+      // Se fundo é branco, coloca borda colorida para dar contraste
+      if (bg === '#ffffff') {
+        simBottomBar.style.setProperty('--sim-btn-border', color);
+      } else {
+        simBottomBar.style.setProperty('--sim-btn-border', 'transparent');
+      }
+      
       logConsole(`Cores alteradas no simulador: fundo=${bg}, ícones/símbolos=${color}`);
     }
 
     selectBtnBg.addEventListener('change', updateButtonColors);
     selectBtnColor.addEventListener('change', updateButtonColors);
+
+    // Controle de Velocidade da Animação (Slider)
+    const inputSpeed = document.getElementById('input-speed');
+    const speedValDisplay = document.getElementById('speed-val-display');
+
+    function updateTransitionSpeed() {
+      const val = inputSpeed.value;
+      speedValDisplay.textContent = `${val}ms`;
+      morphingCard.style.setProperty('--transition-duration', `${val}ms`);
+      overlayBackdrop.style.setProperty('--transition-duration', `${val}ms`);
+      logConsole(`Velocidade da animação calibrada para: ${val}ms`);
+    }
+
+    inputSpeed.addEventListener('input', updateTransitionSpeed);
     
-    // Inicializa as cores de teste
+    // Inicializa os testes
     updateButtonColors();
+    updateTransitionSpeed();
   </script>
 
 </body>
