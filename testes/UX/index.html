@@ -355,7 +355,7 @@
           <span>🔑 Interfaces de Autenticação</span>
         </div>
         <p class="test-desc">
-          Protótipos visuais e acessibilidade na tela de login para colaboradores vicentinos.
+          Protótipos visuais e simulações de segurança/usabilidade de login para os vicentinos colaboradores.
         </p>
         
         <ul class="evolution-list">
@@ -365,8 +365,77 @@
               <span>Tela de Login Responsiva Geral</span>
             </a>
           </li>
+          <li class="evolution-item">
+            <a href="../login/v1_pin.html">
+              <span class="version-badge">v1.0</span>
+              <span>Login por PIN Numérico (Simulador de Crack)</span>
+            </a>
+          </li>
+          <li class="evolution-item">
+            <a href="../login/v2_senha.html">
+              <span class="version-badge">v1.0</span>
+              <span>Login por Senha Complexa (Simulador de Crack)</span>
+            </a>
+          </li>
         </ul>
       </section>
+      
+    </div>
+
+    <!-- Seção Comparativa de Métodos de Login -->
+    <section class="panel" style="margin-top: 2rem; background: var(--ssvp-white); border: 1px solid var(--ssvp-gray-border); padding: 1.5rem; border-radius: 16px;">
+      <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--ssvp-navy); margin-bottom: 0.75rem; text-align: center; border-bottom: 2px solid var(--ssvp-light-blue); padding-bottom: 0.5rem;">
+        Análise Comparativa de Métodos de Login
+      </h2>
+      <p style="font-size: 0.85rem; color: var(--ssvp-text-muted); margin-bottom: 1rem; text-align: center;">
+        Prós, contras e viabilidade de implementação para a realidade das Conferências Vicentinas da SSVP.
+      </p>
+      
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.825rem; text-align: left;">
+          <thead>
+            <tr style="background: var(--ssvp-navy); color: white;">
+              <th style="padding: 0.6rem; border: 1px solid var(--ssvp-gray-border);">Método</th>
+              <th style="padding: 0.6rem; border: 1px solid var(--ssvp-gray-border);">Prós</th>
+              <th style="padding: 0.6rem; border: 1px solid var(--ssvp-gray-border);">Contras</th>
+              <th style="padding: 0.6rem; border: 1px solid var(--ssvp-gray-border);">Recomendação para a SSVP</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding: 0.6rem; border: 1px solid var(--ssvp-gray-border); font-weight: bold; color: var(--ssvp-navy);">PIN (v1.0)</td>
+              <td style="padding: 0.6rem; border: 1px solid var(--ssvp-gray-border);">Simples e rápido de digitar em celulares; fácil memorização.</td>
+              <td style="padding: 0.6rem; border: 1px solid var(--ssvp-gray-border); color: #ef4444;">Baixa segurança; quebra offline instantânea se os hashes vazarem.</td>
+              <td style="padding: 0.6rem; border: 1px solid var(--ssvp-gray-border);">Apenas para desbloqueio local temporário de tela.</td>
+            </tr>
+            <tr style="background: var(--ssvp-light-blue);">
+              <td style="padding: 0.6rem; border: 1px solid var(--ssvp-gray-border); font-weight: bold; color: var(--ssvp-navy);">Senha (v2.0)</td>
+              <td style="padding: 0.6rem; border: 1px solid var(--ssvp-gray-border);">Padrão de mercado; altamente segura se for longa.</td>
+              <td style="padding: 0.6rem; border: 1px solid var(--ssvp-gray-border);">Difícil digitação/memorização por voluntários idosos.</td>
+              <td style="padding: 0.6rem; border: 1px solid var(--ssvp-gray-border);">Bom padrão para a segurança base da conta principal.</td>
+            </tr>
+            <tr>
+              <td style="padding: 0.6rem; border: 1px solid var(--ssvp-gray-border); font-weight: bold; color: var(--ssvp-navy);">Magic Link / OTP</td>
+              <td style="padding: 0.6rem; border: 1px solid var(--ssvp-gray-border);">Sem senhas locais; seguro contra vazamentos de base de dados.</td>
+              <td style="padding: 0.6rem; border: 1px solid var(--ssvp-gray-border);">Depende da entrega rápida de e-mail/SMS em tempo real.</td>
+              <td style="padding: 0.6rem; border: 1px solid var(--ssvp-gray-border);">Excelente alternativa passwordless para login prático.</td>
+            </tr>
+            <tr style="background: var(--ssvp-light-blue);">
+              <td style="padding: 0.6rem; border: 1px solid var(--ssvp-gray-border); font-weight: bold; color: var(--ssvp-navy);">Google Sign-In</td>
+              <td style="padding: 0.6rem; border: 1px solid var(--ssvp-gray-border);">Segurança excelente; suporte nativo a biometria/MFA do Google.</td>
+              <td style="padding: 0.6rem; border: 1px solid var(--ssvp-gray-border);">Requer conta ativa do Google em todos os vicentinos.</td>
+              <td style="padding: 0.6rem; border: 1px solid var(--ssvp-gray-border); font-weight: bold; color: var(--ssvp-success);">Melhor escolha de facilidade/segurança caso já usem Gmail.</td>
+            </tr>
+            <tr>
+              <td style="padding: 0.6rem; border: 1px solid var(--ssvp-gray-border); font-weight: bold; color: var(--ssvp-navy);">Biometria / FaceID</td>
+              <td style="padding: 0.6rem; border: 1px solid var(--ssvp-gray-border);">Entrada instantânea; segurança de hardware local.</td>
+              <td style="padding: 0.6rem; border: 1px solid var(--ssvp-gray-border);">Incompatível com aparelhos muito antigos dos vicentinos.</td>
+              <td style="padding: 0.6rem; border: 1px solid var(--ssvp-gray-border);">Ótima opção secundária para reabrir a sessão sem redigitar senhas.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
       
     </div>
 

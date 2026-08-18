@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Teste de Caso de Uso - Login por Senha (v2)</title>
+  
+  <!-- Fontes do Google -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Estilos Globais -->
+  <link rel="stylesheet" href="../global.css">
+  
+  <style>
+    /* Estilos Premium para o Simulador de Senhas */
+    .password-field-container {
+      position: relative;
+      width: 100%;
+      margin: 1.25rem 0;
+    }
+    
+    .password-input {
+      width: 100%;
+      padding: 0.85rem 2.75rem 0.85rem 1rem;
+      border: 2px solid var(--ssvp-gray-border);
+      border-radius: 10px;
+      font-size: 1rem;
+      color: var(--ssvp-navy);
+      background: var(--ssvp-white);
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+    
+    .password-input:focus {
+      border-color: var(--ssvp-blue);
+      box-shadow: 0 0 8px rgba(0, 127, 255, 0.2);
+    }
+    
+    .toggle-visibility-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--ssvp-text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+    }
+    
+    /* Configuração */
+    .policy-card {
+      background: var(--ssvp-light-blue);
+      border: 1px solid var(--ssvp-gray-border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    
+    .slider-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .slider-header label {
+      font-weight: 700;
+      color: var(--ssvp-navy);
+      font-size: 0.95rem;
+    }
+    
+    .value-badge {
+      font-family: monospace;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--ssvp-blue);
+      background: var(--ssvp-white);
+      padding: 0.15rem 0.5rem;
+      border-radius: 6px;
+      border: 1px solid var(--ssvp-gray-border);
+    }
+    
+    .custom-range {
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      background: var(--ssvp-gray-border);
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+      cursor: pointer;
+    }
+    
+    .custom-range::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--ssvp-blue);
+      border: 2px solid var(--ssvp-white);
+      box-shadow: 0 2px 4px rgba(0, 127, 255, 0.3);
+    }
+    
+    /* Grid de Checkboxes */
+    .checkbox-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+    }
+    
+    @media (min-width: 480px) {
+      .checkbox-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--ssvp-text-main);
+      cursor: pointer;
+    }
+    
+    .checkbox-input {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+    
+    /* Resultados Brute Force */
+    .results-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    
+    @media (min-width: 600px) {
+      .results-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .results-grid .wide-card {
+        grid-column: span 2;
+      }
+    }
+    
+    .attack-card {
+      background: var(--ssvp-white);
+      border: 1px solid var(--ssvp-gray-border);
+      border-radius: 12px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+      border-left: 4px solid var(--ssvp-blue);
+    }
+    
+    .attack-card.online {
+      border-left-color: var(--ssvp-blue);
+    }
+    
+    .attack-card.offline-fast {
+      border-left-color: #ef4444;
+    }
+    
+    .attack-card.offline-slow {
+      border-left-color: var(--ssvp-success);
+    }
+    
+    .attack-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--ssvp-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .attack-speed {
+      font-size: 0.75rem;
+      color: var(--ssvp-text-muted);
+      font-style: italic;
+    }
+    
+    .attack-time {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--ssvp-navy);
+      margin-top: 0.25rem;
+      word-wrap: break-word;
+    }
+    
+    .combinations-display {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--ssvp-navy);
+      text-align: center;
+      background: var(--ssvp-light-blue);
+      border: 1px solid var(--ssvp-gray-border);
+      padding: 0.75rem;
+      border-radius: 10px;
+      margin-top: 1rem;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; color: var(--ssvp-blue); margin-bottom: 0.25rem;">teste: v1.0</div>
+    <h1>Simulação de Login por Senha (v2)</h1>
+    <p>Ajuste as políticas de complexidade da senha e veja como o tempo de quebra offline varia.</p>
+  </header>
+
+  <main class="container">
+    
+    <!-- Configurações de Política de Senha -->
+    <section class="panel">
+      <div class="policy-card">
+        
+        <!-- Slider de Comprimento -->
+        <div class="slider-group">
+          <div class="slider-header">
+            <label for="length-slider" id="label-slider">Comprimento Mínimo</label>
+            <span class="value-badge"><span id="length-val">8</span> caracteres</span>
+          </div>
+          <input 
+            type="range" 
+            id="length-slider" 
+            class="custom-range" 
+            min="4" 
+            max="16" 
+            step="1" 
+            value="8"
+            aria-labelledby="label-slider"
+          >
+        </div>
+        
+        <hr style="border: 0; border-top: 1px solid var(--ssvp-gray-border); margin: 0.25rem 0;">
+        
+        <!-- Regras de Caracteres -->
+        <div class="checkbox-grid">
+          <label class="checkbox-label">
+            <input type="checkbox" id="chk-lower" class="checkbox-input" checked>
+            Letras Minúsculas (a-z)
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="chk-upper" class="checkbox-input" checked>
+            Letras Maiúsculas (A-Z)
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="chk-num" class="checkbox-input" checked>
+            Números (0-9)
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="chk-special" class="checkbox-input">
+            Símbolos (!@#$...)
+          </label>
+        </div>
+        
+      </div>
+      
+      <!-- Entrada física da Senha -->
+      <div style="font-weight: 700; color: var(--ssvp-navy); font-size: 0.95rem;">Digite uma Senha de Teste:</div>
+      <div class="password-field-container">
+        <input type="password" id="pw-input" class="password-input" placeholder="Sua senha..." aria-label="Digite a senha">
+        <button id="toggle-pw-btn" class="toggle-visibility-btn" aria-label="Mostrar/Esconder Senha">
+          <svg style="width: 24px; height: 24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path id="eye-path" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Display de Combinações Totais -->
+      <div class="combinations-display">
+        Tamanho do Alfabeto: <span id="charset-val" style="color: var(--ssvp-blue);">62</span> caracteres<br>
+        Combinações Totais: <span id="comb-val" style="color: var(--ssvp-blue);">218 Trilhões</span>
+      </div>
+    </section>
+
+    <!-- Resultados Brute Force -->
+    <section class="panel" style="margin-top: 1.5rem;">
+      <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--ssvp-navy); margin-bottom: 0.75rem; text-align: center;">Resistência a Ataques (Estimativa)</h2>
+      
+      <div class="results-grid">
+        
+        <!-- Ataque Online -->
+        <div class="attack-card online">
+          <span class="attack-title">1. Ataque Online (Web App)</span>
+          <span class="attack-speed">Velocidade: 10 requisições / segundo</span>
+          <span id="time-online" class="attack-time">Calculando...</span>
+        </div>
+        
+        <!-- Ataque Offline Rápido -->
+        <div class="attack-card offline-fast">
+          <span class="attack-title">2. Ataque Offline (Fast Hash)</span>
+          <span class="attack-speed">Vazamento SHA-256 (RTX 4090): 10 bilhões/s</span>
+          <span id="time-offline-fast" class="attack-time">Calculando...</span>
+        </div>
+        
+        <!-- Ataque Offline Lento -->
+        <div class="attack-card offline-slow">
+          <span class="attack-title">3. Ataque Offline (Slow Hash)</span>
+          <span class="attack-speed">Vazamento Bcrypt (RTX 4090): 100 mil/s</span>
+          <span id="time-offline-slow" class="attack-time">Calculando...</span>
+        </div>
+        
+      </div>
+    </section>
+
+    <!-- Avisos sobre Segurança de Senha -->
+    <section class="panel" style="margin-top: 1.5rem; border-left: 4px solid var(--ssvp-blue); background: var(--ssvp-light-blue);">
+      <h3 style="font-size: 0.95rem; font-weight: 700; color: var(--ssvp-navy); margin-bottom: 0.25rem;">Considerações para os Vicentinos:</h3>
+      <p style="font-size: 0.85rem; color: var(--ssvp-text-main); line-height: 1.45;">
+        Perceba como aumentar o comprimento da senha (comprimento mínimo) e a complexidade (símbolos, números) aumenta exponencialmente o tempo que o hacker precisa. 
+        <br><br>
+        <strong>Conclusão:</strong> Usar uma senha longa de 10 caracteres é muito mais seguro do que um PIN, principalmente se utilizarmos uma função de hash lenta no banco de dados (como Bcrypt ou Argon2) em vez de SHA-256.
+      </p>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Sociedade de São Vicente de Paulo &copy; 2026</p>
+  </footer>
+
+  <script>
+    const lengthSlider = document.getElementById('length-slider');
+    const lengthVal = document.getElementById('length-val');
+    
+    // Checkboxes
+    const chkLower = document.getElementById('chk-lower');
+    const chkUpper = document.getElementById('chk-upper');
+    const chkNum = document.getElementById('chk-num');
+    const chkSpecial = document.getElementById('chk-special');
+    
+    // Displays
+    const charsetVal = document.getElementById('charset-val');
+    const combVal = document.getElementById('comb-val');
+    const timeOnline = document.getElementById('time-online');
+    const timeOfflineFast = document.getElementById('time-offline-fast');
+    const timeOfflineSlow = document.getElementById('time-offline-slow');
+
+    // Senha entrada
+    const pwInput = document.getElementById('pw-input');
+    const togglePwBtn = document.getElementById('toggle-pw-btn');
+    const eyePath = document.getElementById('eye-path');
+
+    // Inicialização
+    updateCalculations();
+
+    // Eventos
+    lengthSlider.addEventListener('input', (e) => {
+      lengthVal.textContent = e.target.value;
+      updateCalculations();
+    });
+
+    [chkLower, chkUpper, chkNum, chkSpecial].forEach(chk => {
+      chk.addEventListener('change', updateCalculations);
+    });
+
+    // Revelar / ocultar senha
+    togglePwBtn.addEventListener('click', () => {
+      if (pwInput.type === 'password') {
+        pwInput.type = 'text';
+        // Altera ícone de olho (removendo a íris para parecer riscado se necessário, ou apenas mudando opacidade)
+        togglePwBtn.style.opacity = '1';
+      } else {
+        pwInput.type = 'password';
+        togglePwBtn.style.opacity = '0.6';
+      }
+    });
+
+    // Realiza as contas dinamicamente
+    function updateCalculations() {
+      let length = parseInt(lengthSlider.value);
+      
+      // Determina o tamanho do alfabeto de entrada (C)
+      let c = 0;
+      if (chkLower.checked) c += 26;
+      if (chkUpper.checked) c += 26;
+      if (chkNum.checked) c += 10;
+      if (chkSpecial.checked) c += 32;
+
+      // Segurança: se todos os checkboxes estiverem vazios, força minúsculas
+      if (c === 0) {
+        chkLower.checked = true;
+        c = 26;
+      }
+
+      charsetVal.textContent = c;
+
+      // N = C^L
+      // Usamos BigInt ou exponenciação normal. Como pode exceder limites JS normais, limitamos a representação gráfica
+      const combinations = Math.pow(c, length);
+      
+      if (combinations < 1e9) {
+        combVal.textContent = Math.round(combinations).toLocaleString('pt-BR');
+      } else if (combinations < 1e12) {
+        combVal.textContent = (combinations / 1e9).toFixed(1) + " Bilhões";
+      } else if (combinations < 1e15) {
+        combVal.textContent = (combinations / 1e12).toFixed(1) + " Trilhões";
+      } else if (combinations < 1e18) {
+        combVal.textContent = (combinations / 1e15).toFixed(1) + " Quatrilhões";
+      } else {
+        combVal.textContent = "Mais de 1 Quintilhão";
+      }
+
+      // Velocidades
+      const speedOnline = 10;
+      const speedOfflineFast = 10000000000; // 10 Bilhões/s
+      const speedOfflineSlow = 100000;      // 100 Mil/s
+
+      // Segundos médios (metade das combinações para força bruta média)
+      const secondsOnline = (combinations / 2) / speedOnline;
+      const secondsOfflineFast = (combinations / 2) / speedOfflineFast;
+      const secondsOfflineSlow = (combinations / 2) / speedOfflineSlow;
+
+      timeOnline.textContent = formatTime(secondsOnline);
+      timeOfflineFast.textContent = formatTime(secondsOfflineFast);
+      timeOfflineSlow.textContent = formatTime(secondsOfflineSlow);
+    }
+
+    // Formata segundos em texto amigável
+    function formatTime(seconds) {
+      if (seconds <= 0) return "Instantâneo";
+      if (seconds < 0.001) return "Instantâneo (frações de milissegundo)";
+      if (seconds < 1) return "Menos de 1 segundo";
+      if (seconds < 60) return `${Math.round(seconds)} segundos`;
+      
+      const minutes = seconds / 60;
+      if (minutes < 60) return `${Math.round(minutes)} minutos`;
+      
+      const hours = minutes / 60;
+      if (hours < 24) return `${Math.round(hours)} horas`;
+      
+      const days = hours / 24;
+      if (days < 365) return `${Math.round(days)} dias`;
+      
+      const years = days / 365;
+      if (years < 1000) return `${Math.round(years)} anos`;
+      
+      const millennia = years / 1000;
+      if (millennia < 1e6) return `${Math.round(millennia).toLocaleString('pt-BR')} milênios`;
+      return "Praticamente Infinito (Bilhões de Anos)";
+    }
+  </script>
+
+</body>
+</html>
