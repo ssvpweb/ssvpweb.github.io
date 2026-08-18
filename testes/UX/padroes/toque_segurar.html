@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   
   <!-- Estilos Globais e Locais -->
-  <link rel="stylesheet" href="../global.css">
+  <link rel="stylesheet" href="../../testes.css">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -28,20 +28,22 @@
     <section class="panel gesture-panel">
       
       <!-- Slider de Controle de Tempo -->
-      <div class="slider-container">
-        <div class="slider-header">
-          <label for="threshold-slider" id="label-slider">Tempo Limite (Threshold)</label>
-          <span class="value-display"><span id="threshold-val">300</span> ms</span>
+      <div class="slider-container" style="text-align: center;">
+        <label for="threshold-slider" id="label-slider" style="font-weight: 700; color: var(--ssvp-navy); font-size: 0.95rem; display: block; margin-bottom: 0.5rem;">Tempo Limite (Threshold)</label>
+        <div style="display: flex; align-items: center; justify-content: center; gap: 1.5rem;">
+          <button id="btn-minus" type="button" class="step-btn" style="width: 44px; height: 44px; border-radius: 50%; background: var(--ssvp-navy); color: white; border: none; font-size: 1.5rem; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; user-select: none; -webkit-user-select: none;">-</button>
+          <span class="value-display" style="font-size: 1.2rem; font-weight: 700; font-family: monospace; min-width: 100px; text-align: center; margin: 0; background: var(--ssvp-white); border: 1px solid var(--ssvp-gray-border); padding: 0.25rem 0.5rem; border-radius: 6px; color: var(--ssvp-blue);"><span id="threshold-val">300</span> ms</span>
+          <button id="btn-plus" type="button" class="step-btn" style="width: 44px; height: 44px; border-radius: 50%; background: var(--ssvp-navy); color: white; border: none; font-size: 1.5rem; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; user-select: none; -webkit-user-select: none;">+</button>
         </div>
         <input 
           type="range" 
           id="threshold-slider" 
-          class="custom-range" 
           min="40" 
           max="600" 
           step="20" 
           value="300"
           aria-labelledby="label-slider"
+          style="display: none;"
         >
       </div>
 
@@ -262,6 +264,26 @@
     touchBtn.addEventListener('mouseleave', (e) => {
       if (isHolding) {
         handleCancel(e);
+      }
+    });
+
+    // Acessibilidade por botões +/-
+    const btnMinus = document.getElementById('btn-minus');
+    const btnPlus = document.getElementById('btn-plus');
+
+    btnMinus.addEventListener('click', () => {
+      let val = parseInt(thresholdSlider.value) - parseInt(thresholdSlider.step || 20);
+      if (val >= parseInt(thresholdSlider.min)) {
+        thresholdSlider.value = val;
+        thresholdSlider.dispatchEvent(new Event('input'));
+      }
+    });
+
+    btnPlus.addEventListener('click', () => {
+      let val = parseInt(thresholdSlider.value) + parseInt(thresholdSlider.step || 20);
+      if (val <= parseInt(thresholdSlider.max)) {
+        thresholdSlider.value = val;
+        thresholdSlider.dispatchEvent(new Event('input'));
       }
     });
   </script>
