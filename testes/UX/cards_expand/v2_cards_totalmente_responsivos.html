@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teste UX - Cards Expandíveis v1.4</title>
+  
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- CSS Externo Compartilhado -->
+  <link rel="stylesheet" href="../global.css">
+
+  <style>
+    /* ==========================================================================
+       CONFIGURAÇÕES ERGONÔMICAS E SCROLL SNAPPING (TRAVA MAGNÉTICA)
+       ========================================================================== */
+    
+    html {
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+    }
+
+    /* Cada card se torna uma parada magnética na tela */
+    .card {
+      scroll-snap-align: center;
+      scroll-snap-stop: always;
+      scroll-margin: 15px;
+      cursor: pointer;
+    }
+
+    /* Padding inferior massivo para alcance ideal do polegar no mobile */
+    .cards-container {
+      padding-bottom: 75vh;
+    }
+
+    /* 
+       Estilo dos inputs para v1.4:
+       Borda base definida como 2px sólida para evitar trepidações no layout
+       ao alternar para o foco de 2px vermelha.
+    */
+    .card-body input[type="text"] {
+      border: 2px solid var(--ssvp-gray-border);
+      margin-top: 0.4rem;
+      margin-bottom: 0.6rem;
+      font-size: 0.85rem;
+    }
+
+    /* Foco com borda vermelha SSVP mais evidente (grossa) e sombra suave */
+    .card-body input[type="text"]:focus {
+      border-color: var(--ssvp-red);
+      box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.15);
+      outline: none;
+    }
+
+    .zone-indicator {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--ssvp-text-muted);
+      border-top: 1px dashed var(--ssvp-gray-border);
+      padding-top: 1rem;
+      margin-top: 1rem;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>v1.4_card_expand.html</h1>
+    <p>Sociedade de São Vicente de Paulo</p>
+  </header>
+
+  <!-- Contêiner de Cards -->
+  <main id="cardsContainer" class="cards-container">
+    
+    <!-- CARD 1: Conferência Nossa Senhora -->
+    <section class="card" id="card1" onclick="toggleCard('card1', event)">
+      <div class="card-header">
+        <div class="card-title-group">
+          <div class="card-icon">CN</div>
+          <h2 class="card-title">Conferência N. Sra. das Graças</h2>
+        </div>
+        <button class="card-toggle-btn" aria-label="Expandir informações">＋</button>
+      </div>
+      
+      <div class="card-content-wrapper">
+        <div class="card-content">
+          <div class="card-body">
+            <!-- Input Superior -->
+            <div class="form-group">
+              <label for="input1_sup">Nome do Relator (Superior)</label>
+              <input type="text" id="input1_sup" placeholder="Quem preenche o relatório..." onfocus="scrollIntoViewOnFocus(this)">
+            </div>
+
+            <p><strong>Presidente:</strong> Confrade Antônio Souza</p>
+            <p><strong>Reuniões:</strong> Domingos às 08:30h, na sala paroquial.</p>
+            <p>Esta conferência atua ativamente no amparo a 12 famílias carentes da comunidade.</p>
+            
+            <!-- Input Inferior -->
+            <div class="form-group" style="margin-top: 0.5rem;">
+              <label for="input1_inf">Observações da Reunião (Inferior)</label>
+              <input type="text" id="input1_inf" placeholder="Digite uma anotação de fechamento..." onfocus="scrollIntoViewOnFocus(this)">
+            </div>
+            
+            <div class="card-meta">
+              <span class="card-tag">Ativa</span>
+              <span>Ref: 2026/A</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CARD 2: Ação Solidária de Inverno -->
+    <section class="card" id="card2" onclick="toggleCard('card2', event)">
+      <div class="card-header">
+        <div class="card-title-group">
+          <div class="card-icon">AS</div>
+          <h2 class="card-title">Campanha do Agasalho 2026</h2>
+        </div>
+        <button class="card-toggle-btn" aria-label="Expandir informações">＋</button>
+      </div>
+      
+      <div class="card-content-wrapper">
+        <div class="card-content">
+          <div class="card-body">
+            <!-- Input Superior -->
+            <div class="form-group">
+              <label for="input2_sup">Responsável pela Ação (Superior)</label>
+              <input type="text" id="input2_sup" placeholder="Confrade/Consócia responsável..." onfocus="scrollIntoViewOnFocus(this)">
+            </div>
+
+            <p><strong>Meta:</strong> Arrecadar 500 cobertores e agasalhos para distribuição a pessoas em situação de rua.</p>
+            
+            <!-- Input Inferior -->
+            <div class="form-group" style="margin-top: 0.5rem;">
+              <label for="input2_inf">Ponto de Coleta Principal (Inferior)</label>
+              <input type="text" id="input2_inf" placeholder="Paróquia, Sede ou outro local..." onfocus="scrollIntoViewOnFocus(this)">
+            </div>
+            
+            <div class="card-meta">
+              <span class="card-tag" style="background-color: rgba(211, 47, 47, 0.1); color: var(--ssvp-red);">Urgente</span>
+              <span>Prazo: 31/08</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CARD 3: Conselho Central Metropolitano -->
+    <section class="card" id="card3" onclick="toggleCard('card3', event)">
+      <div class="card-header">
+        <div class="card-title-group">
+          <div class="card-icon">CC</div>
+          <h2 class="card-title">Conselho Central SVP</h2>
+        </div>
+        <button class="card-toggle-btn" aria-label="Expandir informações">＋</button>
+      </div>
+      
+      <div class="card-content-wrapper">
+        <div class="card-content">
+          <div class="card-body">
+            <!-- Input Superior -->
+            <div class="form-group">
+              <label for="input3_sup">Nome do Diretor Espiritual (Superior)</label>
+              <input type="text" id="input3_sup" placeholder="Padre ou conselheiro espiritual..." onfocus="scrollIntoViewOnFocus(this)">
+            </div>
+
+            <p><strong>Presidente:</strong> Consócia Maria Oliveira</p>
+            <p><strong>Endereço:</strong> Rua São Vicente de Paulo, 120 - Centro</p>
+            
+            <!-- Input Inferior -->
+            <div class="form-group" style="margin-top: 0.5rem;">
+              <label for="input3_inf">Assunto Urgente para Pauta (Inferior)</label>
+              <input type="text" id="input3_inf" placeholder="Assunto a ser levado à reunião..." onfocus="scrollIntoViewOnFocus(this)">
+            </div>
+            
+            <div class="card-meta">
+              <span class="card-tag">Administrativo</span>
+              <span>Central</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CARD 4: Ajuda de Custo e Relatórios -->
+    <section class="card" id="card4" onclick="toggleCard('card4', event)">
+      <div class="card-header">
+        <div class="card-title-group">
+          <div class="card-icon">R1</div>
+          <h2 class="card-title">Relatório Financeiro Simplificado</h2>
+        </div>
+        <button class="card-toggle-btn" aria-label="Expandir informações">＋</button>
+      </div>
+      
+      <div class="card-content-wrapper">
+        <div class="card-content">
+          <div class="card-body">
+            <!-- Input Superior -->
+            <div class="form-group">
+              <label for="input4_sup">Tesoureiro Responsável (Superior)</label>
+              <input type="text" id="input4_sup" placeholder="Quem validou as contas..." onfocus="scrollIntoViewOnFocus(this)">
+            </div>
+
+            <p>Demonstrativo resumido de entradas e saídas voltado para a transparência assistencial.</p>
+            <p><strong>Saldo Disponível:</strong> R$ 730,00</p>
+            
+            <!-- Input Inferior -->
+            <div class="form-group" style="margin-top: 0.5rem;">
+              <label for="input4_inf">Destinatário do Balancete (Inferior)</label>
+              <input type="text" id="input4_inf" placeholder="E-mail do Conselho Regional..." onfocus="scrollIntoViewOnFocus(this)">
+            </div>
+            
+            <div class="card-meta">
+              <span class="card-tag">Finanças</span>
+              <span>Q2 2026</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="zone-indicator">
+      Espaço ergonômico de rolagem (polegar confortável)
+    </div>
+
+  </main>
+
+  <footer>
+    <p>Desenvolvido para testes de usabilidade e responsividade.</p>
+    <p>Sociedade de São Vicente de Paulo - Conselho SVP &copy; 2026</p>
+  </footer>
+
+  <script>
+    // Lógica para alternar a expansão dos cards ao clicar em qualquer lugar deles
+    function toggleCard(cardId, event) {
+      const card = document.getElementById(cardId);
+      if (!card) return;
+
+      const wrapper = card.querySelector('.card-content-wrapper');
+      const toggleBtn = card.querySelector('.card-toggle-btn');
+      
+      if (!wrapper || !toggleBtn) return;
+
+      // UX Guard: Impede o fechamento acidental ao interagir com inputs, links ou outros botões
+      const targetTagName = event.target.tagName.toUpperCase();
+      if (
+        targetTagName === 'INPUT' || 
+        targetTagName === 'TEXTAREA' || 
+        targetTagName === 'A' || 
+        (targetTagName === 'BUTTON' && !event.target.classList.contains('card-toggle-btn'))
+      ) {
+        return; 
+      }
+
+      const isExpanded = wrapper.classList.contains('expanded');
+
+      // Efeito acordeão: Fecha todos os outros cards para liberar espaço no Moto E7
+      document.querySelectorAll('.card').forEach(otherCard => {
+        if (otherCard.id !== cardId) {
+          const otherWrapper = otherCard.querySelector('.card-content-wrapper');
+          const otherBtn = otherCard.querySelector('.card-toggle-btn');
+          if (otherWrapper && otherBtn) {
+            otherWrapper.classList.remove('expanded');
+            otherCard.classList.remove('expanded-active');
+            otherBtn.innerText = '＋';
+            otherBtn.setAttribute('aria-label', 'Expandir informações');
+          }
+        }
+      });
+
+      // Alterna o estado do card clicado
+      if (isExpanded) {
+        wrapper.classList.remove('expanded');
+        card.classList.remove('expanded-active');
+        toggleBtn.innerText = '＋';
+        toggleBtn.setAttribute('aria-label', 'Expandir informações');
+      } else {
+        wrapper.classList.add('expanded');
+        card.classList.add('expanded-active');
+        toggleBtn.innerText = '─';
+        toggleBtn.setAttribute('aria-label', 'Recolher informações');
+        
+        // Rolagem suave e snap automático para manter o card expandido centralizado
+        setTimeout(() => {
+          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 150);
+      }
+    }
+
+    // UX Helper: Garante que o input focado seja centralizado suavemente na viewport.
+    // Isso é crucial para compensar a redução de espaço quando o teclado virtual abre no mobile.
+    function scrollIntoViewOnFocus(inputElement) {
+      setTimeout(() => {
+        inputElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 350); // Aguarda o tempo de animação de abertura do teclado móvel
+    }
+  </script>
+</body>
+</html>

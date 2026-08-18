@@ -258,48 +258,56 @@
     // Banco de Dados Local Estático de Redundância (fallback para offline / rate limits do GitHub)
     const fallbackTestes = [
       {
+        folder: "google_login",
+        files: [
+          { name: "v1_google_login_autenticacao.html" }
+        ]
+      },
+      {
         folder: "google_maps",
         files: [
-          { name: "gmaps_botoes_lista.html" },
-          { name: "gmaps_dropdown_selecao.html" },
-          { name: "gmaps_leaflet_geral.html" },
-          { name: "gmaps_mapa_local.html" },
-          { name: "gmaps_simulador_visita_inicio.html" },
-          { name: "gmaps_simulador_visita_voz_referencias.html" },
-          { name: "gmaps_voz_comandos.html" },
-          { name: "gmaps_voz_feedback.html" }
-        ]
-      },
-      {
-        folder: "open_street_maps",
-        files: [
-          { name: "osm_busca_raio.html" }
-        ]
-      },
-      {
-        folder: "sincronizacao",
-        files: [
-          { name: "sinc_fila_offline.html" }
+          { name: "v1_lista_botoes.html" },
+          { name: "v2_mapa_local.html" },
+          { name: "v3_mapa_leaflet_geral.html" },
+          { name: "v4_dropdown_selecao_enderecos.html" },
+          { name: "v4.1_voz_comandos_mapa.html" },
+          { name: "v4.2_voz_feedback_mapa.html" },
+          { name: "v5_simulador_visita_basico.html" },
+          { name: "v5.1_simulador_visita_voz_referencias.html" }
         ]
       },
       {
         folder: "google_sheets",
         files: [
-          { name: "sheets_crud_pessoas.html" }
+          { name: "LEIA_ME.html" },
+          { name: "v1_sheets_crud_pessoas.html" }
+        ]
+      },
+      {
+        folder: "open_street_maps",
+        files: [
+          { name: "v1_osm_busca_raio.html" }
+        ]
+      },
+      {
+        folder: "sincronizacao",
+        files: [
+          { name: "v1_sinc_fila_offline.html" }
+        ]
+      },
+      {
+        folder: "spa",
+        files: [
+          { name: "index.html" },
+          { name: "v1_login_spa.html" }
         ]
       },
       {
         folder: "voz",
         files: [
           { name: "LEIA_ME.html" },
-          { name: "comandos_de_voz.html" },
-          { name: "voz_v1.html" }
-        ]
-      },
-      {
-        folder: "spa",
-        files: [
-          { name: "index.html" }
+          { name: "v1_gravacao_audio_simples.html" },
+          { name: "v2_comandos_de_voz.html" }
         ]
       }
     ];

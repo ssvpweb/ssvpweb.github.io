@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Teste de Caso de Uso - Configuração de Toque (Barra Inferior)</title>
+  
+  <!-- Fontes do Google -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Estilos Globais -->
+  <link rel="stylesheet" href="../global.css">
+  
+  <style>
+    /* Estilos específicos para o painel lado a lado e o simulador */
+    
+    .config-panel {
+      padding: 1.5rem;
+      border-radius: 16px;
+    }
+    
+    .config-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+      background: var(--ssvp-light-blue);
+      padding: 1.25rem;
+      border-radius: 12px;
+      border: 1px solid var(--ssvp-gray-border);
+      width: 100%;
+    }
+    
+    .slider-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.95rem;
+    }
+    
+    .slider-header label {
+      font-weight: 700;
+      color: var(--ssvp-navy);
+    }
+    
+    .value-display {
+      font-family: monospace;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--ssvp-blue);
+      background: var(--ssvp-white);
+      padding: 0.15rem 0.4rem;
+      border-radius: 6px;
+      border: 1px solid var(--ssvp-gray-border);
+    }
+    
+    .custom-range {
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      background: var(--ssvp-gray-border);
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+      cursor: pointer;
+    }
+    
+    .custom-range::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--ssvp-blue);
+      border: 2px solid var(--ssvp-white);
+      box-shadow: 0 2px 4px rgba(0, 127, 255, 0.3);
+    }
+    
+    .button-col {
+      flex-shrink: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    /* Botão de Teste Compacto Circular */
+    .touch-button-compact {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background-color: var(--ssvp-navy);
+      border: 3px solid var(--ssvp-gray-border);
+      color: var(--ssvp-white);
+      font-size: 0.8rem;
+      font-weight: 700;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+      box-shadow: 0 4px 8px rgba(0, 45, 98, 0.15);
+      transition: transform 0.1s ease, background-color 0.2s ease, border-color 0.2s ease;
+    }
+    
+    .touch-button-compact:active {
+      transform: scale(0.95);
+    }
+    
+    .touch-button-compact.holding {
+      border-color: var(--ssvp-blue);
+      box-shadow: 0 0 15px rgba(0, 127, 255, 0.4);
+    }
+    
+    .touch-button-compact.success-state {
+      background-color: var(--ssvp-success) !important;
+      border-color: var(--ssvp-success) !important;
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+    }
+    
+    .button-progress-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--ssvp-blue);
+      opacity: 0.35;
+      transform: scale(0);
+      border-radius: 50%;
+      pointer-events: none;
+      transform-origin: center center;
+      transition: transform 0.05s linear;
+    }
+    
+    .btn-text-compact {
+      z-index: 2;
+      pointer-events: none;
+      text-align: center;
+      line-height: 1.2;
+    }
+    
+    /* Simulador de Celular */
+    .sim-container {
+      width: 100%;
+      margin-top: 1rem;
+    }
+    
+    .sim-header-label {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--ssvp-text-muted);
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    
+    .sim-screen {
+      position: relative;
+      width: 100%;
+      height: 300px;
+      background-color: var(--ssvp-gray-light);
+      border: 3px solid #334155;
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 8px 24px rgba(0, 45, 98, 0.1);
+    }
+    
+    .sim-content {
+      flex: 1;
+      padding: 1.25rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    
+    .mock-list-item {
+      background: var(--ssvp-white);
+      border: 1px solid var(--ssvp-gray-border);
+      padding: 0.75rem;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    
+    .mock-list-title {
+      font-weight: 700;
+      color: var(--ssvp-navy);
+      font-size: 0.9rem;
+    }
+    
+    .mock-list-desc {
+      font-size: 0.8rem;
+      color: var(--ssvp-text-muted);
+    }
+    
+    /* Barra Inferior Simulada */
+    .sim-bottom-bar {
+      height: 56px;
+      background-color: var(--ssvp-navy);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      position: relative;
+      z-index: 5;
+    }
+    
+    .sim-nav-item {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-weight: 600;
+      position: relative;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+      transition: color 0.2s ease;
+    }
+    
+    .sim-nav-item.active {
+      color: var(--ssvp-white);
+    }
+    
+    .sim-nav-item svg {
+      width: 20px;
+      height: 20px;
+      margin-bottom: 2px;
+      pointer-events: none;
+    }
+    
+    .sim-nav-item .nav-progress {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      top: 0;
+      background-color: var(--ssvp-blue);
+      opacity: 0.25;
+      transform: scaleX(0);
+      transform-origin: center center;
+      pointer-events: none;
+      transition: transform 0.05s linear;
+    }
+    
+    /* Menu Pop-up / Dropdown de Hold */
+    .sim-popup-menu {
+      position: absolute;
+      bottom: 64px;
+      background: var(--ssvp-white);
+      border: 1px solid var(--ssvp-gray-border);
+      border-radius: 12px;
+      padding: 0.5rem;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+      display: none;
+      flex-direction: column;
+      gap: 0.25rem;
+      z-index: 10;
+      width: 180px;
+      animation: popupFade 0.15s ease-out;
+    }
+    
+    @keyframes popupFade {
+      from { transform: translateY(10px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    .sim-popup-item {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--ssvp-navy);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    
+    .sim-popup-item:hover {
+      background-color: var(--ssvp-light-blue);
+    }
+    
+    /* Console de Eventos */
+    .console-panel {
+      height: 140px;
+      background: #0f172a;
+      border-radius: 12px;
+      padding: 0.75rem;
+      font-family: monospace;
+      color: #38bdf8;
+      font-size: 0.8rem;
+      overflow: hidden;
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
+      border: 1px solid #1e293b;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .console-header {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #1e293b;
+      padding-bottom: 0.3rem;
+      margin-bottom: 0.3rem;
+      font-size: 0.7rem;
+      color: #94a3b8;
+    }
+    
+    .console-lines {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    
+    .log-line { line-height: 1.3; }
+    .log-line.event { color: #facc15; }
+    .log-line.success { color: #4ade80; }
+    .log-line.system { color: #94a3b8; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; color: var(--ssvp-blue); margin-bottom: 0.25rem;">teste: v1.0</div>
+    <h1>Configuração de Toque (Barra Inferior)</h1>
+    <p>Ajuste o tempo de Hold lado a lado com o botão e teste na barra inferior simulada.</p>
+  </header>
+
+  <main class="container">
+    
+    <!-- Painel de Calibração Lado a Lado -->
+    <section class="panel config-panel">
+      <div class="config-row">
+        
+        <!-- Slider (Lado Esquerdo) -->
+        <div class="slider-col">
+          <div class="slider-header">
+            <label for="threshold-slider" id="label-slider">Hold Threshold</label>
+            <span class="value-display"><span id="threshold-val">300</span> ms</span>
+          </div>
+          <input 
+            type="range" 
+            id="threshold-slider" 
+            class="custom-range" 
+            min="150" 
+            max="450" 
+            step="25" 
+            value="300"
+            aria-labelledby="label-slider"
+          >
+        </div>
+        
+        <!-- Botão Circular Compacto (Lado Direito) -->
+        <div class="button-col">
+          <button id="touch-btn" class="touch-button-compact" aria-label="Botão de Teste">
+            <div id="btn-progress" class="button-progress-overlay"></div>
+            <span class="btn-text-compact">Testar<br>Toque</span>
+          </button>
+        </div>
+        
+      </div>
+    </section>
+
+    <!-- Simulador de Celular Real contendo a Barra Inferior -->
+    <section class="sim-container">
+      <span class="sim-header-label">Visualização do App (Simulação)</span>
+      
+      <div class="sim-screen">
+        
+        <!-- Pop-up de Hold da aba Visitas -->
+        <div id="visitas-popup" class="sim-popup-menu" style="left: 20px;">
+          <div class="sim-popup-item" onclick="alert('Iniciando nova visita...')">➕ Nova Visita</div>
+          <div class="sim-popup-item" onclick="alert('Pesquisando famílias...')">🔍 Buscar Família</div>
+        </div>
+        
+        <!-- Pop-up de Hold da aba Configurações -->
+        <div id="config-popup" class="sim-popup-menu" style="right: 20px;">
+          <div class="sim-popup-item" onclick="alert('Alterando tema...')">🌓 Alternar Tema</div>
+          <div class="sim-popup-item" onclick="alert('Abrindo configurações avançadas...')">⚙️ Preferências</div>
+        </div>
+        
+        <!-- Conteúdo do App -->
+        <div id="sim-content-area" class="sim-content">
+          <div class="mock-list-item">
+            <div class="mock-list-title">Visita à Família Silva</div>
+            <div class="mock-list-desc">Realizada em 15/08/2026 por Paulo Rezende. Situação estável.</div>
+          </div>
+          <div class="mock-list-item">
+            <div class="mock-list-title">Visita à Família Santos</div>
+            <div class="mock-list-desc">Realizada em 01/08/2026 por Antônio Silva. LOAS Concedido.</div>
+          </div>
+          <div style="font-size: 0.75rem; text-align: center; color: var(--ssvp-text-muted); margin-top: 1rem; line-height: 1.4;">
+            💡 Tente dar um <b>toque rápido</b> nas abas da barra inferior para selecioná-las.<br>
+            💡 Ou <b>segure o dedo</b> nas abas "Visitas" ou "Config" para abrir menus de atalho rápidos!
+          </div>
+        </div>
+        
+        <!-- Barra de Navegação Inferior Simulada -->
+        <nav class="sim-bottom-bar">
+          
+          <div id="nav-home" class="sim-nav-item active" data-name="Início">
+            <div class="nav-progress"></div>
+            <svg fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            <span>Início</span>
+          </div>
+          
+          <div id="nav-visitas" class="sim-nav-item" data-name="Visitas" style="position: relative;">
+            <div class="nav-progress"></div>
+            <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 2c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V9h10v2z"/></svg>
+            <span>Visitas</span>
+          </div>
+          
+          <div id="nav-config" class="sim-nav-item" data-name="Config" style="position: relative;">
+            <div class="nav-progress"></div>
+            <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+            <span>Config</span>
+          </div>
+          
+        </nav>
+      </div>
+    </section>
+
+    <!-- Console de Eventos -->
+    <section class="console-panel">
+      <div class="console-header">
+        <span>Event Logger</span>
+        <button id="clear-console" style="background:none; border:none; color:#ef4444; font-weight:bold; font-size:0.7rem; cursor:pointer;">Limpar</button>
+      </div>
+      <div id="console-lines" class="console-lines">
+        <div class="log-line system">[Sistema] Pronto para testar. Ajuste o Slider (150-450ms) e teste no botão ou nas abas da barra inferior.</div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Sociedade de São Vicente de Paulo &copy; 2026</p>
+  </footer>
+
+  <script>
+    const touchBtn = document.getElementById('touch-btn');
+    const btnProgress = document.getElementById('btn-progress');
+    const thresholdSlider = document.getElementById('threshold-slider');
+    const thresholdVal = document.getElementById('threshold-val');
+    const consoleLines = document.getElementById('console-lines');
+    const clearConsole = document.getElementById('clear-console');
+    
+    // Abas e popups
+    const navItems = document.querySelectorAll('.sim-nav-item');
+    const visitasPopup = document.getElementById('visitas-popup');
+    const configPopup = document.getElementById('config-popup');
+    const simContentArea = document.getElementById('sim-content-area');
+
+    let threshold = parseInt(thresholdSlider.value);
+    let holdTimer = null;
+    let progressTimer = null;
+    let touchStartTime = 0;
+    let isHolding = false;
+    let hasTriggeredHold = false;
+    let activeTarget = null; // Guarda qual elemento está sofrendo toque ativo
+
+    // 1. Controle do Slider
+    thresholdSlider.addEventListener('input', (e) => {
+      threshold = parseInt(e.target.value);
+      thresholdVal.textContent = threshold;
+      addLog(`Threshold ajustado para ${threshold}ms`, 'system');
+    });
+
+    clearConsole.addEventListener('click', () => {
+      consoleLines.innerHTML = '<div class="log-line system">[Sistema] Console limpo.</div>';
+    });
+
+    function addLog(text, type = '') {
+      const line = document.createElement('div');
+      line.className = `log-line ${type}`;
+      const now = new Date();
+      const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}.${now.getMilliseconds().toString().padStart(3, '0')}`;
+      line.textContent = `[${timeStr}] ${text}`;
+      consoleLines.appendChild(line);
+      consoleLines.scrollTop = consoleLines.scrollHeight;
+    }
+
+    // Fecha popups ao clicar na área de conteúdo
+    simContentArea.addEventListener('click', () => {
+      visitasPopup.style.display = 'none';
+      configPopup.style.display = 'none';
+    });
+
+    // 2. Lógica Comum de Gestos (Botão e Abas)
+    
+    function startGesture(e, element, isNav = false) {
+      if (e.cancelable) e.preventDefault();
+      
+      if (isHolding) return;
+      isHolding = true;
+      hasTriggeredHold = false;
+      touchStartTime = Date.now();
+      activeTarget = element;
+      
+      visitasPopup.style.display = 'none';
+      configPopup.style.display = 'none';
+
+      // Progresso Visual
+      let progressOverlay = element.querySelector('.button-progress-overlay') || element.querySelector('.nav-progress');
+      if (progressOverlay) {
+        let start = Date.now();
+        if (progressTimer) clearInterval(progressTimer);
+        progressTimer = setInterval(() => {
+          let elapsed = Date.now() - start;
+          let percent = Math.min(elapsed / threshold, 1);
+          if (isNav) {
+            progressOverlay.style.transform = `scaleX(${percent})`;
+          } else {
+            progressOverlay.style.transform = `scale(${percent})`;
+          }
+          if (percent >= 1) clearInterval(progressTimer);
+        }, 16);
+      }
+
+      if (isNav) {
+        addLog(`Aba [${element.dataset.name}] - Toque iniciado`, 'event');
+      } else {
+        element.classList.add('holding');
+        addLog(`Botão - Toque iniciado`, 'event');
+      }
+
+      // Temporizador de Hold
+      if (holdTimer) clearTimeout(holdTimer);
+      holdTimer = setTimeout(() => {
+        triggerHold(element, isNav);
+      }, threshold);
+    }
+
+    function triggerHold(element, isNav) {
+      if (hasTriggeredHold) return;
+      hasTriggeredHold = true;
+
+      if (isNav) {
+        addLog(`✅ Aba [${element.dataset.name}] - HOLD detectado (> ${threshold}ms)`, 'success');
+        
+        // Abre popups correspondentes
+        if (element.id === 'nav-visitas') {
+          visitasPopup.style.display = 'flex';
+        } else if (element.id === 'nav-config') {
+          configPopup.style.display = 'flex';
+        }
+      } else {
+        element.classList.remove('holding');
+        element.classList.add('success-state');
+        addLog(`✅ Botão - HOLD detectado (> ${threshold}ms)`, 'success');
+      }
+
+      if (navigator.vibrate) {
+        navigator.vibrate(80);
+      }
+    }
+
+    function endGesture(e) {
+      if (!isHolding) return;
+      isHolding = false;
+
+      if (holdTimer) clearTimeout(holdTimer);
+      if (progressTimer) clearInterval(progressTimer);
+
+      let duration = Date.now() - touchStartTime;
+      let element = activeTarget;
+      let isNav = element.classList.contains('sim-nav-item');
+
+      if (isNav) {
+        addLog(`Aba [${element.dataset.name}] - Liberada em ${duration}ms`, 'event');
+        if (!hasTriggeredHold) {
+          // Clique Rápido (Tap) na aba - Muda aba ativa
+          navItems.forEach(item => item.classList.remove('active'));
+          element.classList.add('active');
+          addLog(`👆 Aba [${element.dataset.name}] - TAP registrado. Navegando...`, 'info');
+        }
+        
+        // Reseta barra de progresso da aba
+        let progressOverlay = element.querySelector('.nav-progress');
+        if (progressOverlay) progressOverlay.style.transform = 'scaleX(0)';
+      } else {
+        addLog(`Botão - Liberado em ${duration}ms`, 'event');
+        if (!hasTriggeredHold) {
+          addLog(`👆 Botão - TAP registrado.`, 'info');
+        }
+        
+        setTimeout(() => {
+          if (!isHolding && activeTarget === element) {
+            let progressOverlay = element.querySelector('.button-progress-overlay');
+            if (progressOverlay) progressOverlay.style.transform = 'scale(0)';
+            element.classList.remove('holding');
+            element.classList.remove('success-state');
+          }
+        }, 200);
+      }
+    }
+
+    function cancelGesture() {
+      if (!isHolding) return;
+      isHolding = false;
+      if (holdTimer) clearTimeout(holdTimer);
+      if (progressTimer) clearInterval(progressTimer);
+      
+      let element = activeTarget;
+      let isNav = element.classList.contains('sim-nav-item');
+      
+      addLog(`Interação cancelada/abortada`, 'system');
+      
+      if (isNav) {
+        let progressOverlay = element.querySelector('.nav-progress');
+        if (progressOverlay) progressOverlay.style.transform = 'scaleX(0)';
+      } else {
+        let progressOverlay = element.querySelector('.button-progress-overlay');
+        if (progressOverlay) progressOverlay.style.transform = 'scale(0)';
+        element.classList.remove('holding');
+        element.classList.remove('success-state');
+      }
+    }
+
+    // 3. Bind de Eventos
+
+    // Eventos do Botão de Teste
+    touchBtn.addEventListener('touchstart', (e) => startGesture(e, touchBtn, false), { passive: false });
+    touchBtn.addEventListener('touchend', endGesture);
+    touchBtn.addEventListener('touchcancel', cancelGesture);
+    touchBtn.addEventListener('mousedown', (e) => { if (e.button === 0) startGesture(e, touchBtn, false); });
+
+    // Eventos das Abas da Barra Inferior
+    navItems.forEach(item => {
+      item.addEventListener('touchstart', (e) => startGesture(e, item, true), { passive: false });
+      item.addEventListener('touchend', endGesture);
+      item.addEventListener('touchcancel', cancelGesture);
+      item.addEventListener('mousedown', (e) => { if (e.button === 0) startGesture(e, item, true); });
+    });
+
+    // Eventos globais de Mouse para evitar cliques travados
+    document.addEventListener('mouseup', () => { if (isHolding) endGesture(); });
+    
+  </script>
+</body>
+</html>
