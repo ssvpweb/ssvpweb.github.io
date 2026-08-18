@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Teste de Caso de Uso - Gestos de Toque (SSVP)</title>
+  
+  <!-- Fontes do Google -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Estilos Globais e Locais -->
+  <link rel="stylesheet" href="../global.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <h1>Teste de Gestos de Toque</h1>
+    <p>Use Case: Diferenciar cliques rápidos de toques longos (Touch & Hold)</p>
+  </header>
+
+  <main class="container">
+    
+    <!-- Painel Principal de Teste -->
+    <section class="panel gesture-panel">
+      
+      <!-- Slider de Controle de Tempo -->
+      <div class="slider-container">
+        <div class="slider-header">
+          <label for="threshold-slider" id="label-slider">Tempo Limite (Threshold)</label>
+          <span class="value-display"><span id="threshold-val">500</span> ms</span>
+        </div>
+        <input 
+          type="range" 
+          id="threshold-slider" 
+          class="custom-range" 
+          min="150" 
+          max="1500" 
+          step="50" 
+          value="500"
+          aria-labelledby="label-slider"
+        >
+      </div>
+
+      <!-- Botão de Toque Interativo -->
+      <div class="button-area">
+        <button id="touch-btn" class="touch-button" aria-label="Botão de Toque">
+          <div id="btn-progress" class="button-progress"></div>
+          <span class="btn-text">Pressione</span>
+          <span class="btn-subtext">Segure aqui</span>
+        </button>
+      </div>
+
+      <!-- Estatísticas das Interações -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Toques Rápidos</div>
+          <div id="tap-count" class="stat-val">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Seguradas (Holds)</div>
+          <div id="hold-count" class="stat-val">0</div>
+        </div>
+      </div>
+      
+      <div id="stat-last-card" class="stat-card stat-last" style="width: 100%;">
+        <div class="stat-label">Último Gesto Detectado</div>
+        <div id="last-action" class="stat-val" style="font-size: 1.25rem;">Nenhum</div>
+      </div>
+
+    </section>
+
+    <!-- Console de Logs/Debug -->
+    <section class="console-panel">
+      <div class="console-header">
+        <span>Console de Eventos</span>
+        <button id="clear-console" class="console-clear-btn">Limpar Logs</button>
+      </div>
+      <div id="console-lines" class="console-lines" role="log" aria-live="polite">
+        <div class="log-line system">[Sistema] Ambiente inicializado. Ajuste o slider e toque no botão acima.</div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Sociedade de São Vicente de Paulo &copy; 2026</p>
+  </footer>
+
+  <script>
+    const touchBtn = document.getElementById('touch-btn');
+    const btnProgress = document.getElementById('btn-progress');
+    const thresholdSlider = document.getElementById('threshold-slider');
+    const thresholdVal = document.getElementById('threshold-val');
+    const tapCountVal = document.getElementById('tap-count');
+    const holdCountVal = document.getElementById('hold-count');
+    const lastActionVal = document.getElementById('last-action');
+    const statLast = document.getElementById('stat-last-card');
+    const consoleLines = document.getElementById('console-lines');
+    const clearConsoleBtn = document.getElementById('clear-console');
+
+    let threshold = parseInt(thresholdSlider.value);
+    let holdTimer = null;
+    let progressTimer = null;
+    let touchStartTime = 0;
+    let isHolding = false;
+    let hasTriggeredHold = false;
+    let tapCount = 0;
+    let holdCount = 0;
+
+    // Monitora a mudança do Slider
+    thresholdSlider.addEventListener('input', (e) => {
+      threshold = parseInt(e.target.value);
+      thresholdVal.textContent = threshold;
+      addLog(`Threshold ajustado para ${threshold}ms.`, 'system');
+    });
+
+    // Limpa os logs do console
+    clearConsoleBtn.addEventListener('click', () => {
+      consoleLines.innerHTML = '<div class="log-line system">[Sistema] Console limpo. Pronto para novos testes.</div>';
+    });
+
+    // Registra logs com timestamp
+    function addLog(text, type = 'info') {
+      const line = document.createElement('div');
+      line.className = `log-line ${type}`;
+      
+      const now = new Date();
+      const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}.${now.getMilliseconds().toString().padStart(3, '0')}`;
+      
+      line.textContent = `[${timeStr}] ${text}`;
+      consoleLines.appendChild(line);
+      consoleLines.scrollTop = consoleLines.scrollHeight;
+    }
+
+    // Reseta o estado visual do botão
+    function resetProgress() {
+      btnProgress.style.transform = 'scale(0)';
+      touchBtn.classList.remove('holding');
+      touchBtn.classList.remove('success-state');
+    }
+
+    // Início do Toque (Mobile ou Desktop)
+    function handleStart(e) {
+      // Previne comportamentos padrão do mobile (como zoom, scroll e seleção de texto)
+      if (e.cancelable) {
+        e.preventDefault();
+      }
+      
+      if (isHolding) return;
+      isHolding = true;
+      hasTriggeredHold = false;
+      touchStartTime = Date.now();
+      
+      touchBtn.classList.add('holding');
+      addLog('touchstart / mousedown detectado.', 'event');
+      
+      // Animação interna de preenchimento (progress bar circular)
+      const start = Date.now();
+      if (progressTimer) clearInterval(progressTimer);
+      
+      progressTimer = setInterval(() => {
+        const elapsed = Date.now() - start;
+        const percent = Math.min(elapsed / threshold, 1);
+        btnProgress.style.transform = `scale(${percent})`;
+        if (percent >= 1) {
+          clearInterval(progressTimer);
+        }
+      }, 16); // Aprox. 60fps
+      
+      // Temporizador para disparar a ação de segurar
+      if (holdTimer) clearTimeout(holdTimer);
+      holdTimer = setTimeout(() => {
+        triggerHold();
+      }, threshold);
+    }
+
+    // Ação: Pressionar e Segurar (Long Press) disparada com sucesso
+    function triggerHold() {
+      if (hasTriggeredHold) return;
+      hasTriggeredHold = true;
+      holdCount++;
+      holdCountVal.textContent = holdCount;
+      
+      touchBtn.classList.remove('holding');
+      touchBtn.classList.add('success-state');
+      
+      lastActionVal.textContent = 'Segurar (Long Press)';
+      statLast.style.borderLeftColor = 'var(--ssvp-success)';
+      
+      addLog(`✅ SEGURAR detectado! (> ${threshold}ms).`, 'success');
+      
+      // Feedback tátil por vibração se disponível (padrão de celular)
+      if (navigator.vibrate) {
+        navigator.vibrate(80);
+      }
+    }
+
+    // Fim do Toque
+    function handleEnd(e) {
+      if (!isHolding) return;
+      isHolding = false;
+      
+      if (holdTimer) clearTimeout(holdTimer);
+      if (progressTimer) clearInterval(progressTimer);
+      
+      const duration = Date.now() - touchStartTime;
+      addLog(`touchend / mouseup detectado (duração: ${duration}ms).`, 'event');
+      
+      if (!hasTriggeredHold) {
+        // Foi um toque rápido (Tap)
+        tapCount++;
+        tapCountVal.textContent = tapCount;
+        
+        lastActionVal.textContent = 'Toque Rápido (Tap)';
+        statLast.style.borderLeftColor = 'var(--ssvp-blue)';
+        
+        addLog(`👆 TOQUE RÁPIDO registrado (Tap de ${duration}ms).`, 'info');
+      }
+      
+      // Pequeno atraso para o usuário ver o feedback de sucesso antes de resetar
+      setTimeout(() => {
+        if (!isHolding) {
+          resetProgress();
+        }
+      }, 250);
+    }
+
+    // Cancelamento do Toque (Interrupção por gestos do sistema)
+    function handleCancel(e) {
+      if (!isHolding) return;
+      isHolding = false;
+      
+      if (holdTimer) clearTimeout(holdTimer);
+      if (progressTimer) clearInterval(progressTimer);
+      
+      addLog('Gesto interrompido/cancelado pelo sistema.', 'system');
+      resetProgress();
+    }
+
+    // Eventos de Toque (Otimizados para Celular/Tablet)
+    touchBtn.addEventListener('touchstart', handleStart, { passive: false });
+    touchBtn.addEventListener('touchend', handleEnd, { passive: false });
+    touchBtn.addEventListener('touchcancel', handleCancel, { passive: false });
+
+    // Eventos de Mouse (Fallback completo para Testes no Desktop)
+    touchBtn.addEventListener('mousedown', (e) => {
+      if (e.button === 0) { // Apenas botão esquerdo do mouse
+        handleStart(e);
+      }
+    });
+
+    document.addEventListener('mouseup', (e) => {
+      if (isHolding) {
+        handleEnd(e);
+      }
+    });
+
+    touchBtn.addEventListener('mouseleave', (e) => {
+      if (isHolding) {
+        handleCancel(e);
+      }
+    });
+  </script>
+
+</body>
+</html>

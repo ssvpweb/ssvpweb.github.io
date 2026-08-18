@@ -1,14 +1,132 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laboratório de Testes UX - SSVP</title>
+  
+  <!-- Fontes do Google -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Estilos Globais compartilhados de UX -->
+  <link rel="stylesheet" href="global.css">
+  
+  <style>
+    .tests-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+      width: 100%;
+      margin-top: 1rem;
+    }
+    
+    .test-link-card {
+      background: var(--ssvp-white);
+      border: 1px solid var(--ssvp-gray-border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      text-decoration: none;
+      color: var(--ssvp-text-main);
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      box-shadow: 0 4px 6px rgba(0, 45, 98, 0.04);
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .test-link-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--ssvp-blue);
+      box-shadow: 0 8px 16px rgba(0, 127, 255, 0.08);
+    }
+    
+    .test-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--ssvp-navy);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .test-desc {
+      font-size: 0.9rem;
+      color: var(--ssvp-text-muted);
+      line-height: 1.4;
+    }
+    
+    .tag-active {
+      background: var(--ssvp-light-blue);
+      color: var(--ssvp-blue);
+      font-size: 0.75rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 6px;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-left: auto;
+    }
+    
+    @media (min-width: 600px) {
+      .tests-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .test-link-card.wide {
+        grid-column: span 2;
+      }
+    }
+  </style>
 </head>
-
 <body>
-    <h1>ux</h1>
-</body>
 
+  <header>
+    <h1>Laboratório de Testes UX</h1>
+    <p>Protótipos e Validações de Experiência do Usuário da SSVP</p>
+  </header>
+
+  <main class="container">
+    
+    <div class="tests-grid">
+      
+      <!-- Card: Gestos de Toque -->
+      <a href="padroes/index.html" class="test-link-card wide">
+        <div class="test-title">
+          <span>👆 Gestos de Toque (Tap vs. Hold)</span>
+          <span class="tag-active">Interativo</span>
+        </div>
+        <p class="test-desc">
+          Ambiente de teste para calibrar o tempo limite de duração de toque. Permite ajustar o slider de threshold e testar o feedback tátil/visual para cliques normais e toque-e-segure.
+        </p>
+      </a>
+      
+      <!-- Card: Login SSVP -->
+      <a href="login.html" class="test-link-card">
+        <div class="test-title">
+          <span>🔑 Interface de Login</span>
+        </div>
+        <p class="test-desc">
+          Protótipo visual e validações do painel de login para os vicentinos colaboradores.
+        </p>
+      </a>
+
+      <!-- Card: Barra de Navegação -->
+      <a href="barra_inferior/index.html" class="test-link-card">
+        <div class="test-title">
+          <span>📱 Barra de Navegação Mobile</span>
+        </div>
+        <p class="test-desc">
+          Testes de navegação e safe areas para o rodapé móvel em dispositivos Android e iOS.
+        </p>
+      </a>
+      
+    </div>
+
+  </main>
+
+  <footer>
+    <p>Sociedade de São Vicente de Paulo &copy; 2026</p>
+  </footer>
+
+</body>
 </html>

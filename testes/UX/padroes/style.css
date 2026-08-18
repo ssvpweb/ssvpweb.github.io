@@ -1,0 +1,267 @@
+/* 
+   ==========================================================================
+   ESTILO DO TESTADOR DE GESTOS (TAP VS LONG PRESS)
+   ========================================================================== 
+*/
+
+.gesture-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 2rem;
+  border-radius: 16px;
+}
+
+/* Customização do Slider de Threshold */
+.slider-container {
+  width: 100%;
+  background: var(--ssvp-light-blue);
+  padding: 1.25rem;
+  border-radius: 12px;
+  border: 1px solid var(--ssvp-gray-border);
+}
+
+.slider-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.slider-header label {
+  font-weight: 600;
+  color: var(--ssvp-navy);
+  font-size: 1rem;
+}
+
+.slider-header .value-display {
+  font-family: monospace;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--ssvp-blue);
+  background: var(--ssvp-white);
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid var(--ssvp-gray-border);
+}
+
+.custom-range {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--ssvp-gray-border);
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+.custom-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--ssvp-blue);
+  border: 2px solid var(--ssvp-white);
+  box-shadow: 0 2px 4px rgba(0, 127, 255, 0.3);
+  transition: transform 0.1s ease, background-color 0.2s ease;
+}
+
+.custom-range::-webkit-slider-thumb:active {
+  transform: scale(1.2);
+  background: var(--ssvp-navy);
+}
+
+/* Área Interativa do Botão */
+.button-area {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 180px;
+  width: 100%;
+  position: relative;
+}
+
+.touch-button {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  background-color: var(--ssvp-navy);
+  border: 4px solid var(--ssvp-gray-border);
+  color: var(--ssvp-white);
+  font-size: 1rem;
+  font-weight: 700;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none; /* Previne zoom e scroll nativos ao interagir */
+  box-shadow: 0 4px 12px rgba(0, 45, 98, 0.15);
+  transition: transform 0.1s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Camada Interna de Progresso (Efeito de Preenchimento) */
+.button-progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--ssvp-blue);
+  opacity: 0.35;
+  transform: scale(0);
+  border-radius: 50%;
+  pointer-events: none;
+  transition: transform 0.05s linear;
+  transform-origin: center center;
+}
+
+.touch-button span.btn-text {
+  z-index: 2;
+  pointer-events: none;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.touch-button span.btn-subtext {
+  font-size: 0.75rem;
+  font-weight: 400;
+  opacity: 0.8;
+  margin-top: 4px;
+}
+
+/* Estados do Botão */
+.touch-button:active {
+  transform: scale(0.95);
+}
+
+.touch-button.holding {
+  border-color: var(--ssvp-blue);
+  box-shadow: 0 0 20px rgba(0, 127, 255, 0.4);
+}
+
+.touch-button.success-state {
+  background-color: var(--ssvp-success) !important;
+  border-color: var(--ssvp-success) !important;
+  transform: scale(1.05);
+  box-shadow: 0 0 25px rgba(16, 185, 129, 0.6);
+}
+
+.touch-button.success-state span.btn-text {
+  color: var(--ssvp-white);
+}
+
+/* Painel de Estatísticas */
+.stats-row {
+  display: flex;
+  width: 100%;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.stat-card {
+  flex: 1;
+  background: var(--ssvp-white);
+  border: 1px solid var(--ssvp-gray-border);
+  padding: 1rem;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 2px 4px var(--ssvp-shadow);
+}
+
+.stat-card .stat-label {
+  font-size: 0.8rem;
+  color: var(--ssvp-text-muted);
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.stat-card .stat-val {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--ssvp-navy);
+}
+
+.stat-card.stat-last {
+  border-left: 4px solid var(--ssvp-gray-border);
+  transition: border-color 0.3s ease;
+}
+
+/* Console de Log em Tempo Real */
+.console-panel {
+  display: flex;
+  flex-direction: column;
+  height: 200px;
+  background: #0f172a;
+  border-radius: 12px;
+  padding: 1rem;
+  font-family: 'Courier New', Courier, monospace;
+  color: #38bdf8;
+  font-size: 0.875rem;
+  overflow: hidden;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
+  border: 1px solid #1e293b;
+}
+
+.console-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #1e293b;
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.75rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+
+.console-clear-btn {
+  background: none;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.75rem;
+}
+
+.console-clear-btn:hover {
+  text-decoration: underline;
+}
+
+.console-lines {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  scroll-behavior: smooth;
+}
+
+.log-line {
+  line-height: 1.4;
+  word-break: break-all;
+}
+
+.log-line.event { color: #facc15; }       /* Amarelo para eventos */
+.log-line.success { color: #4ade80; }     /* Verde para sucesso/segurar */
+.log-line.info { color: #38bdf8; }        /* Azul para info/toque curto */
+.log-line.system { color: #94a3b8; }      /* Cinza para logs internos */
+
+/* Ajuste Responsivo para Letras e Toques */
+@media (max-width: 480px) {
+  .gesture-panel {
+    padding: 1rem;
+  }
+  .touch-button {
+    width: 120px;
+    height: 120px;
+  }
+}
