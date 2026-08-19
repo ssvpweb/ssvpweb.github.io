@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Relato de Atendimento - Pastoral de Rua</title>
+  <style>
+    /* Variáveis de design premium e acessível (Foco em uso noturno na rua) */
+    :root {
+      --bg-gradient-start: #0f172a;
+      --bg-gradient-end: #1e293b;
+      --card-bg: #1e293b;
+      --card-border: #334155;
+      
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      
+      --accent-blue: #3b82f6;
+      --accent-blue-hover: #2563eb;
+      
+      --accent-whatsapp: #22c55e;
+      --accent-whatsapp-hover: #16a34a;
+      
+      --accent-danger: #ef4444;
+      --accent-danger-hover: #dc2626;
+      
+      --input-bg: #0f172a;
+      --input-border: #475569;
+      --input-focus: #3b82f6;
+      
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    }
+
+    /* Reset Geral */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+      min-height: 100vh;
+      color: var(--text-primary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      padding-top: calc(1.5rem + env(safe-area-inset-top, 0px));
+      padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+    }
+
+    .container {
+      width: 100%;
+      max-width: 480px;
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    /* Animação suave de entrada */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Card Principal */
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 2rem 1.5rem;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* Cabeçalho */
+    .header {
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+    }
+
+    .header p {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+
+    /* Grupos de Formulário */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .form-group label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .form-group label svg {
+      color: var(--accent-blue);
+    }
+
+    /* Input Wrapper */
+    .input-wrapper {
+      display: flex;
+      gap: 0.5rem;
+      align-items: stretch;
+    }
+
+    /* Estilo do Input e Textarea (Mínimo de 16px para iOS sem zoom) */
+    .form-control {
+      flex: 1;
+      background-color: var(--input-bg);
+      border: 1px solid var(--input-border);
+      color: var(--text-primary);
+      border-radius: 12px;
+      padding: 0.875rem 1rem;
+      font-size: 16px; /* Evita zoom automático no iOS */
+      line-height: 1.5;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+      width: 100%;
+    }
+
+    .form-control::placeholder {
+      color: #64748b;
+    }
+
+    .form-control:focus {
+      border-color: var(--input-focus);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+
+    textarea.form-control {
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    /* Botão de Ação do Microfone (Grande e Fácil de Tocar) */
+    .btn-mic {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--accent-blue);
+      color: var(--text-primary);
+      border: none;
+      border-radius: 12px;
+      width: 48px;
+      min-width: 48px;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+      position: relative;
+    }
+
+    .btn-mic:hover {
+      background-color: var(--accent-blue-hover);
+    }
+
+    .btn-mic:active {
+      transform: scale(0.95);
+    }
+
+    /* Estilo quando estiver gravando */
+    .btn-mic.gravando {
+      background-color: var(--accent-danger);
+      box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.4);
+      animation: pulse 1.5s infinite;
+    }
+
+    .btn-mic.gravando:hover {
+      background-color: var(--accent-danger-hover);
+    }
+
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+      }
+      70% {
+        box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+      }
+    }
+
+    /* Status e Botões de Controle Adicionais */
+    .control-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: -0.25rem;
+    }
+
+    .recording-status {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--accent-danger);
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .recording-status.active {
+      opacity: 1;
+    }
+
+    .recording-status span {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      background-color: var(--accent-danger);
+      border-radius: 50%;
+      animation: blink 1s infinite alternate;
+    }
+
+    @keyframes blink {
+      from { opacity: 0.3; }
+      to { opacity: 1; }
+    }
+
+    .btn-clear {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 6px;
+      transition: color 0.2s, background-color 0.2s;
+    }
+
+    .btn-clear:hover {
+      color: var(--text-primary);
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .btn-clear svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* Botão Principal do WhatsApp */
+    .btn-submit {
+      width: 100%;
+      background-color: var(--accent-whatsapp);
+      color: var(--text-primary);
+      border: none;
+      border-radius: 14px;
+      padding: 1rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      cursor: pointer;
+      box-shadow: var(--shadow-md);
+      transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+      margin-top: 0.5rem;
+    }
+
+    .btn-submit:hover {
+      background-color: var(--accent-whatsapp-hover);
+      box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+    }
+
+    .btn-submit:active {
+      transform: scale(0.98);
+    }
+
+    .btn-submit svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    /* Toast Element */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background-color: #334155;
+      color: #fff;
+      padding: 0.75rem 1.5rem;
+      border-radius: 30px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      box-shadow: var(--shadow-lg);
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
+      opacity: 0;
+      z-index: 1000;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border: 1px solid #475569;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="card">
+      
+      <!-- Cabeçalho -->
+      <div class="header">
+        <h1>Relato de Atendimento</h1>
+        <p>Pastoral do Povo da Rua</p>
+      </div>
+
+      <!-- Campo: Nome do Morador -->
+      <div class="form-group">
+        <label for="morador">
+          <!-- Ícone Person (Material) -->
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+          </svg>
+          Nome do Morador
+        </label>
+        <div class="input-wrapper">
+          <input 
+            type="text" 
+            id="morador" 
+            class="form-control" 
+            placeholder="Nome ou apelido (ou em branco)"
+            autocomplete="off"
+          >
+          <button 
+            type="button" 
+            class="btn-mic" 
+            id="btn-mic-morador" 
+            title="Gravar nome por voz"
+            onclick="alternarGravacao('morador', 'btn-mic-morador')"
+          >
+            <!-- Ícone Mic (Material) -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+              <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+              <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+            </svg>
+          </button>
+        </div>
+        <div class="control-row">
+          <div class="recording-status" id="status-morador">
+            <span></span> Ouvindo voz...
+          </div>
+          <button type="button" class="btn-clear" onclick="limparCampo('morador')">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+            </svg>
+            Limpar
+          </button>
+        </div>
+      </div>
+
+      <!-- Campo: Relato do Atendimento -->
+      <div class="form-group">
+        <label for="relato">
+          <!-- Ícone Description (Material) -->
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+          </svg>
+          Relato do Atendimento
+        </label>
+        <div class="input-wrapper">
+          <textarea 
+            id="relato" 
+            class="form-control" 
+            placeholder="Descreva o atendimento, necessidades, pedidos ou observações..."
+          ></textarea>
+          <button 
+            type="button" 
+            class="btn-mic" 
+            id="btn-mic-relato" 
+            title="Gravar relato por voz"
+            onclick="alternarGravacao('relato', 'btn-mic-relato')"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+              <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+              <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+            </svg>
+          </button>
+        </div>
+        <div class="control-row">
+          <div class="recording-status" id="status-relato">
+            <span></span> Gravando relato...
+          </div>
+          <button type="button" class="btn-clear" onclick="limparCampo('relato')">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+            </svg>
+            Limpar
+          </button>
+        </div>
+      </div>
+
+      <!-- Botão Enviar WhatsApp -->
+      <button type="button" class="btn-submit" onclick="enviarWhatsApp()">
+        <!-- Ícone WhatsApp SVG -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.458L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.42 9.863-9.864.001-2.63-1.023-5.101-2.882-6.963C16.58 1.912 14.106.885 11.996.885 6.558.885 2.13 5.31 2.128 10.749c-.001 1.705.451 3.371 1.31 4.869l-.994 3.634 3.713-.974zm13.003-8.082c-.303-.151-1.793-.884-2.071-.985-.278-.101-.48-.151-.68.151-.2.302-.777.985-.953 1.186-.177.201-.353.226-.656.075-.303-.151-1.28-.472-2.438-1.504-.901-.804-1.509-1.797-1.686-2.099-.177-.302-.019-.465.132-.615.136-.135.303-.352.454-.528.151-.177.202-.302.303-.503.101-.201.05-.377-.026-.528-.075-.151-.68-1.638-.932-2.242-.246-.591-.496-.511-.68-.521-.177-.009-.38-.01-.582-.01-.201 0-.53.075-.808.377-.278.302-1.06 1.037-1.06 2.529 0 1.492 1.085 2.934 1.236 3.136.151.201 2.137 3.262 5.178 4.571.722.311 1.287.498 1.728.638.726.23 1.386.198 1.908.12.582-.087 1.793-.73 2.046-1.434.253-.704.253-1.308.177-1.434-.076-.126-.278-.201-.582-.352z"/>
+        </svg>
+        Enviar pelo WhatsApp
+      </button>
+
+    </div>
+  </div>
+
+  <!-- Toast Element -->
+  <div id="toast" class="toast">Relato copiado para a área de transferência!</div>
+
+  <script>
+    // Suporte para Speech Recognition multiplataforma
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let activeRecognition = null;
+    let activeBotaoId = null;
+
+    // Vibração tátil simples
+    function feedbackTatil(ms = 50) {
+      if (navigator.vibrate) {
+        navigator.vibrate(ms);
+      }
+    }
+
+    // Limpa o valor de um campo
+    function limparCampo(campoId) {
+      feedbackTatil(30);
+      document.getElementById(campoId).value = "";
+      
+      // Se estiver gravando o respectivo campo, interrompe
+      const botaoId = `btn-mic-${campoId}`;
+      const botao = document.getElementById(botaoId);
+      if (botao.classList.contains('gravando')) {
+        pararGravacaoAtiva();
+      }
+    }
+
+    // Exibe aviso flutuante temporário
+    function exibirToast(mensagem) {
+      const toast = document.getElementById('toast');
+      toast.textContent = mensagem;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // Parar gravação atual
+    function pararGravacaoAtiva() {
+      if (activeRecognition) {
+        activeRecognition.stop();
+        activeRecognition = null;
+      }
+      if (activeBotaoId) {
+        const botao = document.getElementById(activeBotaoId);
+        botao.classList.remove('gravando');
+        
+        // Esconde status
+        const campoId = activeBotaoId.replace('btn-mic-', '');
+        document.getElementById(`status-${campoId}`).classList.remove('active');
+        
+        activeBotaoId = null;
+      }
+    }
+
+    // Alternar gravação (Iniciar / Parar)
+    function alternarGravacao(campoId, botaoId) {
+      const botao = document.getElementById(botaoId);
+      const campo = document.getElementById(campoId);
+      const statusElement = document.getElementById(`status-${campoId}`);
+
+      feedbackTatil(60);
+
+      // Se já estiver gravando ESTE campo, para
+      if (botao.classList.contains('gravando')) {
+        pararGravacaoAtiva();
+        return;
+      }
+
+      // Se estiver gravando OUTRO campo, para ele primeiro
+      if (activeRecognition) {
+        pararGravacaoAtiva();
+      }
+
+      if (!SpeechRecognition) {
+        alert("O reconhecimento de voz não é suportado pelo seu navegador/celular nesta página. Certifique-se de estar usando o Chrome no Android ou Safari no iPhone.");
+        return;
+      }
+
+      try {
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'pt-BR';
+        recognition.continuous = false; // Parar automaticamente quando o usuário terminar de falar
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        activeRecognition = recognition;
+        activeBotaoId = botaoId;
+
+        recognition.onstart = () => {
+          botao.classList.add('gravando');
+          statusElement.classList.add('active');
+        };
+
+        recognition.onresult = (event) => {
+          const resultado = event.results[0][0].transcript;
+          if (resultado) {
+            const valorAtual = campo.value.trim();
+            campo.value = valorAtual ? valorAtual + " " + resultado : resultado;
+            campo.dispatchEvent(new Event('input')); // Dispara evento de alteração
+          }
+        };
+
+        recognition.onend = () => {
+          // Desativa animação e status
+          botao.classList.remove('gravando');
+          statusElement.classList.remove('active');
+          
+          if (activeRecognition === recognition) {
+            activeRecognition = null;
+            activeBotaoId = null;
+          }
+        };
+
+        recognition.onerror = (event) => {
+          console.error("Erro no reconhecimento de voz:", event.error);
+          botao.classList.remove('gravando');
+          statusElement.classList.remove('active');
+          
+          if (event.error === 'not-allowed') {
+            exibirToast("Erro: Permissão do microfone negada.");
+          } else if (event.error === 'no-speech') {
+            exibirToast("Nenhuma voz foi detectada.");
+          } else {
+            exibirToast("Erro na gravação: " + event.error);
+          }
+
+          if (activeRecognition === recognition) {
+            activeRecognition = null;
+            activeBotaoId = null;
+          }
+        };
+
+        recognition.start();
+
+      } catch (err) {
+        console.error("Falha ao iniciar Speech Recognition:", err);
+        exibirToast("Não foi possível iniciar o microfone.");
+      }
+    }
+
+    // Enviar dados consolidados para o WhatsApp
+    function enviarWhatsApp() {
+      feedbackTatil(80);
+      
+      // Garante que para a gravação se estiver rodando
+      pararGravacaoAtiva();
+
+      const morador = document.getElementById('morador').value.trim();
+      const relato = document.getElementById('relato').value.trim();
+
+      if (!relato) {
+        alert("Por favor, preencha o relato do atendimento antes de enviar.");
+        return;
+      }
+
+      // Formatação da Mensagem
+      let textoMsg = "*Relato - Pastoral de Rua*\n\n";
+      textoMsg += `*Morador:* ${morador ? morador : "Não identificado"}\n`;
+      textoMsg += `*Relato:* ${relato}`;
+
+      // URL de compartilhamento do WhatsApp
+      const linkWhatsApp = `https://wa.me/?text=${encodeURIComponent(textoMsg)}`;
+      
+      // Copiar também para a área de transferência como segurança (fallback)
+      navigator.clipboard.writeText(textoMsg)
+        .then(() => {
+          exibirToast("Copiado! Abrindo o WhatsApp...");
+          setTimeout(() => {
+            window.open(linkWhatsApp, '_blank');
+          }, 800);
+        })
+        .catch(err => {
+          console.warn("Erro ao copiar relato:", err);
+          // Abre mesmo se falhar a cópia
+          window.open(linkWhatsApp, '_blank');
+        });
+    }
+  </script>
+</body>
+</html>
