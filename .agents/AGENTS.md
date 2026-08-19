@@ -6,10 +6,12 @@
   Se um arquivo de chat na pasta `dev_local/chats/` for modificado, ele deve ser renomeado para incluir a data da última modificação como prefixo no formato `AAMMDD_nome_do_arquivo.md` (onde AA é o ano com 2 dígitos, MM é o mês e DD é o dia). 
   * Exemplo: `nome_do_arquivo.md` ou `260810_nome_do_arquivo.md` vira `260811_nome_do_arquivo.md` se for editado em 11 de Agosto de 2026.
 
+<!--
 ## Otimização de Processamento em Desenvolvimento
 * **NÃO use o browser automatizado (subagente) para tirar capturas de tela ou screenshots**.
 * Em vez de rodar simulações no navegador de IA, instrua o usuário a abrir a página com o Live Server local dele.
 * Sempre detalhe no chat o que o usuário deve testar e analisar manualmente.
+-->
 
 ## Organização de Planos de Implementação
 * **Planos Gerais e Funcionalidades:** Os planos de implementação (específicos de features, conjuntos de features ou o plano geral do webapp) devem ser salvos na pasta `dev/implement/` para subirem para o repositório público.
