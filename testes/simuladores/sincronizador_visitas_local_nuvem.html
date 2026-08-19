@@ -776,7 +776,10 @@
           throw new Error(dados.error);
         }
 
-        visitasNuvem = dados.map(v => ({ ...v, origem: "nuvem" }));
+        // Filtra para remover quaisquer visitas com ID vazio recebido da planilha
+        visitasNuvem = dados
+          .filter(v => v.id && String(v.id).trim() !== "")
+          .map(v => ({ ...v, origem: "nuvem" }));
 
         exibirToast(`Sucesso! ${visitasNuvem.length} visitas baixadas.`);
         renderizarVisitas();
@@ -834,6 +837,17 @@
         console.error("Erro ao sincronizar com nuvem:", err);
         alert("Falha ao salvar na nuvem: " + err.message);
       }
+    }
+
+    // Formata a string de hora para o padrao HH:MM caso venha a data longa do Apps Script
+    function formatarHora(horaStr) {
+      if (!horaStr) return "14:00";
+      const str = String(horaStr).trim();
+      if (str.includes("GMT") || str.includes("1899")) {
+        const matches = str.match(/\d{2}:\d{2}/);
+        if (matches) return matches[0];
+      }
+      return str;
     }
 
     // Renderiza a lista mesclada na tela (Mais recentes primeiro)
@@ -899,7 +913,7 @@
           <div class="visita-footer">
             <div class="visita-meta">
               <span>📅 ${dataFormatada}</span>
-              <span>⏰ ${v.horaInicio} - ${v.horaFim}</span>
+              <span>⏰ ${formatarHora(v.horaInicio)} - ${formatarHora(v.horaFim)}</span>
             </div>
             ${actionHtml}
           </div>
