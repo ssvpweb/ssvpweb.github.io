@@ -1375,7 +1375,8 @@
       }
 
       const semanas = document.getElementById("filtro-semanas").value;
-      const endpoint = url + (semanas ? `?semanas=${semanas}` : "");
+      const cacheBuster = `cb=${Date.now()}`;
+      const endpoint = url + (semanas ? `?semanas=${semanas}&${cacheBuster}` : `?${cacheBuster}`);
 
       exibirToast("Baixando dados da nuvem...");
 
