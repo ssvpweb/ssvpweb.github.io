@@ -1411,9 +1411,14 @@
           throw new Error(dados.error);
         }
 
-        // Filtra para remover quaisquer visitas com ID vazio recebido da planilha
+        // Filtra para remover registros em branco vindos da planilha
         visitasNuvem = dados
-          .filter(v => v.id && String(v.id).trim() !== "")
+          .filter(v => {
+            const temId = v.id && String(v.id).trim() !== "";
+            const temFamilia = v.idFamilia && String(v.idFamilia).trim() !== "";
+            const temResumo = v.resumo && String(v.resumo).trim() !== "";
+            return temId && temFamilia && temResumo;
+          })
           .map(v => ({ ...v, origem: "nuvem" }));
 
         exibirToast(`Sucesso! ${visitasNuvem.length} visitas baixadas.`);
