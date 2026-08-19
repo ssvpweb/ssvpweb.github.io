@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Sincronizador de Visitas Local/Nuvem - SSVP</title>
+  <style>
+    /* Design System Premium (Glassmorphism e Dark Mode Suave) */
+    :root {
+      --bg-gradient-start: #0f172a;
+      --bg-gradient-end: #1e293b;
+      --card-bg: rgba(30, 41, 59, 0.7);
+      --card-border: rgba(255, 255, 255, 0.08);
+      
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      
+      --accent-blue: #3b82f6;
+      --accent-blue-hover: #2563eb;
+      
+      --accent-green: #22c55e;
+      --accent-green-hover: #16a34a;
+      --accent-green-bg: rgba(34, 197, 94, 0.15);
+      --accent-green-border: rgba(34, 197, 94, 0.3);
+      
+      --accent-yellow: #eab308;
+      --accent-yellow-bg: rgba(234, 179, 8, 0.15);
+      --accent-yellow-border: rgba(234, 179, 8, 0.3);
+      
+      --accent-danger: #ef4444;
+      --accent-danger-hover: #dc2626;
+      
+      --input-bg: #0f172a;
+      --input-border: #475569;
+      --input-focus: #3b82f6;
+      
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+      min-height: 100vh;
+      color: var(--text-primary);
+      padding: 2rem 1.5rem;
+      padding-top: calc(2rem + env(safe-area-inset-top, 0px));
+      padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0px));
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1000px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* Cabeçalho */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-script-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      padding: 0.5rem 0.85rem;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: color 0.2s, background-color 0.2s, border-color 0.2s;
+    }
+
+    .btn-script-link:hover {
+      color: var(--text-primary);
+      background-color: rgba(59, 130, 246, 0.1);
+      border-color: var(--accent-blue);
+    }
+
+    .btn-script-link svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .header h1 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      background: linear-gradient(to right, #60a5fa, #3b82f6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .header p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    /* Card de Configuração do Web App */
+    .config-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 1.25rem;
+      box-shadow: var(--shadow-md);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      backdrop-filter: blur(10px);
+    }
+
+    .config-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .config-inputs {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .config-inputs input {
+      flex: 1;
+      min-width: 280px;
+    }
+
+    /* Layout de Duas Colunas */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    @media (max-width: 800px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Painel do Formulário (Esquerda) */
+    .form-panel {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      backdrop-filter: blur(10px);
+    }
+
+    .panel-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 0.5rem;
+      margin-bottom: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.375rem;
+    }
+
+    .form-group label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .form-control {
+      background-color: var(--input-bg);
+      border: 1px solid var(--input-border);
+      color: var(--text-primary);
+      border-radius: 8px;
+      padding: 0.65rem 0.85rem;
+      font-size: 16px; /* Evita auto-zoom no iOS */
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .form-control:focus {
+      border-color: var(--input-focus);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    textarea.form-control {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    /* Painel de Visualização (Direita) */
+    .view-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .actions-bar {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 1rem;
+      box-shadow: var(--shadow-md);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      backdrop-filter: blur(10px);
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .filter-group label {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+
+    .filter-group input {
+      width: 70px;
+      text-align: center;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    /* Estilo dos Botões */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 700;
+      padding: 0.65rem 1.25rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn-primary {
+      background-color: var(--accent-blue);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--accent-blue-hover);
+    }
+
+    .btn-success {
+      background-color: var(--accent-green);
+      color: white;
+    }
+
+    .btn-success:hover {
+      background-color: var(--accent-green-hover);
+    }
+
+    .btn-block {
+      width: 100%;
+      padding: 0.8rem;
+    }
+
+    /* Lista de Cards de Visitas */
+    .visitas-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      max-height: 600px;
+      overflow-y: auto;
+      padding-right: 0.25rem;
+    }
+
+    /* Custom Scrollbar */
+    .visitas-list::-webkit-scrollbar {
+      width: 6px;
+    }
+    .visitas-list::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 4px;
+    }
+    .visitas-list::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+    }
+    .visitas-list::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .empty-state {
+      background-color: var(--card-bg);
+      border: 1px dashed var(--card-border);
+      border-radius: 16px;
+      padding: 3rem 1.5rem;
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      backdrop-filter: blur(10px);
+    }
+
+    /* Card de Visita */
+    .visita-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 1.25rem;
+      box-shadow: var(--shadow-md);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      position: relative;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      backdrop-filter: blur(10px);
+      animation: cardIn 0.3s ease-out;
+    }
+
+    @keyframes cardIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .visita-card:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .visita-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .visita-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .visita-subtitle {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 0.15rem;
+    }
+
+    /* Tags de Origem (Nuvem ou Local) */
+    .tag {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 0.25rem 0.6rem;
+      border-radius: 30px;
+      letter-spacing: 0.05em;
+    }
+
+    .tag-nuvem {
+      background-color: var(--accent-green-bg);
+      color: var(--accent-green);
+      border: 1px solid var(--accent-green-border);
+    }
+
+    .tag-local {
+      background-color: var(--accent-yellow-bg);
+      color: var(--accent-yellow);
+      border: 1px solid var(--accent-yellow-border);
+    }
+
+    .visita-body {
+      font-size: 0.875rem;
+      line-height: 1.5;
+      color: #cbd5e1;
+      background-color: rgba(0, 0, 0, 0.15);
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      border-left: 3px solid var(--accent-blue);
+      white-space: pre-wrap;
+    }
+
+    .visita-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    .visita-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .btn-delete-local {
+      background: none;
+      border: none;
+      color: var(--accent-danger);
+      cursor: pointer;
+      padding: 0.25rem;
+      border-radius: 4px;
+      transition: background-color 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-delete-local:hover {
+      background-color: rgba(239, 68, 68, 0.1);
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background-color: #334155;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 30px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      box-shadow: var(--shadow-lg);
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
+      opacity: 0;
+      z-index: 1000;
+      pointer-events: none;
+      border: 1px solid #475569;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- Cabeçalho -->
+    <div class="header">
+      <div>
+        <h1>Sincronizador de Visitas</h1>
+        <p>Integração de Dados de Atendimento Local e Nuvem (Google Sheets)</p>
+      </div>
+      <a href="https://script.google.com/u/0/home/projects/1wLmM9IdzXo4gN4XLymBkcImlpPi_8UuN9tYna00vZwAcMxJdipT_npJU/edit" target="_blank" class="btn-script-link" title="Abrir editor do Google Apps Script">
+        <!-- Ícone Code -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/>
+        </svg>
+        Ver Apps Script
+      </a>
+    </div>
+
+    <!-- Card de Configuração do Web App -->
+    <div class="config-card">
+      <div class="config-title">
+        <!-- Ícone Settings -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+          <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+        </svg>
+        URL de Integração do Google Apps Script
+      </div>
+      <div class="config-inputs">
+        <input 
+          type="url" 
+          id="web-app-url" 
+          class="form-control" 
+          placeholder="Insira a URL de implantação do Apps Script (https://script.google.com/macros/s/.../exec)"
+          value="https://script.google.com/macros/s/AKfycbwwgVAno8okKq7WiyO5WRrRW7oXTwrzR9DHg9hicGd5yX6S_UWT70l9Vb5nfYaCg8kk/exec"
+        >
+        <button type="button" class="btn btn-primary" onclick="salvarUrlConfig()">Salvar URL</button>
+      </div>
+    </div>
+
+    <!-- Área Principal Grid -->
+    <div class="main-grid">
+      
+      <!-- Painel Esquerdo: Formulário para Adicionar Local -->
+      <div class="form-panel">
+        <div class="panel-title">
+          <!-- Ícone Add -->
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+          </svg>
+          Registrar Visita Local
+        </div>
+        
+        <div class="form-group">
+          <label for="familia-id">Família Atendida</label>
+          <select id="familia-id" class="form-control">
+            <option value="F-SILVA-01">Família Silva (F-SILVA-01)</option>
+            <option value="F-SANTOS-02">Família Santos (F-SANTOS-02)</option>
+            <option value="F-OLIVEIRA-03">Família Oliveira (F-OLIVEIRA-03)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="visita-data">Data da Visita</label>
+          <input type="date" id="visita-data" class="form-control">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="hora-inicio">Hora Início</label>
+            <input type="time" id="hora-inicio" class="form-control" value="14:00">
+          </div>
+          <div class="form-group">
+            <label for="hora-fim">Hora Fim</label>
+            <input type="time" id="hora-fim" class="form-control" value="14:45">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="resumo-visita">Resumo do Atendimento</label>
+          <textarea id="resumo-visita" class="form-control" placeholder="O que foi conversado, necessidades identificadas, auxílios entregues..."></textarea>
+        </div>
+
+        <button type="button" class="btn btn-primary btn-block" onclick="adicionarVisitaLocal()">
+          <!-- Ícone Save -->
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
+          </svg>
+          Salvar no Navegador (Local)
+        </button>
+      </div>
+
+      <!-- Painel Direito: Ações Globais e Lista -->
+      <div class="view-panel">
+        
+        <!-- Barra de Ações -->
+        <div class="actions-bar">
+          <div class="filter-group">
+            <label for="filtro-semanas">Filtrar por Semanas:</label>
+            <input type="number" id="filtro-semanas" class="form-control" placeholder="Ex: 12" value="">
+          </div>
+          <div class="btn-group">
+            <button type="button" class="btn btn-primary" onclick="baixarVisitasNuvem()">
+              <!-- Ícone Download -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/>
+              </svg>
+              Baixar Visitas
+            </button>
+            <button type="button" class="btn btn-success" onclick="enviarParaNuvem()">
+              <!-- Ícone Upload -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+              </svg>
+              Enviar para Nuvem
+            </button>
+          </div>
+        </div>
+
+        <!-- Lista de Cards -->
+        <div id="visitas-container" class="visitas-list">
+          <!-- Dinâmico -->
+          <div class="empty-state">
+            Nenhuma visita carregada. Clique em "Baixar Visitas" para puxar do Google Sheets ou registre uma visita local.
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast">Ação concluída com sucesso!</div>
+
+  <script>
+    // Gerenciador de Estado
+    let visitasNuvem = []; // Visitas vindas do Google Sheets
+    let visitasLocais = []; // Visitas criadas localmente no localStorage
+
+    // Inicialização da página
+    document.addEventListener("DOMContentLoaded", () => {
+      // Ajusta data padrão para hoje no formulário
+      const hoje = new Date().toISOString().split('T')[0];
+      document.getElementById('visita-data').value = hoje;
+
+      // Recupera URL do Apps Script salva
+      const urlSalva = localStorage.getItem("ssvp_web_app_url");
+      if (urlSalva) {
+        document.getElementById("web-app-url").value = urlSalva;
+      }
+
+      // Carrega visitas locais gravadas no localStorage
+      carregarVisitasLocaisDoStorage();
+      
+      // Renderiza estado inicial
+      renderizarVisitas();
+    });
+
+    // Salva a URL do Web App no localStorage
+    function salvarUrlConfig() {
+      const url = document.getElementById("web-app-url").value.trim();
+      if (!url) {
+        exibirToast("Por favor, insira uma URL válida.");
+        return;
+      }
+      localStorage.setItem("ssvp_web_app_url", url);
+      exibirToast("URL de integração salva!");
+    }
+
+    // Retorna a URL ativa do input
+    function obterUrlAtiva() {
+      return document.getElementById("web-app-url").value.trim();
+    }
+
+    // Exibe toast temporário
+    function exibirToast(mensagem) {
+      const toast = document.getElementById("toast");
+      toast.textContent = mensagem;
+      toast.classList.add("show");
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 3000);
+    }
+
+    // Carrega do localStorage
+    function carregarVisitasLocaisDoStorage() {
+      const locaisString = localStorage.getItem("ssvp_visitas_locais");
+      if (locaisString) {
+        try {
+          visitasLocais = JSON.parse(locaisString);
+        } catch (e) {
+          visitasLocais = [];
+        }
+      } else {
+        visitasLocais = [];
+      }
+    }
+
+    // Salva no localStorage
+    function salvarVisitasLocaisNoStorage() {
+      localStorage.setItem("ssvp_visitas_locais", JSON.stringify(visitasLocais));
+    }
+
+    // Adiciona uma visita na lista local
+    function adicionarVisitaLocal() {
+      const idFamilia = document.getElementById("familia-id").value;
+      const data = document.getElementById("visita-data").value;
+      const horaInicio = document.getElementById("hora-inicio").value;
+      const horaFim = document.getElementById("hora-fim").value;
+      const resumo = document.getElementById("resumo-visita").value.trim();
+
+      if (!data || !resumo) {
+        alert("Preencha a data e o resumo do atendimento antes de salvar localmente.");
+        return;
+      }
+
+      // Cria objeto com ID provisório local
+      const novaVisita = {
+        id: "V-LOCAL-" + Date.now(),
+        idFamilia: idFamilia,
+        data: data,
+        horaInicio: horaInicio,
+        horaFim: horaFim,
+        resumo: resumo,
+        origem: "local"
+      };
+
+      visitasLocais.unshift(novaVisita); // Adiciona no início
+      salvarVisitasLocaisNoStorage();
+      renderizarVisitas();
+      
+      // Limpa formulário (menos data e ID da família)
+      document.getElementById("resumo-visita").value = "";
+      exibirToast("Visita adicionada localmente!");
+    }
+
+    // Exclui uma visita local antes de subir para a nuvem
+    function excluirVisitaLocal(id) {
+      if (confirm("Deseja realmente remover esta visita da lista local?")) {
+        visitasLocais = visitasLocais.filter(v => v.id !== id);
+        salvarVisitasLocaisNoStorage();
+        renderizarVisitas();
+        exibirToast("Visita removida.");
+      }
+    }
+
+    // Baixa visitas da nuvem do Google Sheets
+    async function baixarVisitasNuvem() {
+      const url = obterUrlAtiva();
+      if (!url) {
+        alert("Antes de baixar, configure a URL do seu Google Apps Script Web App.");
+        return;
+      }
+
+      const semanas = document.getElementById("filtro-semanas").value;
+      const endpoint = url + (semanas ? `?semanas=${semanas}` : "");
+
+      exibirToast("Baixando dados da nuvem...");
+
+      try {
+        const response = await fetch(endpoint, {
+          method: "GET",
+          redirect: "follow"
+        });
+
+        if (!response.ok) {
+          throw new Error("HTTP status " + response.status);
+        }
+
+        const dados = await response.json();
+        if (dados.error) {
+          throw new Error(dados.error);
+        }
+
+        visitasNuvem = dados.map(v => ({ ...v, origem: "nuvem" }));
+        
+        exibirToast(`Sucesso! ${visitasNuvem.length} visitas baixadas.`);
+        renderizarVisitas();
+
+      } catch (err) {
+        console.error("Erro ao baixar visitas:", err);
+        alert("Falha ao se conectar com o Google Sheets: " + err.message + "\n\nVerifique se a URL está correta e se você publicou o script como Web App executável por 'Qualquer Pessoa'.");
+      }
+    }
+
+    // Envia o lote de visitas locais para a nuvem
+    async function enviarParaNuvem() {
+      const url = obterUrlAtiva();
+      if (!url) {
+        alert("Antes de enviar, configure a URL do seu Google Apps Script Web App.");
+        return;
+      }
+
+      if (visitasLocais.length === 0) {
+        alert("Não há visitas locais na lista para enviar. Adicione novas visitas primeiro.");
+        return;
+      }
+
+      exibirToast("Enviando visitas locais...");
+
+      try {
+        // Removemos o campo fictício de ID provisório local para a planilha criar os IDs do Sheets,
+        // ou mantemos. O doPost lida com IDs. Vamos enviar.
+        // Dica: enviamos como texto puro para evitar preflight requests CORS complexos do navegador
+        const response = await fetch(url, {
+          method: "POST",
+          redirect: "follow",
+          body: JSON.stringify(visitasLocais)
+        });
+
+        if (!response.ok) {
+          throw new Error("HTTP status " + response.status);
+        }
+
+        const resData = await response.json();
+        if (resData.success) {
+          exibirToast(`${visitasLocais.length} visitas salvas na nuvem com sucesso!`);
+          
+          // Esvazia visitas locais
+          visitasLocais = [];
+          salvarVisitasLocaisNoStorage();
+          
+          // Atualiza lista baixando da nuvem
+          await baixarVisitasNuvem();
+        } else {
+          throw new Error(resData.error || "Erro desconhecido");
+        }
+
+      } catch (err) {
+        console.error("Erro ao sincronizar com nuvem:", err);
+        alert("Falha ao salvar na nuvem: " + err.message);
+      }
+    }
+
+    // Renderiza a lista mesclada na tela (Mais recentes primeiro)
+    function renderizarVisitas() {
+      const container = document.getElementById("visitas-container");
+      container.innerHTML = "";
+
+      // Mescla e ordena por data decrescente
+      const todas = [...visitasLocais, ...visitasNuvem];
+      
+      // Ordenação decrescente: visitas mais recentes primeiro
+      todas.sort((a, b) => new Date(b.data) - new Date(a.data));
+
+      if (todas.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            Nenhuma visita carregada. Clique em "Baixar Visitas" para puxar do Google Sheets ou registre uma visita local.
+          </div>
+        `;
+        return;
+      }
+
+      todas.forEach(v => {
+        const card = document.createElement("div");
+        card.className = "visita-card";
+
+        const tagClass = v.origem === "nuvem" ? "tag-nuvem" : "tag-local";
+        const tagLabel = v.origem === "nuvem" ? "Nuvem" : "Local";
+        
+        // Formata data amigável
+        let dataFormatada = v.data;
+        if (v.data) {
+          const partes = v.data.split('-');
+          if (partes.length === 3) {
+            dataFormatada = `${partes[2]}/${partes[1]}/${partes[0]}`;
+          }
+        }
+
+        const headerHtml = `
+          <div class="visita-card-header">
+            <div>
+              <div class="visita-title">${v.idFamilia}</div>
+              <div class="visita-subtitle">ID Visita: ${v.id}</div>
+            </div>
+            <span class="tag ${tagClass}">${tagLabel}</span>
+          </div>
+        `;
+
+        const bodyHtml = `
+          <div class="visita-body">${v.resumo}</div>
+        `;
+
+        // Se for local, exibe botão de exclusão
+        const actionHtml = v.origem === "local" ? `
+          <button class="btn-delete-local" onclick="excluirVisitaLocal('${v.id}')" title="Excluir visita da lista local">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+              <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+            </svg>
+          </button>
+        ` : '';
+
+        const footerHtml = `
+          <div class="visita-footer">
+            <div class="visita-meta">
+              <span>📅 ${dataFormatada}</span>
+              <span>⏰ ${v.horaInicio} - ${v.horaFim}</span>
+            </div>
+            ${actionHtml}
+          </div>
+        `;
+
+        card.innerHTML = headerHtml + bodyHtml + footerHtml;
+        container.appendChild(card);
+      });
+    }
+  </script>
+</body>
+</html>
