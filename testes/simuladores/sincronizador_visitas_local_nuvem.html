@@ -516,9 +516,11 @@
     <!-- Cabeçalho -->
     <div class="header">
       <div>
-        <h1>Sincronizador de Visitas v2</h1>
-        <p>Integração de Dados de Atendimento Local e Nuvem (Google Sheets) <span class="badge-version">v2.2.0</span></p>
+        <h1>Sincronizador de Visitas v3</h1>
+        <p>Integração de Dados de Atendimento Local e Nuvem (Google Sheets) <span class="badge-version">v2.2.0</span>
+        </p>
       </div>
+
       <a href="https://script.google.com/macros/s/AKfycbwwgVAno8okKq7WiyO5WRrRW7oXTwrzR9DHg9hicGd5yX6S_UWT70l9Vb5nfYaCg8kk/exec"
         target="_blank" class="btn-script-link" title="Abrir editor do Google Apps Script">
         <!-- Ícone Code -->
@@ -791,11 +793,11 @@
         const resData = await response.json();
         if (resData.success) {
           exibirToast("Visita deletada da nuvem com sucesso!");
-          
+
           // Remove localmente do array para dar feedback visual instantaneo
           visitasNuvem = visitasNuvem.filter(v => v.id !== id);
           renderizarVisitas();
-          
+
           // Recarrega da nuvem para confirmar a sincronizacao
           await baixarVisitasNuvem();
         } else {
