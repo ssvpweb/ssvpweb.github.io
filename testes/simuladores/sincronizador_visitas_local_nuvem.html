@@ -104,6 +104,18 @@
       height: 16px;
     }
 
+    .badge-version {
+      font-size: 0.7rem;
+      font-weight: 700;
+      background-color: rgba(255, 255, 255, 0.1);
+      color: var(--text-secondary);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      margin-left: 0.5rem;
+      vertical-align: middle;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
     .header h1 {
       font-size: 1.75rem;
       font-weight: 800;
@@ -505,7 +517,7 @@
     <div class="header">
       <div>
         <h1>Sincronizador de Visitas v2</h1>
-        <p>Integração de Dados de Atendimento Local e Nuvem (Google Sheets)</p>
+        <p>Integração de Dados de Atendimento Local e Nuvem (Google Sheets) <span class="badge-version">v2.2.0</span></p>
       </div>
       <a href="https://script.google.com/macros/s/AKfycbwwgVAno8okKq7WiyO5WRrRW7oXTwrzR9DHg9hicGd5yX6S_UWT70l9Vb5nfYaCg8kk/exec"
         target="_blank" class="btn-script-link" title="Abrir editor do Google Apps Script">
@@ -748,6 +760,54 @@
       }
     }
 
+    // Exclui uma visita permanentemente do Google Sheets via Web App
+    async function excluirVisitaNuvem(id) {
+      const url = obterUrlAtiva();
+      if (!url) {
+        alert("Antes de excluir, configure a URL do seu Google Apps Script Web App.");
+        return;
+      }
+
+      if (!confirm(`Deseja realmente deletar esta visita permanentemente da nuvem (Google Sheets)?\nID: ${id}`)) {
+        return;
+      }
+
+      feedbackTatil(60);
+      exibirToast("Deletando da nuvem...");
+
+      try {
+        const response = await fetch(url, {
+          method: "POST",
+          body: JSON.stringify({
+            action: "delete",
+            id: id
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error("HTTP status " + response.status);
+        }
+
+        const resData = await response.json();
+        if (resData.success) {
+          exibirToast("Visita deletada da nuvem com sucesso!");
+          
+          // Remove localmente do array para dar feedback visual instantaneo
+          visitasNuvem = visitasNuvem.filter(v => v.id !== id);
+          renderizarVisitas();
+          
+          // Recarrega da nuvem para confirmar a sincronizacao
+          await baixarVisitasNuvem();
+        } else {
+          throw new Error(resData.error || "Erro desconhecido");
+        }
+
+      } catch (err) {
+        console.error("Erro ao deletar visita da nuvem:", err);
+        alert("Falha ao deletar visita: " + err.message);
+      }
+    }
+
     // Baixa visitas da nuvem do Google Sheets
     async function baixarVisitasNuvem() {
       const url = obterUrlAtiva();
@@ -900,14 +960,25 @@
           <div class="visita-body">${v.resumo}</div>
         `;
 
-        // Se for local, exibe botão de exclusão
-        const actionHtml = v.origem === "local" ? `
-          <button class="btn-delete-local" onclick="excluirVisitaLocal('${v.id}')" title="Excluir visita da lista local">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-              <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
-            </svg>
-          </button>
-        ` : '';
+        // Exibe botão de exclusão para local (remove do storage) e para nuvem (remove da planilha)
+        let actionHtml = '';
+        if (v.origem === "local") {
+          actionHtml = `
+            <button class="btn-delete-local" onclick="excluirVisitaLocal('${v.id}')" title="Excluir visita da lista local">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+              </svg>
+            </button>
+          `;
+        } else if (v.origem === "nuvem") {
+          actionHtml = `
+            <button class="btn-delete-local" onclick="excluirVisitaNuvem('${v.id}')" title="Excluir visita permanentemente do Google Sheets">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+              </svg>
+            </button>
+          `;
+        }
 
         const footerHtml = `
           <div class="visita-footer">
