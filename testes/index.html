@@ -73,75 +73,6 @@
       color: #f59e0b;
     }
 
-    /* Campo de Busca & Filtros */
-    .search-filter-area {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      width: 100%;
-    }
-
-    .search-input-wrapper {
-      position: relative;
-      width: 100%;
-    }
-
-    .search-input {
-      width: 100%;
-      padding: 12px 16px;
-      border-radius: 10px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background-color: #131a2c;
-      color: #f3f4f6;
-      font-size: 16px; /* Previne zoom no Safari do iOS */
-      transition: all 0.2s ease;
-    }
-
-    .search-input:focus {
-      outline: none;
-      border-color: #3b82f6;
-      background-color: #17223b;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-    }
-
-    /* Categorias / Tags */
-    .categories-tabs {
-      display: flex;
-      gap: 6px;
-      overflow-x: auto;
-      padding-bottom: 4px;
-      scrollbar-width: none; /* Firefox */
-    }
-
-    .categories-tabs::-webkit-scrollbar {
-      display: none; /* Safari e Chrome */
-    }
-
-    .tab-btn {
-      padding: 6px 12px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      border-radius: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background-color: #131a2c;
-      color: #9ca3af;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: all 0.2s ease;
-    }
-
-    .tab-btn:hover {
-      background-color: rgba(255, 255, 255, 0.04);
-      color: #f3f4f6;
-    }
-
-    .tab-btn.active {
-      background-color: #3b82f6;
-      color: white;
-      border-color: #3b82f6;
-      box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2);
-    }
-
     /* Cartões de Pasta (Folder Cards) */
     .folder-card {
       background-color: #131a2c;
@@ -318,16 +249,6 @@
       <div id="status-banner" class="status-banner"></div>
     </div>
 
-    <!-- Barra de Busca & Filtros -->
-    <div class="search-filter-area">
-      <div class="search-input-wrapper">
-        <input type="text" id="search-box" class="search-input" placeholder="Pesquisar arquivos de teste..." oninput="handleFilterChange()">
-      </div>
-      <div id="categories-tabs-container" class="categories-tabs">
-        <!-- Injetado dinamicamente -->
-      </div>
-    </div>
-
     <!-- Div principal onde os cartões de pastas serão injetados -->
     <div id="folders-container" class="flex-column" style="gap: 12px; display: flex; flex-direction: column;">
       <div class="loading-state">
@@ -463,10 +384,6 @@
       }
     ];
 
-    // Variáveis globais para armazenar os dados processados e filtros ativos
-    let allProcessedFolders = [];
-    let activeCategory = 'all';
-
     async function loadTestFiles() {
       const container = document.getElementById('folders-container');
       const banner = document.getElementById('status-banner');
@@ -503,13 +420,11 @@
           
           const rawFolderName = pathParts.join('/');
           const displayFolderName = pathParts.join(' / ');
-          const firstLevelDir = pathParts[0] || 'geral';
 
           if (!foldersMap[rawFolderName]) {
             foldersMap[rawFolderName] = {
               displayName: displayFolderName,
               folderPath: rawFolderName,
-              category: firstLevelDir,
               files: []
             };
           }
@@ -525,17 +440,15 @@
           return a.folderPath.localeCompare(b.folderPath);
         });
 
-        allProcessedFolders = sortedFolders.map(folderObj => {
+        const results = sortedFolders.map(folderObj => {
           folderObj.files.sort((a, b) => a.name.localeCompare(b.name));
           return {
             folder: folderObj.displayName,
-            rawFolder: folderObj.folderPath,
-            category: folderObj.category,
             files: folderObj.files
           };
         });
 
-        renderInterface();
+        renderFolders(results);
 
       } catch (error) {
         console.warn("GitHub API indisponível, usando fallback estático local: ", error);
@@ -545,16 +458,12 @@
           banner.style.display = "block";
         }
 
-        // Mapeia o fallback para o mesmo formato
-        allProcessedFolders = fallbackTestes.map(item => {
-          const pathParts = item.folder.split(' / ');
-          const firstLevelDir = pathParts[0] || 'geral';
+        // Mapeia o fallback para renderização direta
+        const results = fallbackTestes.map(item => {
+          const localPath = item.folder.replace(/ \/ /g, '/');
           return {
             folder: item.folder,
-            rawFolder: item.folder.replace(/ \/ /g, '/'),
-            category: firstLevelDir,
             files: item.files.map(f => {
-              const localPath = item.folder.replace(/ \/ /g, '/');
               return {
                 name: f.name,
                 link: `./${localPath}/${f.name}`
@@ -563,93 +472,8 @@
           };
         });
 
-        renderInterface();
+        renderFolders(results);
       }
-    }
-
-    // Inicializa a interface de filtros e renderização dos cartões
-    function renderInterface() {
-      renderCategoryTabs();
-      applyFilters();
-    }
-
-    // Cria as abas de categoria dinamicamente
-    function renderCategoryTabs() {
-      const tabsContainer = document.getElementById('categories-tabs-container');
-      if (!tabsContainer) return;
-
-      // Obtém categorias exclusivas
-      const categories = ['all', ...new Set(allProcessedFolders.map(item => item.category))];
-      
-      // Formatação amigável para exibição das abas
-      const categoryLabels = {
-        'all': 'Todos',
-        'ux': 'Interface (UX/UI)',
-        'login': 'Acesso/Login',
-        'voz': 'Reconhecimento Voz',
-        'spa': 'Navegação SPA',
-        'simuladores': 'Simuladores',
-        'sincronizacao': 'Sincronização',
-        'pwa': 'PWA/Mobile',
-        'pastoral_de_rua': 'Pastoral de Rua',
-        'sem_internet': 'Modo Offline',
-        'google_maps': 'Google Maps',
-        'google_login': 'Google Login',
-        'google_sheets': 'Google Sheets',
-        'open_street_maps': 'OpenStreetMap'
-      };
-
-      tabsContainer.innerHTML = '';
-      categories.forEach(cat => {
-        const btn = document.createElement('button');
-        btn.className = `tab-btn ${activeCategory === cat ? 'active' : ''}`;
-        btn.textContent = categoryLabels[cat] || cat.replace(/_/g, ' ');
-        btn.onclick = () => selectCategory(cat, btn);
-        tabsContainer.appendChild(btn);
-      });
-    }
-
-    function selectCategory(cat, btnElement) {
-      activeCategory = cat;
-      // Atualiza estado visual do botão
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      btnElement.classList.add('active');
-      
-      applyFilters();
-    }
-
-    function handleFilterChange() {
-      applyFilters();
-    }
-
-    // Aplica o filtro de busca e a aba de categoria selecionada
-    function applyFilters() {
-      const searchBox = document.getElementById('search-box');
-      const searchTerm = searchBox ? searchBox.value.toLowerCase().trim() : '';
-
-      const filtered = allProcessedFolders.map(folderObj => {
-        // Verifica se a pasta pertence à categoria ativa (se não for 'all')
-        const matchesCategory = activeCategory === 'all' || folderObj.category === activeCategory;
-        if (!matchesCategory) return null;
-
-        // Se houver busca, filtra os arquivos correspondentes
-        const folderMatchesSearch = folderObj.folder.toLowerCase().includes(searchTerm);
-        
-        const matchingFiles = folderObj.files.filter(file => {
-          return file.name.toLowerCase().includes(searchTerm) || folderMatchesSearch;
-        });
-
-        if (matchingFiles.length > 0) {
-          return {
-            folder: folderObj.folder,
-            rawFolder: folderObj.rawFolder,
-            files: matchingFiles
-          };
-        }
-        return null;
-      }).filter(item => item !== null);
-
-      renderFolders(filtered);
     }
 
     // Renderiza os cartões filtrados na tela
@@ -658,7 +482,7 @@
       container.innerHTML = '';
 
       if (foldersList.length === 0) {
-        container.innerHTML = '<div class="loading-state">Nenhum arquivo ou pasta de teste corresponde aos filtros.</div>';
+        container.innerHTML = '<div class="loading-state">Nenhum diretório de teste encontrado.</div>';
         return;
       }
 
@@ -716,9 +540,9 @@
       allCards.forEach((c, idx) => {
         if (idx !== index) {
           c.classList.remove('active');
-          const otherContent = document.getElementById(`folder-content-${idx}`);
-          const otherIcon = document.getElementById(`folder-icon-${idx}`);
-          const otherChevron = document.getElementById(`folder-chevron-${idx}`);
+          const otherContent = document.getElementById('folder-content-' + idx);
+          const otherIcon = document.getElementById('folder-icon-' + idx);
+          const otherChevron = document.getElementById('folder-chevron-' + idx);
           if (otherContent) otherContent.style.maxHeight = '0px';
           if (otherIcon) otherIcon.innerText = '📁';
           if (otherChevron) otherChevron.innerText = '+';
