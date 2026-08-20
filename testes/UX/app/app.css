@@ -659,6 +659,31 @@ body {
   transform: translate(-50%, -5px);
 }
 
+/* Feedback Visual do Modo Voz nos campos de texto (v4) */
+.modo-voz-ativo input, 
+.modo-voz-ativo textarea {
+  border: 1.5px solid #d32f2f !important; /* Borda vermelha SSVP fina */
+  box-shadow: 0 0 3px rgba(211, 47, 47, 0.1) !important;
+}
+
+.modo-voz-ativo input:focus, 
+.modo-voz-ativo textarea:focus {
+  border-width: 3px !important; /* Borda mais grossa no foco */
+  border-color: #d32f2f !important;
+  box-shadow: 0 0 10px rgba(211, 47, 47, 0.5) !important;
+  animation: voiceBorderPulse 1.5s infinite alternate !important;
+}
+
+@keyframes voiceBorderPulse {
+  0% {
+    box-shadow: 0 0 4px rgba(211, 47, 47, 0.3);
+  }
+  100% {
+    box-shadow: 0 0 12px rgba(211, 47, 47, 0.7);
+  }
+}
+
+
 
 
 
