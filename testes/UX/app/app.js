@@ -19,14 +19,16 @@ const state = {
   canto: 2.50,
   audio: 3.50,
   padding: 0.50,
-  speed: 0.08 // Velocidade de transição padrão definida no CSS externo
+  speed: 0.08, // Velocidade de transição padrão definida no CSS externo
+  holdTime: 0.80 // Tempo padrão de tocar e segurar em segundos
 };
 
 const limits = {
   canto: { min: 1.50, max: 4.00, step: 0.10 },
   audio: { min: 2.00, max: 6.00, step: 0.10 },
   padding: { min: 0.25, max: 1.50, step: 0.05 },
-  speed: { min: 0.05, max: 2.00, step: 0.01 }
+  speed: { min: 0.05, max: 2.00, step: 0.01 },
+  holdTime: { min: 0.40, max: 2.00, step: 0.10 }
 };
 
 // Mapeamento local das cores selecionadas em tempo real
@@ -67,7 +69,7 @@ function adjustVal(type, direction) {
     // Atualiza a visualização na label correspondente caso exista no DOM
     const label = document.getElementById(`lbl-${type}`);
     if (label) {
-      label.textContent = type === 'speed' ? `${roundedTarget.toFixed(2)}s` : `${roundedTarget.toFixed(2)}rem`;
+      label.textContent = (type === 'speed' || type === 'holdTime') ? `${roundedTarget.toFixed(2)}s` : `${roundedTarget.toFixed(2)}rem`;
     }
     
     // Atualiza a variável CSS correspondente na raiz do documento
@@ -79,6 +81,9 @@ function adjustVal(type, direction) {
       document.documentElement.style.setProperty('--padding-vertical-barras', `${roundedTarget}rem`);
     } else if (type === 'speed') {
       document.documentElement.style.setProperty('--tempo-transicao', `${roundedTarget}s`);
+    } else if (type === 'holdTime') {
+      const lblApp = document.getElementById('lbl-app-hold');
+      if (lblApp) lblApp.textContent = `${roundedTarget.toFixed(2)}s`;
     }
 
     // Salva as novas dimensões e velocidade no localStorage
@@ -331,6 +336,7 @@ function saveSettingsToStorage() {
   localStorage.setItem('ssvp_font_size', activeFont);
   
   localStorage.setItem('ssvp_speed', state.speed);
+  localStorage.setItem('ssvp_hold_time', state.holdTime);
   localStorage.setItem('ssvp_canto', state.canto);
   localStorage.setItem('ssvp_audio', state.audio);
   localStorage.setItem('ssvp_padding', state.padding);
@@ -340,6 +346,7 @@ function loadSettingsFromStorage() {
   const savedTheme = localStorage.getItem('ssvp_theme');
   const savedFont = localStorage.getItem('ssvp_font_size');
   const savedSpeed = localStorage.getItem('ssvp_speed');
+  const savedHold = localStorage.getItem('ssvp_hold_time');
   const savedCanto = localStorage.getItem('ssvp_canto');
   const savedAudio = localStorage.getItem('ssvp_audio');
   const savedPadding = localStorage.getItem('ssvp_padding');
@@ -364,7 +371,7 @@ function loadSettingsFromStorage() {
     if (lbl) lbl.textContent = `${state.padding.toFixed(2)}rem`;
   }
   
-  // 2. Carrega e aplica velocidade de abertura
+  // 2. Carrega e aplica velocidade de abertura e tempo de segurar
   if (savedSpeed) {
     state.speed = parseFloat(savedSpeed);
     document.documentElement.style.setProperty('--tempo-transicao', `${state.speed}s`);
@@ -372,6 +379,11 @@ function loadSettingsFromStorage() {
     if (lblApp) lblApp.textContent = `${state.speed.toFixed(2)}s`;
     const lblDev = document.getElementById('lbl-speed');
     if (lblDev) lblDev.textContent = `${state.speed.toFixed(2)}s`;
+  }
+  if (savedHold) {
+    state.holdTime = parseFloat(savedHold);
+    const lblHold = document.getElementById('lbl-app-hold');
+    if (lblHold) lblHold.textContent = `${state.holdTime.toFixed(2)}s`;
   }
 
   // 3. Carrega e aplica tema visual (Claro/Escuro)
@@ -385,16 +397,92 @@ function loadSettingsFromStorage() {
   }
 }
 
-// --- 9. Recursos de Digitação por Voz (v4) ---
+// --- 9. Recursos de Voz e Alternador de Entrada Voz vs Teclado (v4) ---
 let lastFocusedInput = null;
 let recognition = null;
+let longPressTimer = null;
+let isLongPressAction = false;
+let appInputMode = 'voice'; // 'voice' (microfone de ditado) ou 'keyboard' (digitação)
 
 // Captura dinamicamente qual input ou textarea recebeu o foco
 document.addEventListener('focusin', (event) => {
   if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
     lastFocusedInput = event.target;
+    updateMicrophonePulse();
   }
 });
+
+document.addEventListener('focusout', (event) => {
+  if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
+    // Timeout pequeno para capturar a transição do foco
+    setTimeout(() => {
+      if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+        updateMicrophonePulse();
+      }
+    }, 50);
+  }
+});
+
+function adjustAppHoldTime(direction) {
+  adjustVal('holdTime', direction);
+}
+
+// Alterna entre Modo Voz e Modo Teclado
+function toggleInputModeMode() {
+  appInputMode = (appInputMode === 'voice') ? 'keyboard' : 'voice';
+  
+  const textFields = document.querySelectorAll('.display-area input, .display-area textarea');
+  textFields.forEach(field => {
+    if (appInputMode === 'voice') {
+      field.setAttribute('inputmode', 'none');
+    } else {
+      field.removeAttribute('inputmode');
+    }
+  });
+
+  // Se mudou para teclado e há um campo focado, abre o teclado virtual
+  if (appInputMode === 'keyboard' && lastFocusedInput) {
+    lastFocusedInput.focus();
+  }
+
+  updateMicrophonePulse();
+  showTemporaryNotification(appInputMode === 'voice' ? '🎤 Modo Voz Ativo' : '⌨️ Modo Teclado Ativo');
+}
+
+function updateMicrophonePulse() {
+  const btnVoz = document.getElementById('btn_voz');
+  if (!btnVoz) return;
+
+  btnVoz.classList.remove('pulsar-convite');
+  btnVoz.classList.remove('modo-teclado-ativo');
+
+  if (appInputMode === 'keyboard') {
+    btnVoz.classList.add('modo-teclado-ativo');
+  } else if (appInputMode === 'voice') {
+    const hasFocus = document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA';
+    if (hasFocus) {
+      btnVoz.classList.add('pulsar-convite');
+    }
+  }
+}
+
+// Exibe um toast temporário de aviso na tela
+function showTemporaryNotification(text) {
+  let toast = document.getElementById('toast-notification');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'toast-notification';
+    toast.className = 'toast-notification';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = text;
+  toast.classList.add('show');
+  
+  // Esconde após 1.5 segundos
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, 1500);
+}
 
 function initVoiceRecognition() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -418,14 +506,12 @@ function initVoiceRecognition() {
   recognition.onresult = (event) => {
     const text = event.results[0][0].transcript;
     if (lastFocusedInput) {
-      // Concatena com espaço se já houver texto
       const currVal = lastFocusedInput.value;
       if (currVal && !currVal.endsWith(' ')) {
         lastFocusedInput.value = currVal + ' ' + text;
       } else {
         lastFocusedInput.value = (currVal || '') + text;
       }
-      // Dispara evento input para notificar listeners
       lastFocusedInput.dispatchEvent(new Event('input'));
     }
   };
@@ -464,7 +550,6 @@ function toggleVoiceRecognition(event) {
   }
 
   if (!lastFocusedInput) {
-    // Alerta visual no próprio indicador central
     const indicator = document.getElementById('voice-indicator');
     const indText = document.getElementById('voice-text');
     if (indicator && indText) {
@@ -482,9 +567,86 @@ function toggleVoiceRecognition(event) {
   try {
     recognition.start();
   } catch (err) {
-    // Para se já estiver ativo
     recognition.stop();
   }
+}
+
+// Configura os ouvintes de toque longo e curto no botão de voz
+function setupVoiceButtonTouchEvents() {
+  const btnVoz = document.getElementById('btn_voz');
+  if (!btnVoz) return;
+
+  let startX = 0;
+  let startY = 0;
+
+  const handleStart = (e) => {
+    if (e.touches && e.touches[0]) {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+    }
+    isLongPressAction = false;
+
+    // Configura o timer com base na velocidade cadastrada no state.holdTime
+    longPressTimer = setTimeout(() => {
+      isLongPressAction = true;
+      toggleInputModeMode();
+      if (navigator.vibrate) navigator.vibrate(60);
+    }, state.holdTime * 1000);
+  };
+
+  const handleEnd = (e) => {
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      longPressTimer = null;
+    }
+
+    if (!isLongPressAction) {
+      if (appInputMode === 'voice') {
+        toggleVoiceRecognition(e);
+      } else {
+        showTemporaryNotification("🎤 Toque longo para usar Voz");
+      }
+    }
+    isLongPressAction = false;
+  };
+
+  const handleCancel = () => {
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      longPressTimer = null;
+    }
+    isLongPressAction = false;
+  };
+
+  const handleMove = (e) => {
+    if (e.touches && e.touches[0]) {
+      const moveX = e.touches[0].clientX;
+      const moveY = e.touches[0].clientY;
+      if (Math.abs(moveX - startX) > 30 || Math.abs(moveY - startY) > 30) {
+        if (longPressTimer) {
+          clearTimeout(longPressTimer);
+          longPressTimer = null;
+        }
+      }
+    }
+  };
+
+  // Eventos de Mouse (Desktop)
+  btnVoz.addEventListener('mousedown', handleStart);
+  btnVoz.addEventListener('mouseup', handleEnd);
+  btnVoz.addEventListener('mouseleave', handleCancel);
+
+  // Eventos de Toque (Smartphone)
+  btnVoz.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    handleStart(e);
+  });
+  btnVoz.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    handleEnd(e);
+  });
+  btnVoz.addEventListener('touchmove', handleMove);
+  btnVoz.addEventListener('touchcancel', handleCancel);
 }
 
 // Inicialização Automática caso o script seja carregado no final do DOM
@@ -496,4 +658,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Inicializa o módulo SpeechRecognition
   initVoiceRecognition();
+
+  // Configura os gatilhos de toque e pressionamento longo do microfone
+  setupVoiceButtonTouchEvents();
+
+  // Garante que o inputmode esteja inicialmente alinhado ao modo voz nos inputs
+  applyInputModeSettings();
 });

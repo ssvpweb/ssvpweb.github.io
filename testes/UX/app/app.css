@@ -616,6 +616,50 @@ body {
   color: #ffffff;
 }
 
+/* Pulsação de convite para tocar no microfone (Modo Voz com campo focado) */
+.bar-circle.pulsar-convite {
+  animation: convitePulse 1.8s infinite alternate !important;
+  background-color: #007fff !important; /* Brilha em azul sutil */
+  color: #ffffff !important;
+  border-color: #ffffff !important;
+}
+
+@keyframes convitePulse {
+  0% { box-shadow: 0 0 0 0px rgba(0, 127, 255, 0.4); }
+  100% { box-shadow: 0 0 0 12px rgba(0, 127, 255, 0); }
+}
+
+/* Botão de voz opaco quando inativo no Modo Teclado */
+.bar-circle.modo-teclado-ativo {
+  opacity: 0.35;
+}
+
+/* Notificação pop-up temporária de mudança de modo */
+.toast-notification {
+  position: absolute;
+  bottom: 5.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(11, 15, 25, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 30px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  z-index: 100;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+  transition: opacity 0.25s, transform 0.25s;
+  opacity: 0;
+}
+
+.toast-notification.show {
+  opacity: 1;
+  transform: translate(-50%, -5px);
+}
+
+
 
 
 
