@@ -109,6 +109,10 @@ body {
   box-shadow: 0 4px 12px rgba(0,0,0,0.4);
   z-index: 11;
   transition: width 0.2s ease, height 0.2s ease, background-color 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cor-barras); /* Cor do ícone herda das barras para contraste */
 }
 
 .display-area {
@@ -332,9 +336,9 @@ body {
 }
 
 /* Ícones de botão */
-.canto-circle svg {
-  width: 70%;
-  height: 70%;
+.canto-circle svg, .audio-circle svg {
+  width: 60%;
+  height: 60%;
   transition: opacity 0.1s ease;
   pointer-events: none;
 }
@@ -563,7 +567,7 @@ body {
 }
 
 /* Animação do botão do microfone gravando/escutando */
-.canto-circle.listening {
+.audio-circle.listening {
   animation: audioPulse 1.2s infinite alternate !important;
   background-color: #d32f2f !important;
   color: #ffffff !important;
