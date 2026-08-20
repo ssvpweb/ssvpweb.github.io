@@ -659,27 +659,39 @@ body {
   transform: translate(-50%, -5px);
 }
 
-/* Feedback Visual do Modo Voz nos campos de texto (v4) */
+/* Feedback Visual do Modo Voz nos campos de texto e cards (v4) */
+.modo-voz-ativo .app-card,
 .modo-voz-ativo input, 
 .modo-voz-ativo textarea {
-  border: 1.5px solid #d32f2f !important; /* Borda vermelha SSVP fina */
-  box-shadow: 0 0 3px rgba(211, 47, 47, 0.1) !important;
-}
-
-.modo-voz-ativo input:focus, 
-.modo-voz-ativo textarea:focus {
-  border-width: 3px !important; /* Borda mais grossa no foco */
-  border-color: #d32f2f !important;
-  box-shadow: 0 0 10px rgba(211, 47, 47, 0.5) !important;
-  animation: voiceBorderPulse 1.5s infinite alternate !important;
+  border: 1px solid #d32f2f !important;
+  animation: voiceBorderPulse 1.8s infinite alternate !important;
 }
 
 @keyframes voiceBorderPulse {
   0% {
-    box-shadow: 0 0 4px rgba(211, 47, 47, 0.3);
+    border-color: rgba(211, 47, 47, 0.35);
+    box-shadow: 0 0 3px rgba(211, 47, 47, 0.1);
   }
   100% {
-    box-shadow: 0 0 12px rgba(211, 47, 47, 0.7);
+    border-color: rgba(211, 47, 47, 1);
+    box-shadow: 0 0 8px rgba(211, 47, 47, 0.35);
+  }
+}
+
+.modo-voz-ativo input:focus, 
+.modo-voz-ativo textarea:focus {
+  border-width: 3px !important;
+  animation: voiceBorderFocusPulse 1.4s infinite alternate !important;
+}
+
+@keyframes voiceBorderFocusPulse {
+  0% {
+    border-color: rgba(211, 47, 47, 0.5);
+    box-shadow: 0 0 5px rgba(211, 47, 47, 0.25);
+  }
+  100% {
+    border-color: rgba(211, 47, 47, 1);
+    box-shadow: 0 0 14px rgba(211, 47, 47, 0.65);
   }
 }
 
