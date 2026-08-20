@@ -427,11 +427,10 @@ function adjustAppHoldTime(direction) {
   adjustVal('holdTime', direction);
 }
 
-// Alterna entre Modo Voz e Modo Teclado
-function toggleInputModeMode() {
-  appInputMode = (appInputMode === 'voice') ? 'keyboard' : 'voice';
-  
+function applyInputModeSettings() {
   const textFields = document.querySelectorAll('.display-area input, .display-area textarea');
+  const displayArea = document.querySelector('.display-area');
+
   textFields.forEach(field => {
     if (appInputMode === 'voice') {
       field.setAttribute('inputmode', 'none');
@@ -440,12 +439,28 @@ function toggleInputModeMode() {
     }
   });
 
+  if (displayArea) {
+    if (appInputMode === 'voice') {
+      displayArea.classList.add('modo-voz-ativo');
+    } else {
+      displayArea.classList.remove('modo-voz-ativo');
+    }
+  }
+
+  updateMicrophonePulse();
+}
+
+// Alterna entre Modo Voz e Modo Teclado
+function toggleInputModeMode() {
+  appInputMode = (appInputMode === 'voice') ? 'keyboard' : 'voice';
+  
+  applyInputModeSettings();
+
   // Se mudou para teclado e há um campo focado, abre o teclado virtual
   if (appInputMode === 'keyboard' && lastFocusedInput) {
     lastFocusedInput.focus();
   }
 
-  updateMicrophonePulse();
   showTemporaryNotification(appInputMode === 'voice' ? '🎤 Modo Voz Ativo' : '⌨️ Modo Teclado Ativo');
 }
 
