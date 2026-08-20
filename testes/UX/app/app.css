@@ -1,0 +1,620 @@
+/* ==========================================================================
+   CSS Unificado - Estudo de UX/Layout SSVP
+   Compartilhado entre protótipos na pasta testes/ux/app/
+   ========================================================================== */
+
+:root {
+  /* Variáveis de Dimensionamento Padrão */
+  --raio-cantos: 3.5em;               /* Tamanho inicial de 3.5em */
+  --raio-audio: 3.5em;                /* Tamanho inicial de 3.5em */
+  --padding-vertical-barras: 0.50rem; /* 8px base */
+  
+  /* Cores Oficiais SSVP e Auxiliares */
+  --cor-fundo: #0b0f19;
+  --cor-barras: #002d62;
+  --cor-canto: #ffffff;
+  --cor-audio: #ffffff;
+  --cor-texto-barra: #ffffff;
+  
+  /* Estilos estruturais fixos */
+  --card-bg: rgba(21, 28, 44, 0.75);
+  --card-border: 1px solid rgba(255, 255, 255, 0.08);
+  --font-family: 'Montserrat', Arial, sans-serif;
+}
+
+/* Reset Geral e Fontes */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-family);
+}
+
+/* Corpo da Página / Viewport Principal */
+body {
+  background-color: var(--cor-fundo);
+  color: #f3f4f6;
+  height: 100vh;
+  /* Altura corrigida dinamicamente via JS em dispositivos móveis */
+  height: calc(var(--vh, 1vh) * 100);
+  width: 100vw;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: background-color 0.25s ease;
+}
+
+/* Barra Superior Fixa (Header) */
+.bar-sup {
+  background-color: var(--cor-barras);
+  padding-top: calc(var(--padding-vertical-barras) + env(safe-area-inset-top));
+  padding-bottom: var(--padding-vertical-barras);
+  padding-left: 1rem;
+  padding-right: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+  transition: background-color 0.25s ease, padding 0.2s ease;
+}
+
+/* Barra Inferior Fixa (Footer) */
+.bar-inf {
+  background-color: var(--cor-barras);
+  padding-top: var(--padding-vertical-barras);
+  padding-bottom: calc(var(--padding-vertical-barras) + env(safe-area-inset-bottom));
+  padding-left: 1rem;
+  padding-right: 1rem;
+  display: flex;
+  align-items: center; /* Centralização vertical de todos os círculos */
+  justify-content: space-between;
+  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+  transition: background-color 0.25s ease, padding 0.2s ease;
+}
+
+/* Estilo Base de Círculos */
+.bar-circle {
+  border-radius: 50%;
+  cursor: pointer;
+  display: inline-block;
+  transition: all 0.25s ease;
+  flex-shrink: 0;
+}
+
+.bar-circle:hover {
+  opacity: 0.85;
+}
+
+/* Círculos de Canto (Nas pontas das barras) */
+.canto-circle {
+  background-color: var(--cor-canto);
+  width: var(--raio-cantos);
+  height: var(--raio-cantos);
+  border: 2px solid #ffffff;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+  transition: width 0.2s ease, height 0.2s ease, background-color 0.25s ease;
+}
+
+/* Círculo de Áudio (Centro da Barra Inferior) */
+.audio-circle {
+  background-color: var(--cor-audio);
+  width: var(--raio-audio);
+  height: var(--raio-audio);
+  border: 3px solid #ffffff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  z-index: 11;
+  transition: width 0.2s ease, height 0.2s ease, background-color 0.25s ease;
+}
+
+/* Área Central de Exibição */
+.display-area {
+  flex: 1;
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* ==========================================================================
+   Componente: Painel de Configurações Dinâmico
+   ========================================================================== */
+
+.panel-config {
+  position: absolute;
+  left: 50%;
+  top: 15%;
+  transform: translateX(-50%);
+  width: calc(100% - 30px);
+  max-width: 320px;
+  background: var(--card-bg);
+  border: var(--card-border);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 6;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.panel-header {
+  padding: 10px 14px;
+  background-color: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #e5e7eb;
+  cursor: pointer;
+  user-select: none;
+}
+
+.panel-toggle-btn {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #9ca3af;
+}
+
+.panel-body {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 380px;
+  transition: max-height 0.3s ease;
+  overflow-y: auto;
+}
+
+/* Colapsamento do painel */
+.panel-config.collapsed .panel-body {
+  max-height: 0;
+  padding: 0;
+  border: none;
+}
+
+/* Controles de Linha */
+.config-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.config-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #9ca3af;
+}
+
+/* Controles de Contador (+ / -) */
+.counter-control {
+  display: flex;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.25);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+}
+
+.counter-control button {
+  background: none;
+  border: none;
+  color: white;
+  width: 32px;
+  height: 32px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.counter-control button:active {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.counter-control span {
+  font-size: 0.75rem;
+  font-weight: 700;
+  min-width: 70px;
+  text-align: center;
+  font-family: monospace;
+}
+
+/* Dropdown Seletor */
+.color-select {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: white;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+}
+
+/* Paleta de Cores */
+.config-color-section {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 10px;
+  margin-top: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.color-palette {
+  display: flex;
+  justify-content: space-between;
+  gap: 2px;
+}
+
+.color-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.color-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.color-item:hover .color-dot {
+  transform: scale(1.1);
+  border-color: #ffffff;
+}
+
+.color-dot.selected::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+.color-dot.light-color.selected::after {
+  color: #0b0f19;
+}
+
+.color-number {
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: #6b7280;
+  transition: color 0.2s;
+}
+
+.color-item:hover .color-number {
+  color: #f3f4f6;
+}
+
+/* ==========================================================================
+   Efeito de Card Expandido (v2)
+   ========================================================================== */
+
+:root {
+  --tempo-transicao: 0.08s;
+  --cor-card-bg: #151c2c;
+  --cor-card-texto: #ffffff;
+  --cor-card-subtexto: #9ca3af;
+}
+
+/* Ajustes nos botões circulares da barra inferior para abrigar ícones */
+.canto-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cor-barras); /* Cor do ícone herda das barras para contraste */
+}
+
+/* Estado ativo do botão de canto quando o card correspondente está aberto */
+.canto-circle.card-aberto {
+  background-color: #ffffff !important;
+}
+
+.canto-circle.card-aberto svg {
+  opacity: 0 !important; /* Oculta o ícone imediatamente */
+}
+
+/* Ícones de botão */
+.canto-circle svg {
+  width: 70%;
+  height: 70%;
+  transition: opacity 0.1s ease;
+  pointer-events: none;
+}
+
+/* Card Expandido (Efeito a partir do canto) */
+.card-expandido {
+  position: absolute;
+  bottom: 0.5rem;
+  width: var(--raio-cantos);
+  height: var(--raio-cantos);
+  border-radius: calc(var(--raio-cantos) / 2);
+  background-color: var(--cor-card-bg);
+  border: var(--card-border);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 12;
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  transition: all var(--tempo-transicao) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Card da Esquerda (Engrenagem) */
+.card-esquerda {
+  left: 1rem;
+  transform-origin: bottom left;
+}
+
+/* Card da Direita (Interrogação) */
+.card-direita {
+  right: 1rem;
+  transform-origin: bottom right;
+}
+
+/* Estado Ativado / Expandido do Card */
+.card-expandido.active {
+  width: calc(100% - 2rem);
+  height: calc(100% - 1rem);
+  border-radius: calc(var(--raio-cantos) / 2) !important; /* Raio idêntico ao do círculo (metade do diâmetro) */
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Conteúdo do Card */
+.card-content {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-expandido.active .card-content {
+  opacity: 1;
+  transition-delay: 0.1s; /* Exibe o conteúdo apenas após a expansão iniciar */
+}
+
+.card-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--cor-card-texto);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-text {
+  font-size: 0.82rem;
+  color: var(--cor-card-subtexto);
+  line-height: 1.5;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* Identificador de Nome de Arquivo na Barra Superior */
+.file-name-label {
+  font-size: 0.80rem;
+  font-weight: 700;
+  color: var(--cor-texto-barra);
+  letter-spacing: 0.05em;
+  opacity: 0.9;
+  user-select: none;
+}
+
+/* Controles internos do Card de Configurações (v3) */
+.setting-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 8px;
+}
+
+.setting-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--cor-card-texto);
+}
+
+.theme-buttons, .font-buttons {
+  display: flex;
+  gap: 4px;
+  background-color: rgba(0, 0, 0, 0.15);
+  padding: 3px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.theme-buttons button, .font-buttons button {
+  background: none;
+  border: none;
+  color: var(--cor-card-subtexto);
+  padding: 6px 12px;
+  font-size: 0.70rem;
+  font-weight: 700;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.theme-buttons button.active, .font-buttons button.active {
+  background-color: #007fff; /* Azul Royal SSVP */
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 127, 255, 0.3);
+}
+
+/* Sobrescrita de contraste de botões para Modo Claro */
+.light-theme-card .theme-buttons, 
+.light-theme-card .font-buttons {
+  background-color: rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.light-theme-card .theme-buttons button, 
+.light-theme-card .font-buttons button {
+  color: #4b5563;
+}
+
+.light-theme-card .theme-buttons button.active, 
+.light-theme-card .font-buttons button.active {
+  background-color: #007fff;
+  color: #ffffff;
+}
+
+/* Cards internos do formulário do aplicativo (v4) */
+.display-area-content {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 1rem;
+  box-sizing: border-box;
+  overflow-y: auto;
+  height: 100%;
+}
+
+.app-card {
+  background-color: var(--cor-card-bg);
+  border: var(--card-border);
+  border-radius: calc(var(--raio-cantos) / 2);
+  padding: 1.2rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  color: var(--cor-card-texto);
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.app-card-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.app-card-text {
+  font-size: 0.76rem;
+  color: var(--cor-card-subtexto);
+  line-height: 1.45;
+}
+
+.app-card input, 
+.app-card textarea {
+  width: 100%;
+  padding: 0.8rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: rgba(0, 0, 0, 0.2);
+  color: var(--cor-card-texto);
+  font-family: inherit;
+  font-size: 0.82rem;
+  transition: all 0.25s ease;
+  box-sizing: border-box;
+}
+
+/* Modo Claro: Sobrescrita de contraste para inputs */
+.light-theme-card input,
+.light-theme-card textarea,
+.light-theme-container input,
+.light-theme-container textarea {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid rgba(0, 0, 0, 0.15) !important;
+  color: #0b0f19 !important;
+}
+
+/* Borda pulsante de foco nos inputs e textfields do app (v4) */
+.display-area input:focus, 
+.display-area textarea:focus {
+  outline: none;
+  animation: borderPulse 1.5s infinite alternate;
+}
+
+@keyframes borderPulse {
+  0% {
+    border-color: rgba(0, 127, 255, 0.4);
+    box-shadow: 0 0 4px rgba(0, 127, 255, 0.2);
+  }
+  100% {
+    border-color: rgba(0, 127, 255, 1);
+    box-shadow: 0 0 12px rgba(0, 127, 255, 0.6);
+  }
+}
+
+/* Animação do botão do microfone gravando/escutando */
+.canto-circle.listening {
+  animation: audioPulse 1.2s infinite alternate !important;
+  background-color: #d32f2f !important;
+  color: #ffffff !important;
+}
+
+@keyframes audioPulse {
+  0% { box-shadow: 0 0 0 0px rgba(211, 47, 47, 0.5); }
+  100% { box-shadow: 0 0 0 15px rgba(211, 47, 47, 0); }
+}
+
+/* Indicador de voz central na área de desenho */
+.voice-indicator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(11, 15, 25, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.75rem 1.5rem;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 100;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.voice-indicator.hidden {
+  opacity: 0;
+}
+
+.voice-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #d32f2f;
+  border-radius: 50%;
+  animation: dotPulse 0.8s infinite alternate;
+}
+
+@keyframes dotPulse {
+  0% { transform: scale(0.8); opacity: 0.5; }
+  100% { transform: scale(1.4); opacity: 1; }
+}
+
+.voice-text {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+
+
+

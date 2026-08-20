@@ -1,0 +1,499 @@
+/* ==========================================================================
+   JavaScript Unificado - Controle Interativo de Layout SSVP
+   Compartilhado entre protótipos na pasta testes/ux/app/
+   ========================================================================== */
+
+// Paleta de Cores SSVP Oficial com numeração identificadora
+const ssvpColors = [
+  { id: 1, name: "Azul Escuro", hex: "#002d62", isLight: false },
+  { id: 2, name: "Azul Royal", hex: "#007fff", isLight: false },
+  { id: 3, name: "Vermelho SSVP", hex: "#d32f2f", isLight: false },
+  { id: 4, name: "Amarelo Ouro", hex: "#f59e0b", isLight: false },
+  { id: 5, name: "Verde SSVP", hex: "#10b981", isLight: false },
+  { id: 6, name: "Branco", hex: "#ffffff", isLight: true },
+  { id: 7, name: "Preto/Lab", hex: "#0b0f19", isLight: false }
+];
+
+// Valores iniciais e limites (em rem e segundos)
+const state = {
+  canto: 2.50,
+  audio: 3.50,
+  padding: 0.50,
+  speed: 0.08 // Velocidade de transição padrão definida no CSS externo
+};
+
+const limits = {
+  canto: { min: 1.50, max: 4.00, step: 0.10 },
+  audio: { min: 2.00, max: 6.00, step: 0.10 },
+  padding: { min: 0.25, max: 1.50, step: 0.05 },
+  speed: { min: 0.05, max: 2.00, step: 0.01 }
+};
+
+// Mapeamento local das cores selecionadas em tempo real
+const activeColors = {
+  barras: "#002d62",
+  canto: "#ffffff",
+  audio: "#ffffff",
+  fundo: "#0b0f19"
+};
+
+let activeCard = null;
+
+// --- 1. Função Dinâmica de Viewport (Exclusão exata das barras de navegação do sistema) ---
+function resetHeight() {
+  let vh = window.innerHeight * 0.01;
+  document.documentElement.style.setProperty('--vh', `${vh}px`);
+}
+
+window.addEventListener('resize', resetHeight);
+window.addEventListener('orientationchange', resetHeight);
+resetHeight(); // Executa no carregamento inicial
+
+// --- 2. Ajustes de Tamanho e Escala (rem / s) com Tratamento Resiliente ---
+function adjustVal(type, direction) {
+  const current = state[type];
+  const limit = limits[type];
+  if (!limit) return;
+  
+  const step = limit.step;
+  const target = direction > 0 ? current + step : current - step;
+
+  // Corrige a matemática de ponto flutuante do JS
+  const roundedTarget = parseFloat(target.toFixed(2));
+
+  if (roundedTarget >= limit.min && roundedTarget <= limit.max) {
+    state[type] = roundedTarget;
+    
+    // Atualiza a visualização na label correspondente caso exista no DOM
+    const label = document.getElementById(`lbl-${type}`);
+    if (label) {
+      label.textContent = type === 'speed' ? `${roundedTarget.toFixed(2)}s` : `${roundedTarget.toFixed(2)}rem`;
+    }
+    
+    // Atualiza a variável CSS correspondente na raiz do documento
+    if (type === 'canto') {
+      document.documentElement.style.setProperty('--raio-cantos', `${roundedTarget}rem`);
+    } else if (type === 'audio') {
+      document.documentElement.style.setProperty('--raio-audio', `${roundedTarget}rem`);
+    } else if (type === 'padding') {
+      document.documentElement.style.setProperty('--padding-vertical-barras', `${roundedTarget}rem`);
+    } else if (type === 'speed') {
+      document.documentElement.style.setProperty('--tempo-transicao', `${roundedTarget}s`);
+    }
+
+    // Salva as novas dimensões e velocidade no localStorage
+    saveSettingsToStorage();
+  }
+}
+
+// --- 3. Controle dos Cards Expandidos (Efeito v2) ---
+function toggleCard(side, event) {
+  if (event) event.stopPropagation();
+
+  const isSameCard = activeCard === side;
+  closeActiveCard();
+
+  if (!isSameCard) {
+    const card = document.getElementById(side === 'esquerda' ? 'card-esq' : 'card-dir');
+    const btn = document.getElementById(side === 'esquerda' ? 'btn_config' : 'btn_ajuda');
+    
+    if (card) card.classList.add('active');
+    if (btn) btn.classList.add('card-aberto');
+    
+    activeCard = side;
+  }
+}
+
+function closeActiveCard() {
+  const cardEsq = document.getElementById('card-esq');
+  const cardDir = document.getElementById('card-dir');
+  const btnEsq = document.getElementById('btn_config');
+  const btnDir = document.getElementById('btn_ajuda');
+
+  if (cardEsq) cardEsq.classList.remove('active');
+  if (cardDir) cardDir.classList.remove('active');
+  if (btnEsq) btnEsq.classList.remove('card-aberto');
+  if (btnDir) btnDir.classList.remove('card-aberto');
+  
+  activeCard = null;
+}
+
+// Fechar ao clicar em qualquer lugar fora do card aberto ou botão correspondente
+document.addEventListener('click', function(event) {
+  if (activeCard) {
+    const cardEsq = document.getElementById('card-esq');
+    const cardDir = document.getElementById('card-dir');
+    const btnEsq = document.getElementById('btn_config');
+    const btnDir = document.getElementById('btn_ajuda');
+
+    let insideEsq = false;
+    let insideDir = false;
+
+    if (cardEsq && btnEsq) {
+      insideEsq = cardEsq.contains(event.target) || btnEsq.contains(event.target);
+    }
+    if (cardDir && btnDir) {
+      insideDir = cardDir.contains(event.target) || btnDir.contains(event.target);
+    }
+
+    if (!insideEsq && !insideDir) {
+      closeActiveCard();
+    }
+  }
+});
+
+// --- 4. Alternador de Tema (Modo Claro/Escuro Dinâmico) ---
+function toggleTheme(theme) {
+  if (theme === 'claro') {
+    document.documentElement.style.setProperty('--cor-fundo', '#ffffff');
+    document.documentElement.style.setProperty('--cor-card-bg', '#e9ecef');
+    document.documentElement.style.setProperty('--cor-card-texto', '#0b0f19');
+    document.documentElement.style.setProperty('--cor-card-subtexto', '#4b5563');
+    activeColors.fundo = '#ffffff';
+  } else {
+    document.documentElement.style.setProperty('--cor-fundo', '#0b0f19');
+    document.documentElement.style.setProperty('--cor-card-bg', '#151c2c');
+    document.documentElement.style.setProperty('--cor-card-texto', '#ffffff');
+    document.documentElement.style.setProperty('--cor-card-subtexto', '#9ca3af');
+    activeColors.fundo = '#0b0f19';
+  }
+  highlightSelectedColor();
+}
+
+// --- 5. Painel de Cores Dinâmico com Números ---
+function initColorPalette() {
+  const palette = document.getElementById('color-palette');
+  if (!palette) return;
+  palette.innerHTML = '';
+
+  ssvpColors.forEach(color => {
+    const item = document.createElement('div');
+    item.className = 'color-item';
+    item.onclick = () => selectColorForTarget(color.hex);
+
+    const dot = document.createElement('div');
+    dot.className = `color-dot ${color.isLight ? 'light-color' : ''}`;
+    dot.style.backgroundColor = color.hex;
+    dot.title = color.name;
+
+    const num = document.createElement('span');
+    num.className = 'color-number';
+    num.textContent = color.id;
+
+    item.appendChild(dot);
+    item.appendChild(num);
+    palette.appendChild(item);
+  });
+
+  highlightSelectedColor();
+}
+
+function selectColorForTarget(hex) {
+  const targetSelect = document.getElementById('color-target');
+  if (!targetSelect) return;
+  
+  const target = targetSelect.value;
+  activeColors[target] = hex;
+
+  document.documentElement.style.setProperty(`--cor-${target}`, hex);
+  
+  // Sincroniza o select de modo claro/escuro se o alvo for o fundo
+  if (target === 'fundo') {
+    const themeSelect = document.getElementById('theme-select');
+    if (themeSelect) {
+      if (hex.toLowerCase() === '#ffffff') {
+        themeSelect.value = 'claro';
+        toggleTheme('claro');
+      } else if (hex.toLowerCase() === '#0b0f19') {
+        themeSelect.value = 'escuro';
+        toggleTheme('escuro');
+      }
+    }
+  }
+  
+  highlightSelectedColor();
+}
+
+function highlightSelectedColor() {
+  const targetSelect = document.getElementById('color-target');
+  if (!targetSelect) return;
+
+  const target = targetSelect.value;
+  const currentHex = activeColors[target].toLowerCase();
+
+  const dots = document.querySelectorAll('.color-dot');
+  dots.forEach(dot => {
+    const bg = rgb2hex(dot.style.backgroundColor).toLowerCase();
+    if (bg === currentHex) {
+      dot.classList.add('selected');
+    } else {
+      dot.classList.remove('selected');
+    }
+  });
+}
+
+// Converte rgb(r, g, b) para #hexadecimal
+function rgb2hex(rgb) {
+  if (/^#[0-9A-F]{6}$/i.test(rgb)) return rgb;
+  rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+  if (rgb === null) return '#000000';
+  function hex(x) {
+    return ("0" + parseInt(x).toString(16)).slice(-2);
+  }
+  return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
+}
+
+// --- 6. Controle de Colapso do Painel ---
+function togglePanel() {
+  const panel = document.getElementById('panel-config');
+  const icon = document.getElementById('panel-toggle-icon');
+  if (!panel || !icon) return;
+  
+  panel.classList.toggle('collapsed');
+  icon.textContent = panel.classList.contains('collapsed') ? '+' : '−';
+}
+
+// --- 7. Controles Exclusivos do Card de Configurações (v3) ---
+function setAppTheme(theme) {
+  toggleTheme(theme);
+  
+  const cardEsq = document.getElementById('card-esq');
+  const cardDir = document.getElementById('card-dir');
+  const btnClaro = document.getElementById('btn-theme-claro');
+  const btnEscuro = document.getElementById('btn-theme-escuro');
+  const themeSelect = document.getElementById('theme-select');
+
+  // Sincroniza o select oculto/secundário se existir
+  if (themeSelect) {
+    themeSelect.value = theme;
+  }
+
+  // Adiciona a classe light-theme-card para ajustes internos de contraste de botões
+  if (theme === 'claro') {
+    if (cardEsq) cardEsq.classList.add('light-theme-card');
+    if (cardDir) cardDir.classList.add('light-theme-card');
+    if (btnClaro) btnClaro.classList.add('active');
+    if (btnEscuro) btnEscuro.classList.remove('active');
+  } else {
+    if (cardEsq) cardEsq.classList.remove('light-theme-card');
+    if (cardDir) cardDir.classList.remove('light-theme-card');
+    if (btnClaro) btnClaro.classList.remove('active');
+    if (btnEscuro) btnEscuro.classList.add('active');
+  }
+
+  // Salva a alteração de tema no localStorage
+  saveSettingsToStorage();
+}
+
+function setAppFontSize(size) {
+  const btnP = document.getElementById('btn-font-p');
+  const btnM = document.getElementById('btn-font-m');
+  const btnG = document.getElementById('btn-font-g');
+  
+  if (btnP) btnP.classList.remove('active');
+  if (btnM) btnM.classList.remove('active');
+  if (btnG) btnG.classList.remove('active');
+  
+  const targetBtn = document.getElementById(`btn-font-${size.toLowerCase()}`);
+  if (targetBtn) targetBtn.classList.add('active');
+  
+  // Altera a escala da fonte raiz do HTML (1rem = escala base)
+  if (size === 'P') {
+    document.documentElement.style.fontSize = '14px'; // 87.5%
+  } else if (size === 'M') {
+    document.documentElement.style.fontSize = '16px'; // 100%
+  } else if (size === 'G') {
+    document.documentElement.style.fontSize = '20px'; // 125%
+  }
+
+  // Salva o novo tamanho de fonte de acessibilidade no localStorage
+  saveSettingsToStorage();
+}
+
+function adjustAppSpeed(direction) {
+  // Ajusta o valor no estado global
+  adjustVal('speed', direction);
+  
+  // Sincroniza o valor textual da velocidade nos dois visores possíveis
+  const appSpeedLabel = document.getElementById('lbl-app-speed');
+  if (appSpeedLabel) {
+    appSpeedLabel.textContent = `${state.speed.toFixed(2)}s`;
+  }
+}
+
+// --- 8. Persistência de Configurações (localStorage) ---
+function saveSettingsToStorage() {
+  localStorage.setItem('ssvp_theme', activeColors.fundo === '#ffffff' ? 'claro' : 'escuro');
+  
+  let activeFont = 'M';
+  if (document.getElementById('btn-font-p')?.classList.contains('active')) activeFont = 'P';
+  if (document.getElementById('btn-font-g')?.classList.contains('active')) activeFont = 'G';
+  localStorage.setItem('ssvp_font_size', activeFont);
+  
+  localStorage.setItem('ssvp_speed', state.speed);
+  localStorage.setItem('ssvp_canto', state.canto);
+  localStorage.setItem('ssvp_audio', state.audio);
+  localStorage.setItem('ssvp_padding', state.padding);
+}
+
+function loadSettingsFromStorage() {
+  const savedTheme = localStorage.getItem('ssvp_theme');
+  const savedFont = localStorage.getItem('ssvp_font_size');
+  const savedSpeed = localStorage.getItem('ssvp_speed');
+  const savedCanto = localStorage.getItem('ssvp_canto');
+  const savedAudio = localStorage.getItem('ssvp_audio');
+  const savedPadding = localStorage.getItem('ssvp_padding');
+
+  // 1. Carrega e aplica dimensões customizadas
+  if (savedCanto) {
+    state.canto = parseFloat(savedCanto);
+    document.documentElement.style.setProperty('--raio-cantos', `${state.canto}rem`);
+    const lbl = document.getElementById('lbl-canto');
+    if (lbl) lbl.textContent = `${state.canto.toFixed(2)}rem`;
+  }
+  if (savedAudio) {
+    state.audio = parseFloat(savedAudio);
+    document.documentElement.style.setProperty('--raio-audio', `${state.audio}rem`);
+    const lbl = document.getElementById('lbl-audio');
+    if (lbl) lbl.textContent = `${state.audio.toFixed(2)}rem`;
+  }
+  if (savedPadding) {
+    state.padding = parseFloat(savedPadding);
+    document.documentElement.style.setProperty('--padding-vertical-barras', `${state.padding}rem`);
+    const lbl = document.getElementById('lbl-padding');
+    if (lbl) lbl.textContent = `${state.padding.toFixed(2)}rem`;
+  }
+  
+  // 2. Carrega e aplica velocidade de abertura
+  if (savedSpeed) {
+    state.speed = parseFloat(savedSpeed);
+    document.documentElement.style.setProperty('--tempo-transicao', `${state.speed}s`);
+    const lblApp = document.getElementById('lbl-app-speed');
+    if (lblApp) lblApp.textContent = `${state.speed.toFixed(2)}s`;
+    const lblDev = document.getElementById('lbl-speed');
+    if (lblDev) lblDev.textContent = `${state.speed.toFixed(2)}s`;
+  }
+
+  // 3. Carrega e aplica tema visual (Claro/Escuro)
+  if (savedTheme) {
+    setAppTheme(savedTheme);
+  }
+
+  // 4. Carrega e aplica tamanho de fonte
+  if (savedFont) {
+    setAppFontSize(savedFont);
+  }
+}
+
+// --- 9. Recursos de Digitação por Voz (v4) ---
+let lastFocusedInput = null;
+let recognition = null;
+
+// Captura dinamicamente qual input ou textarea recebeu o foco
+document.addEventListener('focusin', (event) => {
+  if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
+    lastFocusedInput = event.target;
+  }
+});
+
+function initVoiceRecognition() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) return;
+
+  recognition = new SpeechRecognition();
+  recognition.lang = 'pt-BR';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  recognition.onstart = () => {
+    const btnVoz = document.getElementById('btn_voz');
+    if (btnVoz) btnVoz.classList.add('listening');
+
+    const indicator = document.getElementById('voice-indicator');
+    const indText = document.getElementById('voice-text');
+    if (indicator) indicator.classList.remove('hidden');
+    if (indText) indText.textContent = "Ouvindo... Dite o texto";
+  };
+
+  recognition.onresult = (event) => {
+    const text = event.results[0][0].transcript;
+    if (lastFocusedInput) {
+      // Concatena com espaço se já houver texto
+      const currVal = lastFocusedInput.value;
+      if (currVal && !currVal.endsWith(' ')) {
+        lastFocusedInput.value = currVal + ' ' + text;
+      } else {
+        lastFocusedInput.value = (currVal || '') + text;
+      }
+      // Dispara evento input para notificar listeners
+      lastFocusedInput.dispatchEvent(new Event('input'));
+    }
+  };
+
+  recognition.onend = () => {
+    const btnVoz = document.getElementById('btn_voz');
+    if (btnVoz) btnVoz.classList.remove('listening');
+
+    const indicator = document.getElementById('voice-indicator');
+    if (indicator) indicator.classList.add('hidden');
+  };
+
+  recognition.onerror = (event) => {
+    console.error("Erro reconhecimento voz: ", event.error);
+    const indText = document.getElementById('voice-text');
+    if (indText) {
+      if (event.error === 'not-allowed') {
+        indText.textContent = "Permissão de microfone negada.";
+      } else {
+        indText.textContent = "Erro ao ouvir. Tente novamente.";
+      }
+    }
+    setTimeout(() => {
+      const indicator = document.getElementById('voice-indicator');
+      if (indicator) indicator.classList.add('hidden');
+    }, 1800);
+  };
+}
+
+function toggleVoiceRecognition(event) {
+  if (event) event.stopPropagation();
+
+  if (!recognition) {
+    alert("O reconhecimento de voz não é suportado ou ativado neste navegador. Use o Chrome ou Safari.");
+    return;
+  }
+
+  if (!lastFocusedInput) {
+    // Alerta visual no próprio indicador central
+    const indicator = document.getElementById('voice-indicator');
+    const indText = document.getElementById('voice-text');
+    if (indicator && indText) {
+      indicator.classList.remove('hidden');
+      indText.textContent = "Toque em um campo de texto primeiro!";
+      setTimeout(() => {
+        indicator.classList.add('hidden');
+      }, 2000);
+    } else {
+      alert("Por favor, toque em um campo de texto antes de falar.");
+    }
+    return;
+  }
+
+  try {
+    recognition.start();
+  } catch (err) {
+    // Para se já estiver ativo
+    recognition.stop();
+  }
+}
+
+// Inicialização Automática caso o script seja carregado no final do DOM
+document.addEventListener('DOMContentLoaded', () => {
+  initColorPalette();
+  
+  // Carrega as configurações persistidas no localStorage do navegador
+  loadSettingsFromStorage();
+
+  // Inicializa o módulo SpeechRecognition
+  initVoiceRecognition();
+});

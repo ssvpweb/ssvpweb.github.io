@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Layout Básico (v1) - SSVP</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+
+  <!-- Barra Superior (2 Círculos de Canto) -->
+  <div class="bar-sup">
+    <div class="bar-circle canto-circle"></div>
+    <span class="file-name-label">v1_layout_basico.html</span>
+    <div class="bar-circle canto-circle"></div>
+  </div>
+
+  <!-- Área de Desenho Central (Preta Vazia) -->
+  <div class="display-area">
+    
+    <!-- Painel de Configurações (Colapsado por padrão) -->
+    <div id="panel-config" class="panel-config collapsed">
+      <div class="panel-header" onclick="togglePanel()">
+        <span>⚙️ Painel de Configurações</span>
+        <span id="panel-toggle-icon" class="panel-toggle-btn">+</span>
+      </div>
+      <div id="panel-body" class="panel-body">
+        
+        <!-- Ajuste do raio dos círculos de canto -->
+        <div class="config-row">
+          <span class="config-label">Raio Cantos:</span>
+          <div class="counter-control">
+            <button onclick="adjustVal('canto', -1)">−</button>
+            <span id="lbl-canto">2.50rem</span>
+            <button onclick="adjustVal('canto', 1)">+</button>
+          </div>
+        </div>
+
+        <!-- Ajuste do raio do círculo de áudio -->
+        <div class="config-row">
+          <span class="config-label">Raio Áudio:</span>
+          <div class="counter-control">
+            <button onclick="adjustVal('audio', -1)">−</button>
+            <span id="lbl-audio">3.50rem</span>
+            <button onclick="adjustVal('audio', 1)">+</button>
+          </div>
+        </div>
+
+        <!-- Ajuste do padding vertical das barras -->
+        <div class="config-row">
+          <span class="config-label">Padding Barras:</span>
+          <div class="counter-control">
+            <button onclick="adjustVal('padding', -1)">−</button>
+            <span id="lbl-padding">0.50rem</span>
+            <button onclick="adjustVal('padding', 1)">+</button>
+          </div>
+        </div>
+
+        <!-- Cores do Manual SSVP -->
+        <div class="config-color-section">
+          <div class="config-row">
+            <span class="config-label">Escolher Alvo:</span>
+            <select id="color-target" class="color-select" onchange="highlightSelectedColor()">
+              <option value="barras">Barras (Sup/Inf)</option>
+              <option value="canto">Círculos de Canto</option>
+              <option value="audio">Círculo de Áudio</option>
+              <option value="fundo">Fundo da Tela</option>
+            </select>
+          </div>
+          <div class="color-palette" id="color-palette">
+            <!-- Gerado dinamicamente com numeração sob as cores -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Barra Inferior (2 Círculos de Canto e 1 Central de Áudio) -->
+  <div class="bar-inf">
+    <div class="bar-circle canto-circle" id="btn_config"></div>
+    <div class="bar-circle audio-circle" id="btn_voz"></div>
+    <div class="bar-circle canto-circle" id="btn_ajuda"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -34,6 +34,7 @@
       background-color: #090d16;
       color: var(--text-main);
       height: 100vh;
+      height: 100dvh; /* Viewport dinâmico móvel */
       width: 100vw;
       overflow: hidden;
       display: flex;
@@ -186,6 +187,7 @@
     .iframe-container {
       width: 100vw;
       height: calc(100vh - var(--toolbar-height));
+      height: calc(100dvh - var(--toolbar-height)); /* Viewport dinâmico móvel */
       margin-top: var(--toolbar-height);
       background-color: #0b0f19;
       position: relative;
@@ -194,6 +196,7 @@
 
     .dev-toolbar.collapsed ~ .iframe-container {
       height: 100vh;
+      height: 100dvh; /* Viewport dinâmico móvel */
       margin-top: 0;
     }
 
@@ -362,6 +365,7 @@
       { folder: "ux/cards_expand", files: [{ name: "index.html" }] },
       { folder: "ux/cards_slide", files: [{ name: "index.html" }] },
       { folder: "ux/voz_com_toque", files: [{ name: "index.html" }] },
+      { folder: "ux/app", files: [{ name: "v1_layout_basico.html" }] },
       { folder: "voz", files: [{ name: "LEIA_ME.html" }, { name: "v1_gravacao_audio_simples.html" }, { name: "v2_comandos_de_voz.html" }] }
     ];
 
