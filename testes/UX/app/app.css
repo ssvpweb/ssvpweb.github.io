@@ -328,11 +328,13 @@ body {
 
 /* Estado ativo do botão de canto quando o card correspondente está aberto */
 .canto-circle.card-aberto {
-  background-color: #ffffff !important;
+  background-color: color-mix(in srgb, var(--cor-barras) 80%, white 20%) !important;
+  border-color: color-mix(in srgb, var(--cor-barras) 80%, white 20%) !important;
+  color: white !important;
 }
 
 .canto-circle.card-aberto svg {
-  opacity: 0 !important; /* Oculta o ícone imediatamente */
+  opacity: 1 !important; /* Mantém o ícone visível em alto contraste */
 }
 
 /* Ícones de botão */
