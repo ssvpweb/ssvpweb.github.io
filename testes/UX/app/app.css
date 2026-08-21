@@ -120,6 +120,7 @@ body {
 .display-area {
   flex: 1;
   position: relative;
+  z-index: 1; /* Cria a camada para a área central */
   width: 100%;
   min-height: 0; /* Fundamental para o scroll do flexbox vertical */
 }
@@ -715,7 +716,7 @@ body {
   background-color: var(--cor-card-bg);
   border-bottom: 2px solid var(--cor-barras);
   padding: 1rem 1.2rem;
-  z-index: 8; /* Fica abaixo da barra superior (z-index 10) para deslizar por trás dela */
+  z-index: 9; /* Fica acima dos cards (camada central), mas abaixo da barra superior (z-index 10) */
   transform: translateY(-100%);
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 8px 20px rgba(0,0,0,0.4);
