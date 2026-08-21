@@ -20,7 +20,8 @@ const state = {
   audio: 3.50,
   padding: 0.50,
   speed: 0.08, // Velocidade de transição padrão definida no CSS externo
-  holdTime: 0.80 // Tempo padrão de tocar e segurar em segundos
+  holdTime: 0.80, // Tempo padrão de tocar e segurar em segundos
+  speakMessages: true // Configuração de leitura automática de mensagens por voz (v5)
 };
 
 const limits = {
@@ -143,6 +144,23 @@ document.addEventListener('click', function(event) {
 
     if (!insideEsq && !insideDir) {
       closeActiveCard();
+    }
+  }
+
+  // Fechar banner de notificação (v5) ao clicar fora dele
+  const banner = document.getElementById('notification-banner');
+  if (banner && banner.classList.contains('show')) {
+    const isClickInsideBanner = banner.contains(event.target);
+    const isClickOnSimBtn = event.target.closest('.sim-btn');
+    if (!isClickInsideBanner && !isClickOnSimBtn) {
+      banner.classList.remove('show');
+      if (typeof notificationTimer !== 'undefined' && notificationTimer) {
+        clearTimeout(notificationTimer);
+        notificationTimer = null;
+      }
+      if (typeof synth !== 'undefined' && synth && synth.speaking) {
+        synth.cancel();
+      }
     }
   }
 });
@@ -340,6 +358,7 @@ function saveSettingsToStorage() {
   localStorage.setItem('ssvp_canto', state.canto);
   localStorage.setItem('ssvp_audio', state.audio);
   localStorage.setItem('ssvp_padding', state.padding);
+  localStorage.setItem('ssvp_speak_messages', state.speakMessages ? 'true' : 'false');
 }
 
 function loadSettingsFromStorage() {
@@ -350,6 +369,7 @@ function loadSettingsFromStorage() {
   const savedCanto = localStorage.getItem('ssvp_canto');
   const savedAudio = localStorage.getItem('ssvp_audio');
   const savedPadding = localStorage.getItem('ssvp_padding');
+  const savedSpeak = localStorage.getItem('ssvp_speak_messages');
 
   // 1. Carrega e aplica dimensões customizadas
   if (savedCanto) {
@@ -394,6 +414,17 @@ function loadSettingsFromStorage() {
   // 4. Carrega e aplica tamanho de fonte
   if (savedFont) {
     setAppFontSize(savedFont);
+  }
+
+  // 5. Carrega e aplica configuração de ditação de mensagens por voz (v5)
+  if (savedSpeak !== null) {
+    state.speakMessages = savedSpeak === 'true';
+  } else {
+    state.speakMessages = true; // Valor padrão inicial
+  }
+  const chk = document.getElementById('chk-speak-messages');
+  if (chk) {
+    chk.checked = state.speakMessages;
   }
 }
 
@@ -680,3 +711,72 @@ document.addEventListener('DOMContentLoaded', () => {
   // Garante que o inputmode esteja inicialmente alinhado ao modo voz nos inputs
   applyInputModeSettings();
 });
+
+// ==========================================================================
+// Módulo de Notificações Inteligentes Deslizantes (v5)
+// ==========================================================================
+let notificationTimer = null;
+const synth = window.speechSynthesis;
+
+function toggleSpeakMessages(event) {
+  state.speakMessages = event.target.checked;
+  localStorage.setItem('ssvp_speak_messages', state.speakMessages ? 'true' : 'false');
+  showTemporaryNotification(state.speakMessages ? "🔊 Leitura por voz ativada" : "🔇 Leitura por voz desativada");
+}
+
+function triggerSimulatedEvent(type, event) {
+  if (event) event.stopPropagation();
+
+  let text = "";
+  if (type === 'wifi') {
+    text = "Sincronização Concluída: Histórico de visitas da Família Silva baixado com sucesso para uso offline.";
+  } else if (type === 'transito') {
+    text = "Atenção: Você está a 5 minutos do destino cadastrado, UBS Indianópolis.";
+  } else if (type === 'chegada') {
+    text = "Alerta de Chegada: Você está na casa da Família Silva. Lembrete: Levar cesta básica.";
+  }
+
+  showNotificationBanner(text);
+
+  // Se a opção de fala estiver habilitada, lê a mensagem
+  if (state.speakMessages) {
+    speakNotification(text);
+  }
+}
+
+function showNotificationBanner(text) {
+  const banner = document.getElementById('notification-banner');
+  const bannerText = document.getElementById('notification-text');
+  if (!banner || !bannerText) return;
+
+  if (notificationTimer) {
+    clearTimeout(notificationTimer);
+  }
+
+  bannerText.textContent = text;
+  banner.classList.add('show');
+
+  // Adiciona efeito de vibração se disponível (feedback tátil de trânsito)
+  if (navigator.vibrate) {
+    navigator.vibrate([80, 50, 80]);
+  }
+
+  // Oculta automaticamente após 6 segundos
+  notificationTimer = setTimeout(() => {
+    banner.classList.remove('show');
+  }, 6000);
+}
+
+function speakNotification(text) {
+  if (!synth) return;
+
+  // Cancela qualquer fala em andamento
+  if (synth.speaking) {
+    synth.cancel();
+  }
+
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'pt-BR';
+  utterance.rate = 1.0; // Velocidade natural
+  synth.speak(utterance);
+}

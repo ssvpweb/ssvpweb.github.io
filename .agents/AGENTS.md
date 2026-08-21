@@ -16,6 +16,7 @@
 ## Organização de Planos de Implementação
 * **Planos Gerais e Funcionalidades:** Os planos de implementação (específicos de features, conjuntos de features ou o plano geral do webapp) devem ser salvos na pasta `dev/implement/` para subirem para o repositório público.
 * **Segurança e Privacidade de Dados:** Qualquer plano de implementação que envolva segurança de dados, autenticação, criptografia, chaves de API, senhas ou privacidade de dados (LGPD) deve ser mantido estritamente na pasta `dev_local/` (evitando a exposição pública via `.gitignore`).
+* **Ajustes Simples e Pequenos:** Para tarefas triviais, pequenos ajustes de layout, correções de sintaxe ou alinhamentos simples de CSS/JS que não envolvam grandes mudanças estruturais ou novas funcionalidades, o agente **NÃO deve criar planos de implementação (`implementation_plan.md`), listas de tarefas (`task.md`) ou walkthroughs (`walkthrough.md`)**. Nesses casos, o agente deve propor os snippets de alteração diretamente e aplicá-los após autorização rápida.
 
 ## Compatibilidade Multiplataforma (Android & iOS)
 * **Prevenção de Zoom Automático (iPhone):** Todos os campos de formulário (`input`, `textarea`, `select`) devem ter tamanho de fonte mínimo de `16px` (ou `1rem`) em visualizações móveis para evitar que o Safari dê zoom de foco indesejado.
