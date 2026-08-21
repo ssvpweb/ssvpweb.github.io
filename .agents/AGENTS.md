@@ -23,3 +23,6 @@
 * **Margens de Segurança (Safe Areas):** Elementos fixados nas extremidades da tela (barras inferiores ou superiores) devem usar variáveis CSS `env(safe-area-inset-...)` para não serem cobertos pela barra de navegação virtual ou pelo entalhe (Notch) do iOS.
 * **Políticas de Captura/Execução de Mídia:** Funcionalidades de Speech Recognition (Reconhecimento de Voz) ou áudio retorno (Speech Synthesis) devem ser acionadas estritamente de dentro de um evento de clique ou interação física ativa do usuário na tela, suportando os prefixos `window.webkitSpeechRecognition`.
 * **Padrões de Dimensionamento (Unidades CSS):** Para garantir a acessibilidade de escala móvel para idosos, utilize preferencialmente a unidade `rem` para tamanhos de texto (`font-size`), espaçamentos (`padding`, `margin`) e alturas dinâmicas. Use `px` apenas para elementos de precisão física que não devem distorcer (como bordas de até `3px`, divisores e deslocamentos de sombra `box-shadow`). Evite o uso aninhado e complexo de `em`.
+
+## Identificação de Versão nos Protótipos de Teste
+* **Versão no Topo:** Em todos os arquivos de testes/protótipos que sofrerem modificações ou forem criados, adicione de forma sutil e discreta a identificação da versão correspondente (como o nome do arquivo ou número da versão) na barra superior ou no topo do layout.

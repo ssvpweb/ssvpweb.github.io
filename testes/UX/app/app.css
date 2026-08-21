@@ -47,6 +47,7 @@ body {
 
 /* Barra Superior Fixa (Header) */
 .bar-sup {
+  position: relative;
   background-color: var(--cor-barras);
   padding-top: calc(var(--padding-vertical-barras) + env(safe-area-inset-top));
   padding-bottom: var(--padding-vertical-barras);
@@ -63,6 +64,7 @@ body {
 
 /* Barra Inferior Fixa (Footer) */
 .bar-inf {
+  position: relative;
   background-color: var(--cor-barras);
   padding-top: var(--padding-vertical-barras);
   padding-bottom: calc(var(--padding-vertical-barras) + env(safe-area-inset-bottom));
