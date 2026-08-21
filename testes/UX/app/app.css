@@ -713,7 +713,7 @@ body {
   background-color: var(--cor-card-bg);
   border-bottom: 2px solid var(--cor-barras);
   padding: 1rem 1.2rem;
-  z-index: 15;
+  z-index: 8; /* Fica abaixo da barra superior (z-index 10) para deslizar por trás dela */
   transform: translateY(-100%);
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 8px 20px rgba(0,0,0,0.4);

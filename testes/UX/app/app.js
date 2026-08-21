@@ -760,11 +760,6 @@ function showNotificationBanner(text) {
   if (navigator.vibrate) {
     navigator.vibrate([80, 50, 80]);
   }
-
-  // Oculta automaticamente após 6 segundos
-  notificationTimer = setTimeout(() => {
-    banner.classList.remove('show');
-  }, 6000);
 }
 
 function speakNotification(text) {
