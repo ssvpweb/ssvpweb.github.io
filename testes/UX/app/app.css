@@ -820,3 +820,131 @@ body {
 .switch-container input:checked + .switch-slider:before {
   transform: translateX(24px);
 }
+
+/* ==========================================================================
+   Módulo de Login Seguro e Teclado Numérico (v6)
+   ========================================================================== */
+
+/* Limita tamanho do card de login */
+.login-box {
+  max-width: 360px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1.5rem;
+  box-sizing: border-box;
+}
+
+/* Indicadores de PIN (4 bolinhas/círculos) */
+.pin-display-group {
+  margin: 1.5rem 0 1rem 0;
+}
+
+.pin-dots-container {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin: 0.5rem 0;
+}
+
+.pin-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  background-color: transparent;
+  transition: all 0.15s ease;
+}
+
+/* Modo Claro: Borda do PIN */
+.light-theme-card .pin-dot {
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+.pin-dot.filled {
+  background-color: var(--cor-audio);
+  border-color: var(--cor-audio);
+  transform: scale(1.1);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+}
+
+/* Teclado Numérico Ergonômico */
+.num-keyboard {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  justify-items: center;
+  margin-top: 1rem;
+}
+
+.key-btn {
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--cor-card-texto);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-family: inherit;
+  font-size: 1.5rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.key-btn:active {
+  transform: scale(0.9);
+  background-color: #007fff; /* Azul Royal ao pressionar */
+  color: #ffffff;
+  border-color: #007fff;
+}
+
+/* Estilo para teclas especiais C e Backspace */
+.key-btn.key-action {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Tema Claro: Teclado */
+.light-theme-card .key-btn {
+  background-color: rgba(0, 0, 0, 0.03);
+  color: #0b0f19;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.light-theme-card .key-btn:active {
+  background-color: #007fff;
+  color: #ffffff;
+  border-color: #007fff;
+}
+
+/* Feedback de Erro Visual no Card de Login */
+.app-card.login-error {
+  border-color: #d32f2f !important;
+  animation: shakeCard 0.4s ease-in-out;
+}
+
+@keyframes shakeCard {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-8px); }
+  40%, 80% { transform: translateX(8px); }
+}
+
+/* Feedback de Sucesso */
+.app-card.login-success {
+  border-color: #10b981 !important;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+}
+
+/* Sessão Ativa Status */
+.session-status {
+  transition: all 0.3s ease;
+  padding: 10px 0;
+  text-align: center;
+}
+
+.session-status.hidden {
+  display: none;
+}

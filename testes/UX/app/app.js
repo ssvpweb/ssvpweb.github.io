@@ -710,6 +710,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Garante que o inputmode esteja inicialmente alinhado ao modo voz nos inputs
   applyInputModeSettings();
+
+  // Valida o estado do login/sessão (v6)
+  checkActiveSession();
 });
 
 // ==========================================================================
@@ -774,4 +777,119 @@ function speakNotification(text) {
   utterance.lang = 'pt-BR';
   utterance.rate = 1.0; // Velocidade natural
   synth.speak(utterance);
+}
+
+// ==========================================================================
+// Módulo de Login Seguro e Teclado Numérico (v6)
+// ==========================================================================
+let typedPin = '';
+
+function checkActiveSession() {
+  const sessionStatus = document.getElementById('session-status');
+  const loginFields = document.getElementById('login-fields');
+  if (!sessionStatus || !loginFields) return;
+
+  const session = localStorage.getItem('ssvp_session');
+  if (session === 'active') {
+    sessionStatus.classList.remove('hidden');
+    loginFields.style.display = 'none';
+  } else {
+    sessionStatus.classList.add('hidden');
+    loginFields.style.display = 'block';
+  }
+}
+
+function pressKey(key, event) {
+  if (event) event.stopPropagation();
+
+  // Ignora teclas se a sessão já estiver ativa
+  if (localStorage.getItem('ssvp_session') === 'active') return;
+
+  if (key === 'C') {
+    typedPin = '';
+  } else if (key === 'B') {
+    typedPin = typedPin.slice(0, -1);
+  } else if (typedPin.length < 4) {
+    typedPin += key;
+  }
+
+  updatePinDots();
+
+  // Inicia validação assim que o PIN alcança 4 dígitos
+  if (typedPin.length === 4) {
+    setTimeout(validatePin, 200); // Pequeno atraso para o preenchimento visual do último círculo
+  }
+}
+
+function updatePinDots() {
+  for (let i = 0; i < 4; i++) {
+    const dot = document.getElementById(`dot-${i}`);
+    if (dot) {
+      if (i < typedPin.length) {
+        dot.classList.add('filled');
+      } else {
+        dot.classList.remove('filled');
+      }
+    }
+  }
+}
+
+function validatePin() {
+  const loginCard = document.getElementById('login-card');
+  if (!loginCard) return;
+
+  if (typedPin === '1904') {
+    // Caso de Sucesso
+    loginCard.classList.add('login-success');
+    localStorage.setItem('ssvp_session', 'active');
+    
+    const textSuccess = "Login realizado com sucesso! Acessando o painel de visitas.";
+    showTemporaryNotification("✓ Acesso Concedido");
+
+    if (state.speakMessages) {
+      speakNotification(textSuccess);
+    }
+
+    if (navigator.vibrate) {
+      navigator.vibrate([100, 50, 100]);
+    }
+
+    setTimeout(() => {
+      loginCard.classList.remove('login-success');
+      checkActiveSession();
+    }, 1500);
+
+  } else {
+    // Caso de Falha
+    loginCard.classList.add('login-error');
+    typedPin = '';
+    updatePinDots();
+
+    const textError = "PIN incorreto. Tente novamente.";
+    showTemporaryNotification("❌ Código PIN Incorreto");
+
+    if (state.speakMessages) {
+      speakNotification(textError);
+    }
+
+    if (navigator.vibrate) {
+      navigator.vibrate(150);
+    }
+
+    setTimeout(() => {
+      loginCard.classList.remove('login-error');
+    }, 550);
+  }
+}
+
+function directAccess(event) {
+  if (event) event.stopPropagation();
+  showTemporaryNotification("✓ Painel de visitas acessado");
+}
+
+function simulatedLogout(event) {
+  if (event) event.stopPropagation();
+  localStorage.removeItem('ssvp_session');
+  showTemporaryNotification("⚙️ Logout efetuado com sucesso");
+  checkActiveSession();
 }

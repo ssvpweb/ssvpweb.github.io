@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Login e Autenticação (v6) - SSVP</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="app.css">
+</head>
+
+<body>
+
+  <!-- Barra Superior (2 Círculos de Canto com o nome do arquivo ativo) -->
+  <div class="bar-sup">
+    <div class="bar-circle canto-circle">6</div>
+    <span class="file-name-label">v6_login.html</span>
+    <div class="bar-circle canto-circle"></div>
+  </div>
+
+  <!-- Área de Desenho Central (Preta com Formulário Realístico para simulação) -->
+  <div class="display-area" onclick="closeActiveCard()">
+
+    <!-- Área de Conteúdo Central (Scrollável) -->
+    <div class="display-area-content" style="display: flex; flex-direction: column; justify-content: center; min-height: 100%;">
+
+      <!-- Card Central de Login -->
+      <div id="login-card" class="app-card login-box">
+        <div class="app-card-title" style="justify-content: center; font-size: 1rem; margin-bottom: 1rem;">
+          🔑 <span>Acesso ao Sistema SSVP</span>
+        </div>
+
+        <!-- Mensagem de Sessão Ativa ou Redirecionamento -->
+        <div id="session-status" class="session-status hidden">
+          <p style="color: var(--cor-audio); font-size: 0.8rem; font-weight: 600; text-align: center; margin-bottom: 12px;">
+            Sessão ativa encontrada para este dispositivo.
+          </p>
+          <div style="display: flex; gap: 8px;">
+            <button class="sim-btn" onclick="directAccess(event)" style="background-color: var(--cor-barras); text-align: center;">Entrar no Painel</button>
+            <button class="sim-btn" onclick="simulatedLogout(event)" style="background-color: #d32f2f; text-align: center; border-color: #d32f2f;">Sair</button>
+          </div>
+        </div>
+
+        <!-- Formulário Real do Login (Visível se não houver sessão ativa) -->
+        <div id="login-fields">
+          <!-- Campo Matrícula/CPF (font-size 16px para iOS) -->
+          <div class="login-field-group" style="margin-bottom: 1rem;">
+            <label for="txt-matricula" style="font-size: 0.72rem; font-weight: 700; color: var(--cor-card-texto); display: block; margin-bottom: 4px;">Matrícula ou CPF:</label>
+            <input type="text" id="txt-matricula" placeholder="Digite sua matrícula..." autocomplete="off" style="font-size: 16px; width: 100%; box-sizing: border-box;">
+          </div>
+
+          <!-- Indicador visual de preenchimento do PIN (4 Círculos) -->
+          <div class="pin-display-group">
+            <span style="font-size: 0.72rem; font-weight: 700; color: var(--cor-card-texto); display: block; text-align: center; margin-bottom: 8px;">Código PIN de Acesso (4 Dígitos):</span>
+            <div class="pin-dots-container">
+              <div class="pin-dot" id="dot-0"></div>
+              <div class="pin-dot" id="dot-1"></div>
+              <div class="pin-dot" id="dot-2"></div>
+              <div class="pin-dot" id="dot-3"></div>
+            </div>
+            <p style="font-size: 0.62rem; text-align: center; color: var(--cor-card-subtexto); margin-top: 4px;">💡 PIN Padrão de teste: 1904</p>
+          </div>
+
+          <!-- Teclado Numérico Ergonômico de Canto Redondo (Botões Grandes 65px) -->
+          <div class="num-keyboard">
+            <button class="key-btn" onclick="pressKey('1', event)">1</button>
+            <button class="key-btn" onclick="pressKey('2', event)">2</button>
+            <button class="key-btn" onclick="pressKey('3', event)">3</button>
+            <button class="key-btn" onclick="pressKey('4', event)">4</button>
+            <button class="key-btn" onclick="pressKey('5', event)">5</button>
+            <button class="key-btn" onclick="pressKey('6', event)">6</button>
+            <button class="key-btn" onclick="pressKey('7', event)">7</button>
+            <button class="key-btn" onclick="pressKey('8', event)">8</button>
+            <button class="key-btn" onclick="pressKey('9', event)">9</button>
+            <button class="key-btn key-action" onclick="pressKey('C', event)" style="font-size: 1rem; color: #d32f2f;">C</button>
+            <button class="key-btn" onclick="pressKey('0', event)">0</button>
+            <button class="key-btn key-action" onclick="pressKey('B', event)" style="font-size: 1rem;">⌫</button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Indicador de Voz Central (Inicialmente Oculto) -->
+    <div id="voice-indicator" class="voice-indicator hidden">
+      <div class="voice-dot"></div>
+      <span id="voice-text" class="voice-text">Ouvindo... Fale o texto</span>
+    </div>
+
+    <!-- Card da Esquerda (Configurações Rápidas integradas no aplicativo) -->
+    <div id="card-esq" class="card-expandido card-esquerda" onclick="event.stopPropagation()">
+      <div class="card-content">
+        <div class="card-title">
+          <svg viewBox="0 0 24 24" fill="currentColor" style="width: 20px; height: 20px; vertical-align: middle;">
+            <path
+              d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" />
+          </svg>
+          <span>Ajustes do Aplicativo</span>
+        </div>
+        <div class="card-text"
+          style="display: flex; flex-direction: column; gap: 1rem; margin-top: 0.5rem; overflow-y: auto;">
+
+          <!-- Escolha de Tema: Modo Claro / Escuro -->
+          <div class="setting-item">
+            <span class="setting-label">Tema Visual:</span>
+            <div class="theme-buttons">
+              <button id="btn-theme-claro" onclick="setAppTheme('claro')">Claro</button>
+              <button id="btn-theme-escuro" onclick="setAppTheme('escuro')" class="active">Escuro</button>
+            </div>
+          </div>
+
+          <!-- Tamanho das Letras: P, M, G (Acessibilidade elástica) -->
+          <div class="setting-item">
+            <span class="setting-label">Tamanho das letras:</span>
+            <div class="font-buttons">
+              <button id="btn-font-p" onclick="setAppFontSize('P')">P</button>
+              <button id="btn-font-m" onclick="setAppFontSize('M')" class="active">M</button>
+              <button id="btn-font-g" onclick="setAppFontSize('G')">G</button>
+            </div>
+          </div>
+
+          <!-- Velocidade de Abertura: + e - -->
+          <div class="setting-item">
+            <span class="setting-label">Veloc. de abertura dos menus:</span>
+            <div class="counter-control">
+              <button onclick="adjustAppSpeed(-1)">−</button>
+              <span id="lbl-app-speed">0.08s</span>
+              <button onclick="adjustAppSpeed(1)">+</button>
+            </div>
+          </div>
+
+          <!-- Tempo de Tocar e Segurar: + e - -->
+          <div class="setting-item">
+            <span class="setting-label">Tempo de tocar e segurar:</span>
+            <div class="counter-control">
+              <button onclick="adjustAppHoldTime(-1)">−</button>
+              <span id="lbl-app-hold">0.80s</span>
+              <button onclick="adjustAppHoldTime(1)">+</button>
+            </div>
+          </div>
+
+          <p
+            style="font-size: 0.65rem; color: var(--cor-card-subtexto); margin-top: auto; line-height: 1.4; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px;">
+            A escala elástica permite que, ao selecionar a fonte G, todo o formulário de login e os botões do teclado numérico aumentem proporcionalmente para idosos.
+          </p>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Card da Direita (Ajuda/Suporte) -->
+    <div id="card-dir" class="card-expandido card-direita" onclick="event.stopPropagation()">
+      <div class="card-content">
+        <div class="card-title">
+          <svg viewBox="0 0 24 24" fill="currentColor" style="width: 20px; height: 20px; vertical-align: middle;">
+            <path
+              d="M11.07 12.85c.77-1.39 2.25-2.21 3.11-3.44.91-1.29.4-3.41-1.45-3.41-1.35 0-2.03.78-2.42 1.76-.18.46-.59.74-1.07.74-.75 0-1.28-.73-1.05-1.44C8.82 5.17 10.45 4 12.75 4c2.9 0 4.95 2.18 4.29 5.2-.47 2.15-2.25 3.39-3.08 4.67-.32.49-.46 1.01-.46 1.63v.5c0 .55-.45 1-1 1s-1-.45-1-1v-.8c0-.98.24-1.74.57-2.35zM12 20c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5S12.83 20 12 20z" />
+          </svg>
+          <span>Apoio ao Login</span>
+        </div>
+        <div class="card-text">
+          <p style="margin-bottom: 12px;"><strong>Instruções de Acesso:</strong></p>
+          <p style="margin-bottom: 8px;">1. Digite sua matrícula institucional no campo superior.</p>
+          <p style="margin-bottom: 8px;">2. Use o teclado de botões grandes para inserir o PIN de 4 dígitos.</p>
+          <p style="margin-bottom: 12px;">3. O PIN padrão configurado para este teste de laboratório é <strong>1904</strong>.</p>
+          <p>Caso tenha esquecido sua credencial, procure o Conselho Central.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Barra Inferior (2 Círculos de Canto com ícone e 1 Central de Áudio) -->
+  <div class="bar-inf">
+    <!-- Botão da Esquerda (Engrenagem) -->
+    <div class="bar-circle canto-circle" id="btn_config" onclick="toggleCard('esquerda', event)">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path
+          d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" />
+      </svg>
+    </div>
+    <!-- Botão Central (Áudio) -->
+    <div class="bar-circle audio-circle" id="btn_voz" onclick="toggleVoiceRecognition(event)">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
+      </svg>
+    </div>
+    <!-- Botão da Direita (Interrogação) -->
+    <div class="bar-circle canto-circle" id="btn_ajuda" onclick="toggleCard('direita', event)">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path
+          d="M11.07 12.85c.77-1.39 2.25-2.21 3.11-3.44.91-1.29.4-3.41-1.45-3.41-1.35 0-2.03.78-2.42 1.76-.18.46-.59.74-1.07.74-.75 0-1.28-.73-1.05-1.44C8.82 5.17 10.45 4 12.75 4c2.9 0 4.95 2.18 4.29 5.2-.47 2.15-2.25 3.39-3.08 4.67-.32.49-.46 1.01-.46 1.63v.5c0 .55-.45 1-1 1s-1-.45-1-1v-.8c0-.98.24-1.74.57-2.35zM12 20c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5S12.83 20 12 20z" />
+      </svg>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>
