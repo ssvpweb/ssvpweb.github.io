@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Construtor de Comandos - Árvore de Decisão JSON - SSVP</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-color: hsl(222, 47%, 7%);
+      --card-bg: hsl(222, 40%, 12%);
+      --card-bg-hover: hsl(222, 35%, 16%);
+      --primary-color: hsl(250, 95%, 70%);
+      --primary-glow: hsla(250, 95%, 70%, 0.2);
+      --success-color: hsl(150, 80%, 38%);
+      --success-glow: hsla(150, 80%, 38%, 0.25);
+      --accent-color: hsl(330, 90%, 60%);
+      --accent-glow: hsla(330, 90%, 60%, 0.25);
+      --text-main: hsl(210, 40%, 98%);
+      --text-muted: hsl(215, 20%, 65%);
+      --border-color: rgba(255, 255, 255, 0.06);
+      
+      --font-display: 'Outfit', sans-serif;
+      --font-body: 'Plus Jakarta Sans', sans-serif;
+      
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      padding-bottom: calc(30px + var(--safe-bottom));
+      justify-content: space-between;
+      overflow-x: hidden;
+    }
+
+    /* Identificação da Versão no Topo */
+    .top-version-bar {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      opacity: 0.7;
+      margin-bottom: 10px;
+      letter-spacing: 0.05em;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 10px;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    header h1 {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #fff 40%, var(--primary-color) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 4px;
+    }
+
+    /* Instruções Sucintas no Topo */
+    .instrucoes-topo {
+      background-color: rgba(255, 255, 255, 0.015);
+      border: 1.5px solid var(--border-color);
+      border-radius: 14px;
+      padding: 12px 16px;
+      font-size: 0.8rem;
+      line-height: 1.45;
+      color: var(--text-muted);
+      width: 100%;
+      max-width: 500px;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .instrucoes-topo strong {
+      color: var(--primary-color);
+    }
+
+    main {
+      width: 100%;
+      max-width: 500px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      flex-grow: 1;
+      justify-content: flex-start;
+    }
+
+    /* Cards Dinâmicos de Opções (Centralizados) */
+    .options-card {
+      background-color: var(--card-bg);
+      border-radius: 20px;
+      padding: 15px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 150px;
+      justify-content: center;
+      animation: pop-in 0.3s ease-out;
+    }
+
+    .options-header {
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--primary-color);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .options-grid.list-view {
+      display: flex;
+      flex-direction: column;
+      max-height: 180px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .options-grid.list-view::-webkit-scrollbar {
+      width: 4px;
+    }
+    .options-grid.list-view::-webkit-scrollbar-thumb {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 99px;
+    }
+
+    /* Cards de Opção */
+    .option-btn {
+      background-color: rgba(255, 255, 255, 0.02);
+      border: 1.5px solid var(--border-color);
+      border-radius: 12px;
+      padding: 14px 10px;
+      color: var(--text-main);
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .option-btn:hover {
+      background-color: var(--card-bg-hover);
+      border-color: var(--primary-color);
+    }
+
+    .option-btn:active {
+      transform: scale(0.98);
+    }
+
+    /* Bloco de Confirmação do Comando Montado */
+    .montado-overlay-card {
+      display: none;
+      background: linear-gradient(135deg, hsl(250, 95%, 15%) 0%, hsl(250, 95%, 10%) 100%);
+      border: 2px solid var(--primary-color);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 10px 30px var(--primary-glow);
+      flex-direction: column;
+      gap: 15px;
+      text-align: center;
+      animation: pop-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .montado-title {
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--primary-color);
+    }
+
+    .montado-text {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: white;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    .executar-btn {
+      background-color: var(--success-color);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.1rem;
+      cursor: pointer;
+      box-shadow: 0 5px 15px var(--success-glow);
+      transition: all 0.2s;
+    }
+
+    .executar-btn:hover {
+      background-color: hsl(150, 80%, 42%);
+      transform: translateY(-2px);
+    }
+
+    .executar-btn:active {
+      transform: translateY(1px);
+    }
+
+    /* Console de Ação */
+    .action-console {
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 14px;
+      padding: 12px;
+      border: 1px dashed var(--border-color);
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    /* Seção de Controle e Pilha Vertical (Na Base) */
+    .bottom-controls-section {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: auto;
+    }
+
+    /* Container de Empilhamento e Botão Montar no Topo */
+    .stack-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+      max-width: 320px;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    /* Botão Montar (Fica no topo da pilha) */
+    .montar-btn {
+      display: none;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      box-shadow: 0 4px 10px var(--primary-glow);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: all 0.2s;
+      animation: pop-in 0.2s ease-out;
+    }
+
+    .montar-btn:hover {
+      background-color: hsl(250, 95%, 75%);
+    }
+
+    /* Breadcrumbs Empilhados Verticalmente */
+    .breadcrumbs-stack {
+      display: flex;
+      flex-direction: column-reverse; /* Chips acumulam para cima, aproximando do botão Montar */
+      gap: 8px;
+      width: 100%;
+    }
+
+    .breadcrumb-chip {
+      background-color: var(--success-color);
+      color: white;
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 8px 16px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      width: 100%;
+      box-shadow: 0 4px 10px var(--success-glow);
+      animation: slide-up 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .breadcrumb-chip.preposition {
+      background-color: transparent;
+      border: 1.5px dashed var(--success-color);
+      color: var(--success-color);
+      box-shadow: none;
+      justify-content: center;
+    }
+
+    .breadcrumb-chip .remove-btn {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.2rem;
+      cursor: pointer;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      opacity: 0.8;
+    }
+
+    .breadcrumb-chip .remove-btn:hover {
+      opacity: 1;
+    }
+
+    /* Botão do Microfone */
+    .mic-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .mic-btn {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary-color) 0%, hsl(250, 95%, 60%) 100%);
+      border: none;
+      outline: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
+      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+    }
+
+    .mic-btn::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background-color: var(--primary-color);
+      opacity: 0.2;
+      z-index: -1;
+    }
+
+    .mic-btn:active {
+      transform: scale(0.92);
+    }
+
+    .mic-btn.preparing {
+      background: linear-gradient(135deg, hsl(35, 95%, 55%) 0%, hsl(20, 95%, 50%) 100%);
+      box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+    }
+
+    .mic-btn.preparing::before {
+      animation: pulse-ring 1.5s infinite ease-out;
+      background-color: hsl(35, 95%, 55%);
+    }
+
+    .mic-btn.listening {
+      background: linear-gradient(135deg, var(--accent-color) 0%, hsl(330, 90%, 50%) 100%);
+      box-shadow: 0 6px 20px rgba(236, 72, 153, 0.5);
+    }
+
+    .mic-btn.listening::before {
+      animation: pulse-ring 1.5s infinite ease-out;
+      background-color: var(--accent-color);
+    }
+
+    .mic-btn svg {
+      width: 32px;
+      height: 32px;
+      fill: white;
+    }
+
+    .status-label {
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .status-label.preparing {
+      color: hsl(35, 95%, 55%);
+    }
+
+    .status-label.listening {
+      color: var(--accent-color);
+    }
+
+    /* Console de Debug Fino */
+    .debug-log {
+      width: 100%;
+      max-width: 500px;
+      margin-top: 15px;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 12px;
+      font-family: monospace;
+      font-size: 0.7rem;
+      color: hsl(120, 100%, 75%);
+      max-height: 80px;
+      overflow-y: auto;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    @keyframes pulse-ring {
+      0% {
+        transform: scale(1);
+        opacity: 0.4;
+      }
+      100% {
+        transform: scale(1.3);
+        opacity: 0;
+      }
+    }
+
+    @keyframes pop-in {
+      0% {
+        transform: scale(0.9);
+        opacity: 0;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slide-up {
+      0% {
+        transform: translateY(15px);
+        opacity: 0;
+      }
+      100% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Identificação da Versão no Topo -->
+  <div class="top-version-bar">
+    v1.7
+  </div>
+
+  <header>
+    <h1>Construtor Incremental JSON</h1>
+  </header>
+
+  <!-- Instruções Sucintas no Topo -->
+  <section class="instrucoes-topo">
+    <strong>Como Usar por Voz/Toque:</strong><br>
+    • Toque no microfone 🎤 e aguarde ficar <strong>vermelho</strong>.<br>
+    • Fale a frase completa (ex: <em>"Fale sobre Maria Silva relatos"</em>) ou construa tocando.<br>
+    • Clique em <strong>MONTAR COMANDO</strong> para habilitar a execução.
+  </section>
+
+  <main>
+    <!-- Card de Confirmação do Comando Montado -->
+    <section class="montado-overlay-card" id="montado-card">
+      <div class="montado-title">Comando Pronto para Execução</div>
+      <div class="montado-text" id="montado-text">...</div>
+      <button class="executar-btn" id="executar-btn">EXECUTAR COMANDO</button>
+    </section>
+
+    <!-- Cards Dinâmicos de Opções (Tocar) -->
+    <section class="options-card" id="options-card">
+      <div class="options-header" id="options-header">Carregando...</div>
+      <div class="options-grid" id="options-grid">
+        <!-- Inserido dinamicamente -->
+      </div>
+    </section>
+
+    <!-- Console de Ação -->
+    <section class="action-console" id="action-console">
+      <span style="color: var(--text-muted); font-style: italic;">Aguardando comandos...</span>
+    </section>
+
+    <!-- Seção de Controles na Base (Pilha e Botão) -->
+    <section class="bottom-controls-section">
+      <!-- Container de Empilhamento + Botão Montar -->
+      <div class="stack-wrapper">
+        <button class="montar-btn" id="montar-btn">MONTAR COMANDO</button>
+        <div class="breadcrumbs-stack" id="breadcrumbs">
+          <!-- Chips de comando empilham para cima -->
+        </div>
+      </div>
+
+      <!-- Microfone -->
+      <div class="mic-container">
+        <button class="mic-btn" id="mic-btn" aria-label="Microfone de comando">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z" />
+            <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" />
+          </svg>
+        </button>
+        <div class="status-label" id="status-label">Pronto</div>
+        <div style="font-size: 0.7rem; color: var(--text-muted); font-style: italic; text-align: center; margin-top: -3px;" id="tip-label">Aguarde ficar vermelho para falar</div>
+      </div>
+    </section>
+
+    <!-- Depuração -->
+    <div style="width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 6px; margin-top: 10px;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); font-weight: bold; letter-spacing: 0.05em;">Logs do Parser</span>
+        <button id="clear-debug-btn" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; cursor: pointer;">Limpar</button>
+      </div>
+      <div class="debug-log" id="debug-log">
+        Parser pronto. Aguardando fala ou toque...
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // --- Mapeamento de Árvore de Decisão por Schema JSON ---
+    const SCHEMA_COMANDOS = {
+      id: "raiz",
+      nextOptions: [
+        {
+          id: "mostre",
+          label: "Mostre",
+          aliases: ["mostre", "mostrar", "mostra", "monstro", "mestre", "ver", "exiba", "exibir", "mostro", "monstra", "morte", "monte", "host", "moste", "mostrá", "mostrei"],
+          isFinal: false,
+          nextOptions: "TOPICOS"
+        },
+        {
+          id: "fale",
+          label: "Fale",
+          aliases: ["fale", "falar", "diga", "ouvir", "vale", "fali", "falei", "falando", "valer", "fales", "fala", "falou", "olhe", "folhe", "lê", "cali", "ali", "sal", "sul", "palha", "vile", "fale-me", "faria", "falou-se", "balde"],
+          isFinal: false,
+          nextOptions: "TOPICOS"
+        }
+      ]
+    };
+
+    const SCHEMA_TOPICOS = [
+      {
+        id: "visita de hoje",
+        label: "Visita de hoje",
+        aliases: ["visita", "visitas", "hoje", "agenda", "agendadas"],
+        isFinal: true
+      },
+      {
+        id: "assistidos",
+        label: "Assistidos",
+        aliases: ["assistido", "assistidos", "assistidas", "pessoa", "pessoas", "família", "familias", "lar", "lares", "assistida"],
+        isFinal: false,
+        nextOptions: "ASSISTIDOS"
+      },
+      {
+        id: "confrades",
+        label: "Confrades",
+        aliases: ["confrade", "confrades", "membros", "irmãos"],
+        isFinal: true
+      },
+      {
+        id: "consócias",
+        label: "Consócias",
+        aliases: ["consócia", "consócias", "consocia", "consocias", "irmãs"],
+        isFinal: true
+      },
+      {
+        id: "regra",
+        label: "Regra",
+        aliases: ["regra", "regulamento", "estatuto", "regras"],
+        isFinal: true
+      },
+      {
+        id: "hábitos",
+        label: "Hábitos",
+        aliases: ["hábito", "hábitos", "rotina", "rotinas", "costume", "costumes"],
+        isFinal: true
+      }
+    ];
+
+    const SCHEMA_ASSISTIDOS = [
+      { id: "Maria Silva", label: "Maria Silva", aliases: ["maria", "silva", "maria silva", "dona maria", "marina", "faria"], isFinal: false, nextOptions: "DETALHES" },
+      { id: "José Santos", label: "José Santos", aliases: ["josé", "santos", "seo josé", "seu josé", "josé santos", "jose"], isFinal: false, nextOptions: "DETALHES" },
+      { id: "Francisca Souza", label: "Francisca Souza", aliases: ["francisca", "souza", "dona francisca", "francisca souza"], isFinal: false, nextOptions: "DETALHES" },
+      { id: "Antônio Oliveira", label: "Antônio Oliveira", aliases: ["antônio", "oliveira", "seo antônio", "seu antônio", "antonio", "antonio oliveira"], isFinal: false, nextOptions: "DETALHES" },
+      { id: "Ana Pereira", label: "Ana Pereira", aliases: ["ana", "pereira", "dona ana", "ana pereira"], isFinal: false, nextOptions: "DETALHES" }
+    ];
+
+    const SCHEMA_DETALHES = [
+      { id: "últimos relatos", label: "Últimos relatos", aliases: ["relato", "relatos", "histórico", "visitas anteriores", "relatório", "relatorios"], isFinal: true },
+      { id: "metas", label: "Metas", aliases: ["meta", "metas", "objetivo", "objetivos", "plano", "planos"], isFinal: true },
+      { id: "endereço", label: "Endereço (Rota)", aliases: ["endereço", "endereco", "rota", "rotas", "mapa", "onde mora", "localização", "localizacao"], isFinal: true }
+    ];
+
+    // Array de nós do JSON que representam o caminho ativo
+    let pathSelected = []; 
+    let isListening = false;
+
+    // Elementos DOM
+    const micBtn = document.getElementById('mic-btn');
+    const statusLabel = document.getElementById('status-label');
+    const debugLog = document.getElementById('debug-log');
+    const optionsCard = document.getElementById('options-card');
+    const optionsHeader = document.getElementById('options-header');
+    const optionsGrid = document.getElementById('options-grid');
+    const breadcrumbs = document.getElementById('breadcrumbs');
+    const actionConsole = document.getElementById('action-console');
+    const btnMontar = document.getElementById('montar-btn');
+    const cardMontado = document.getElementById('montado-card');
+    const textMontado = document.getElementById('montado-text');
+    const btnExecutar = document.getElementById('executar-btn');
+
+    // Inicialização
+    window.addEventListener('DOMContentLoaded', () => {
+      renderCurrentStepOptions();
+    });
+
+    // Logging
+    function logDebug(msg) {
+      const time = new Date().toLocaleTimeString();
+      debugLog.innerHTML = `[${time}] ${msg}<br>` + debugLog.innerHTML;
+    }
+
+    // --- Parser de Frase Completa Inteligente (Travessia Automática da Árvore) ---
+    function processarFraseCompleta(texto) {
+      const t = texto.toLowerCase().trim();
+      logDebug(`Processando frase: "${t}"`);
+
+      // Limpa para reconstrução
+      pathSelected = [];
+
+      // 1. Ação (Raiz)
+      const acaoNode = SCHEMA_COMANDOS.nextOptions.find(opt => opt.aliases.some(alias => t.includes(alias)));
+      if (!acaoNode) {
+        logDebug("Ação inicial não reconhecida.");
+        renderCurrentStepOptions();
+        return;
+      }
+      pathSelected.push(acaoNode);
+      logDebug(`Mapeado Ação: ${acaoNode.label.toUpperCase()}`);
+
+      // 2. Determinar Tópico (Assunto)
+      let topicoNode = null;
+      // Atalho inteligente: Se houver nome de assistido na frase, assume tópico "assistidos"
+      const temAssistido = SCHEMA_ASSISTIDOS.some(ast => ast.aliases.some(alias => t.includes(alias)));
+      if (temAssistido) {
+        topicoNode = SCHEMA_TOPICOS.find(opt => opt.id === 'assistidos');
+      } else {
+        topicoNode = SCHEMA_TOPICOS.find(opt => opt.aliases.some(alias => t.includes(alias)));
+      }
+
+      if (!topicoNode) {
+        renderCurrentStepOptions();
+        return;
+      }
+      pathSelected.push(topicoNode);
+      logDebug(`Mapeado Tópico: ${topicoNode.label.toUpperCase()}`);
+
+      // 3. Determinar Assistido (se tópico for assistidos)
+      if (topicoNode.id === 'assistidos') {
+        const assistidoNode = SCHEMA_ASSISTIDOS.find(ast => ast.aliases.some(alias => t.includes(alias)));
+        if (!assistidoNode) {
+          renderCurrentStepOptions();
+          return;
+        }
+        pathSelected.push(assistidoNode);
+        logDebug(`Mapeado Assistido: ${assistidoNode.label.toUpperCase()}`);
+
+        // 4. Determinar Detalhe
+        const detalheNode = SCHEMA_DETALHES.find(det => det.aliases.some(alias => t.includes(alias)));
+        if (detalheNode) {
+          pathSelected.push(detalheNode);
+          logDebug(`Mapeado Detalhe: ${detalheNode.label.toUpperCase()}`);
+        }
+      }
+
+      renderCurrentStepOptions();
+      
+      // Se a última opção mapeada na frase for final, abre a tela de montagem direta
+      const ultimoNo = pathSelected[pathSelected.length - 1];
+      if (ultimoNo && ultimoNo.isFinal) {
+        abrirConfirmacaoMontada();
+      }
+    }
+
+    // --- Renderização Dinâmica das Opções baseada no JSON ---
+    function renderCurrentStepOptions() {
+      optionsGrid.innerHTML = '';
+      optionsGrid.className = "options-grid";
+      optionsCard.style.display = 'flex';
+
+      const totalNos = pathSelected.length;
+      
+      if (totalNos === 0) {
+        // Passo 1: Ação (Raiz)
+        optionsHeader.textContent = "Passo 1: Selecione a Ação";
+        SCHEMA_COMANDOS.nextOptions.forEach(opt => {
+          createOptionCard(opt.label, () => selectNode(opt));
+        });
+        updateStackUI();
+        return;
+      }
+
+      const ultimoNo = pathSelected[totalNos - 1];
+
+      // Se o nó atual é folha (isFinal = true)
+      if (ultimoNo.isFinal) {
+        optionsHeader.textContent = "Comando Pronto";
+        optionsGrid.innerHTML = `
+          <button class="option-btn" style="grid-column: span 2; border-color: var(--success-color);" onclick="abrirConfirmacaoMontada()">
+            <span>Comando Concluído! Clique em MONTAR</span>
+          </button>
+        `;
+        updateStackUI();
+        return;
+      }
+
+      // Se não for folha, carrega as próximas opções correspondentes
+      const nextSchemaType = ultimoNo.nextOptions;
+      let nextOptionsArray = [];
+
+      if (nextSchemaType === "TOPICOS") {
+        optionsHeader.textContent = "Passo 2: Selecione o Assunto";
+        nextOptionsArray = SCHEMA_TOPICOS;
+      } else if (nextSchemaType === "ASSISTIDOS") {
+        optionsHeader.textContent = "Passo 3: Selecione o Assistido(a)";
+        optionsGrid.className = "options-grid list-view";
+        nextOptionsArray = SCHEMA_ASSISTIDOS;
+      } else if (nextSchemaType === "DETALHES") {
+        optionsHeader.textContent = "Passo 4: Selecione o Detalhe";
+        nextOptionsArray = SCHEMA_DETALHES;
+      } else if (Array.isArray(nextSchemaType)) {
+        nextOptionsArray = nextSchemaType;
+      }
+
+      nextOptionsArray.forEach(opt => {
+        createOptionCard(opt.label, () => selectNode(opt));
+      });
+
+      updateStackUI();
+    }
+
+    function createOptionCard(label, onClick) {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.textContent = label;
+      btn.onclick = onClick;
+      optionsGrid.appendChild(btn);
+    }
+
+    // Ação ao selecionar nó (toque ou voz correspondente)
+    function selectNode(node) {
+      pathSelected.push(node);
+      logDebug(`Seleção: ${node.label.toUpperCase()}`);
+      
+      renderCurrentStepOptions();
+      
+      if (node.isFinal) {
+        abrirConfirmacaoMontada();
+      }
+    }
+
+    // --- Atualização da Pilha Vertical de Chips ---
+    function updateStackUI() {
+      breadcrumbs.innerHTML = '';
+      
+      const listChips = [];
+
+      // 1. Ação (Primeiro elemento do path)
+      if (pathSelected.length > 0) {
+        listChips.push({ label: pathSelected[0].label, index: 1 });
+        
+        // 2. Preposição "sobre" (Subentendido, fica logo acima da Ação)
+        listChips.push({ label: "sobre", index: null, preposition: true });
+      }
+
+      // 3. Demais nós a partir do índice 1
+      for (let i = 1; i < pathSelected.length; i++) {
+        listChips.push({ label: pathSelected[i].label, index: i + 1 });
+      }
+
+      // Habilitar/desabilitar botão Montar no topo da pilha
+      if (listChips.length > 0) {
+        btnMontar.style.display = 'block';
+      } else {
+        btnMontar.style.display = 'none';
+        cardMontado.style.display = 'none';
+      }
+
+      if (listChips.length === 0) {
+        breadcrumbs.innerHTML = `
+          <div class="breadcrumb-placeholder" id="placeholder-text">
+            Nenhum bloco de comando ativo.
+          </div>
+        `;
+        return;
+      }
+
+      // Cria a pilha de chips (Flex reverso empilha de baixo para cima)
+      listChips.forEach(item => {
+        const chip = document.createElement('div');
+        chip.className = `breadcrumb-chip ${item.preposition ? 'preposition' : ''}`;
+        
+        if (item.preposition) {
+          chip.innerHTML = `<span>sobre</span>`;
+        } else {
+          chip.innerHTML = `
+            <span>${item.label}</span>
+            <button class="remove-btn" onclick="voltarParaIndice(${item.index - 1})">×</button>
+          `;
+        }
+        breadcrumbs.appendChild(chip);
+      });
+    }
+
+    function voltarParaIndice(index) {
+      if (index === null) return;
+      
+      // Reduz o pathSelected até a posição anterior
+      pathSelected = pathSelected.slice(0, index);
+
+      cardMontado.style.display = 'none';
+      actionConsole.innerHTML = `
+        <span style="color: var(--text-muted); font-style: italic;">Aguardando comandos...</span>
+      `;
+
+      logDebug(`Caminho reduzido. Retornou para o nível ${index}`);
+      renderCurrentStepOptions();
+    }
+
+    // --- Montagem e Execução do Comando ---
+    function montarFraseComando() {
+      const parts = [];
+      if (pathSelected.length > 0) {
+        parts.push(pathSelected[0].id);
+        parts.push("sobre"); // Preposição automática
+        for (let i = 1; i < pathSelected.length; i++) {
+          parts.push(pathSelected[i].id);
+        }
+      }
+      return parts.join(" ");
+    }
+
+    function abrirConfirmacaoMontada() {
+      const frase = montarFraseComando();
+      textMontado.textContent = frase;
+      
+      cardMontado.style.display = 'flex';
+      optionsCard.style.display = 'none';
+      logDebug(`Comando montado: "${frase}"`);
+    }
+
+    btnMontar.addEventListener('click', () => {
+      abrirConfirmacaoMontada();
+    });
+
+    btnExecutar.addEventListener('click', () => {
+      cardMontado.style.display = 'none';
+      optionsCard.style.display = 'flex';
+
+      let msg = "";
+      const totalNos = pathSelected.length;
+      
+      if (totalNos > 1) {
+        const topicoNode = pathSelected[1];
+        
+        if (topicoNode.id === 'visita de hoje') {
+          msg = "Exibindo visitas agendadas para hoje.";
+        } else if (topicoNode.id === 'regra') {
+          msg = "Abrindo manual da Regra da SSVP Brasil.";
+        } else if (topicoNode.id === 'confrades' || topicoNode.id === 'consócias') {
+          msg = "Carregando lista de vicentinos.";
+        } else if (topicoNode.id === 'hábitos') {
+          msg = "Exibindo hábitos vicentinos.";
+        } else if (totalNos > 2) {
+          const assistido = pathSelected[2].id;
+          const detalhe = totalNos > 3 ? pathSelected[3].id : 'metas';
+          
+          if (detalhe === 'últimos relatos') {
+            msg = `Relato de ${assistido}: Visita de ontem concluída com entrega de cesta.`;
+          } else if (detalhe === 'metas') {
+            msg = `Metas de ${assistido}: Reforma do lar e provisão de remédios.`;
+          } else if (detalhe === 'endereço') {
+            msg = `Abrindo rotas de navegação para a residência de ${assistido}.`;
+          }
+        }
+      }
+
+      actionConsole.innerHTML = `
+        <span style="color: var(--success-color); font-weight: bold;">Executado: </span>
+        <span>${msg}</span>
+      `;
+
+      logDebug(`Comando executado: ${msg}`);
+
+      setTimeout(() => {
+        resetCompleto();
+      }, 7000);
+    });
+
+    function resetCompleto() {
+      pathSelected = [];
+      cardMontado.style.display = 'none';
+      optionsCard.style.display = 'flex';
+      actionConsole.innerHTML = `
+        <span style="color: var(--text-muted); font-style: italic;">Aguardando comandos...</span>
+      `;
+      logDebug("Reset geral do construtor.");
+      renderCurrentStepOptions();
+    }
+
+    // --- Configuração da Web Speech API (Otimizada e Pontual) ---
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+
+    function iniciarGravacao() {
+      if (!SpeechRecognition) {
+        logDebug("Erro: SpeechRecognition não suportado.");
+        statusLabel.textContent = "Não suportado";
+        return;
+      }
+
+      // Instanciação dinâmica a cada clique
+      recognition = new SpeechRecognition();
+      recognition.lang = 'pt-BR';
+      recognition.continuous = false; // Desliga automaticamente ao silenciar
+      recognition.interimResults = true; // Transcrição dinâmica ativa
+
+      recognition.onresult = (event) => {
+        let transcript = '';
+        for (let i = 0; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
+        }
+        processarFraseCompleta(transcript);
+      };
+
+      recognition.onstart = () => {
+        logDebug("onstart: Captação de voz ativa. Fale agora!");
+        isListening = true;
+        micBtn.classList.remove('preparing');
+        micBtn.classList.add('listening');
+        statusLabel.textContent = "FALE AGORA!";
+        statusLabel.classList.remove('preparing');
+        statusLabel.classList.add('listening');
+      };
+
+      recognition.onend = () => {
+        logDebug("onend: Gravação concluída.");
+        isListening = false;
+        micBtn.classList.remove('preparing', 'listening');
+        statusLabel.textContent = "Pronto";
+        statusLabel.classList.remove('preparing', 'listening');
+      };
+
+      recognition.onerror = (event) => {
+        logDebug(`onerror: ${event.error}`);
+        
+        if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+          statusLabel.textContent = "Erro: Sem Permissão";
+          logDebug("DICA: Vá em Ajustes -> Safari -> Microfone e marque 'Permitir'.");
+        } else if (event.error === 'no-speech') {
+          statusLabel.textContent = "Erro: Sem Som";
+          logDebug("DICA: Fale somente depois que o microfone ficar VERMELHO.");
+        } else {
+          statusLabel.textContent = `Erro: ${event.error}`;
+        }
+        
+        isListening = false;
+        micBtn.classList.remove('preparing', 'listening');
+        statusLabel.classList.remove('preparing', 'listening');
+      };
+
+      try {
+        recognition.start();
+      } catch (e) {
+        logDebug(`Erro ao iniciar: ${e.message}`);
+        micBtn.classList.remove('preparing');
+        statusLabel.classList.remove('preparing');
+      }
+    }
+
+    // Clique físico no microfone
+    micBtn.addEventListener('click', () => {
+      if (isListening) {
+        if (recognition) recognition.stop();
+      } else {
+        logDebug("Inicializando gravação...");
+        cardMontado.style.display = 'none';
+        optionsCard.style.display = 'flex';
+        
+        micBtn.classList.add('preparing');
+        statusLabel.textContent = "Aguardando...";
+        statusLabel.classList.add('preparing');
+        
+        iniciarGravacao();
+      }
+    });
+
+    // Limpar console
+    const clearDebugBtn = document.getElementById('clear-debug-btn');
+    clearDebugBtn.addEventListener('click', () => {
+      debugLog.innerHTML = "Logs limpos.";
+      resetCompleto();
+    });
+  </script>
+</body>
+
+</html>
