@@ -216,9 +216,7 @@
       box-shadow: 0 4px 12px var(--success-glow);
     }
 
-    .option-btn .icon {
-      font-size: 1.8rem;
-    }
+    /* Removido estilo do ícone */
 
     /* Controles do Microfone */
     .controls-container {
@@ -367,11 +365,9 @@
       
       <div class="options-grid" id="options-grid">
         <button class="option-btn" id="btn-mostre" onclick="selectAction('mostre')">
-          <span class="icon">👀</span>
           <span>Mostre</span>
         </button>
         <button class="option-btn" id="btn-fale" onclick="selectAction('fale')">
-          <span class="icon">🔊</span>
           <span>Fale</span>
         </button>
       </div>
@@ -403,9 +399,16 @@
 
   <script>
     // --- Configuração da Inteligência Fonética ---
+    // Mapeamento fonético expandido para alta tolerância em celulares
     const COMANDOS_MAPEADOS = {
-      "mostre": ["mostre", "mostrar", "mostra", "monstro", "mestre", "ver", "exiba", "exibir"],
-      "fale": ["fale", "falar", "diga", "ouvir", "vale", "fali", "falei", "falando"]
+      "mostre": [
+        "mostre", "mostrar", "mostra", "monstro", "mestre", "ver", "exiba", "exibir",
+        "mostro", "monstra", "morte", "monte", "host", "moste", "mostrá", "mostrei"
+      ],
+      "fale": [
+        "fale", "falar", "diga", "ouvir", "vale", "fali", "falei", "falando", 
+        "valer", "fales", "fala"
+      ]
     };
 
     let selectedAction = null; // Ação ativa
@@ -488,7 +491,9 @@
       logDebug("SpeechRecognition detectado.");
       recognition = new SpeechRecognition();
       recognition.lang = 'pt-BR';
-      recognition.continuous = true; // Mantém o microfone aberto
+      
+      // Desativado continuous para comandos de palavra única (melhora a consolidação do buffer no iOS)
+      recognition.continuous = false; 
       recognition.interimResults = true; // Transcrição dinâmica
 
       recognition.onresult = (event) => {
