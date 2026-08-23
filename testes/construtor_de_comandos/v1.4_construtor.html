@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Construtor de Comandos - Inteligência de Voz - SSVP</title>
+  <title>Construtor de Comandos Incremental - SSVP</title>
   
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -48,40 +48,41 @@
       flex-direction: column;
       align-items: center;
       padding: 20px;
-      padding-bottom: calc(40px + var(--safe-bottom));
+      padding-bottom: calc(30px + var(--safe-bottom));
       justify-content: space-between;
+      overflow-x: hidden;
     }
 
-    /* Identificação da Versão no Topo (Apenas a versão) */
+    /* Identificação da Versão no Topo (Apenas versão) */
     .top-version-bar {
       font-family: var(--font-display);
       font-weight: 600;
       font-size: 0.85rem;
       color: var(--text-muted);
       opacity: 0.7;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
       letter-spacing: 0.05em;
     }
 
     header {
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
       width: 100%;
       max-width: 500px;
     }
 
     header h1 {
       font-family: var(--font-display);
-      font-size: 1.8rem;
+      font-size: 1.6rem;
       font-weight: 700;
       background: linear-gradient(135deg, #fff 40%, var(--primary-color) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
     }
 
     header p {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: var(--text-muted);
     }
 
@@ -90,31 +91,116 @@
       max-width: 500px;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 15px;
       flex-grow: 1;
-      justify-content: center;
+      justify-content: flex-start;
     }
 
-    /* Container de Breadcrumbs (Blocos já selecionados) */
-    .breadcrumbs-container {
+    /* Cards Dinâmicos de Opções (Centralizados) */
+    .options-card {
       background-color: var(--card-bg);
-      border-radius: 16px;
+      border-radius: 20px;
       padding: 15px;
       border: 1px solid var(--border-color);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
       display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-      min-height: 60px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      flex-direction: column;
+      gap: 12px;
+      min-height: 150px;
+      justify-content: center;
+      animation: pop-in 0.3s ease-out;
     }
 
-    .breadcrumb-placeholder {
-      color: var(--text-muted);
-      font-size: 0.9rem;
-      font-style: italic;
-      width: 100%;
+    .options-header {
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--primary-color);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .options-grid.list-view {
+      display: flex;
+      flex-direction: column;
+      max-height: 200px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .options-grid.list-view::-webkit-scrollbar {
+      width: 4px;
+    }
+    .options-grid.list-view::-webkit-scrollbar-thumb {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 99px;
+    }
+
+    /* Cards de Opção */
+    .option-btn {
+      background-color: rgba(255, 255, 255, 0.02);
+      border: 1.5px solid var(--border-color);
+      border-radius: 12px;
+      padding: 14px 10px;
+      color: var(--text-main);
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
       text-align: center;
+    }
+
+    .option-btn:hover {
+      background-color: var(--card-bg-hover);
+      border-color: var(--primary-color);
+    }
+
+    .option-btn:active {
+      transform: scale(0.98);
+    }
+
+    /* Console de Ação */
+    .action-console {
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 14px;
+      padding: 12px;
+      border: 1px dashed var(--border-color);
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    /* Seção de Controle e Pilha Vertical (Na Base) */
+    .bottom-controls-section {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: auto;
+    }
+
+    /* Breadcrumbs Empilhados Verticalmente a partir do topo do botão */
+    .breadcrumbs-stack {
+      display: flex;
+      flex-direction: column-reverse; /* Faz o primeiro comando inserido ir para a base e empilhar para cima */
+      gap: 8px;
+      width: 100%;
+      max-width: 320px;
+      align-items: center;
+      margin-bottom: 15px;
     }
 
     .breadcrumb-chip {
@@ -123,111 +209,52 @@
       font-family: var(--font-display);
       font-weight: 600;
       font-size: 0.95rem;
-      padding: 6px 12px;
+      padding: 8px 16px;
       border-radius: 12px;
       display: flex;
       align-items: center;
-      gap: 6px;
-      box-shadow: 0 3px 8px var(--success-glow);
-      animation: pop-in 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      justify-content: space-between;
+      gap: 12px;
+      width: 100%;
+      box-shadow: 0 4px 10px var(--success-glow);
+      animation: slide-up 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .breadcrumb-chip.preposition {
+      background-color: transparent;
+      border: 1.5px dashed var(--success-color);
+      color: var(--success-color);
+      box-shadow: none;
+      justify-content: center;
     }
 
     .breadcrumb-chip .remove-btn {
       background: none;
       border: none;
       color: white;
-      font-size: 1.1rem;
+      font-size: 1.2rem;
       cursor: pointer;
       line-height: 1;
       display: flex;
       align-items: center;
-      justify-content: center;
-      padding: 0 2px;
       opacity: 0.8;
-      transition: opacity 0.2s;
     }
 
     .breadcrumb-chip .remove-btn:hover {
       opacity: 1;
     }
 
-    /* Cards Dinâmicos de Opções */
-    .options-card {
-      background-color: var(--card-bg);
-      border-radius: 20px;
-      padding: 20px;
-      border: 1px solid var(--border-color);
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      min-height: 160px;
-      justify-content: center;
-    }
-
-    .options-header {
-      font-family: var(--font-display);
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--primary-color);
-      border-bottom: 1px solid var(--border-color);
-      padding-bottom: 8px;
-      margin-bottom: 5px;
-    }
-
-    .options-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    /* Cards de Opção */
-    .option-btn {
-      background-color: rgba(255, 255, 255, 0.02);
-      border: 1.5px solid var(--border-color);
-      border-radius: 14px;
-      padding: 20px 16px;
-      color: var(--text-main);
-      font-family: var(--font-display);
-      font-size: 1.1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Botão do Microfone */
+    .mic-container {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 10px;
-      text-align: center;
-    }
-
-    .option-btn:hover {
-      background-color: var(--card-bg-hover);
-      border-color: var(--primary-color);
-      transform: translateY(-2px);
-    }
-
-    .option-btn:active {
-      transform: translateY(1px);
-    }
-
-    .option-btn.selected {
-      background-color: var(--success-glow);
-      border-color: var(--success-color);
-      color: white;
-      box-shadow: 0 4px 12px var(--success-glow);
-    }
-
-    /* Controles do Microfone */
-    .controls-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
     }
 
     .mic-btn {
-      width: 90px;
-      height: 90px;
+      width: 80px;
+      height: 80px;
       border-radius: 50%;
       background: linear-gradient(135deg, var(--primary-color) 0%, hsl(250, 95%, 60%) 100%);
       border: none;
@@ -236,7 +263,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
       transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       position: relative;
     }
@@ -258,7 +285,7 @@
 
     .mic-btn.preparing {
       background: linear-gradient(135deg, hsl(35, 95%, 55%) 0%, hsl(20, 95%, 50%) 100%);
-      box-shadow: 0 8px 30px rgba(245, 158, 11, 0.5);
+      box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
     }
 
     .mic-btn.preparing::before {
@@ -268,7 +295,7 @@
 
     .mic-btn.listening {
       background: linear-gradient(135deg, var(--accent-color) 0%, hsl(330, 90%, 50%) 100%);
-      box-shadow: 0 8px 30px rgba(236, 72, 153, 0.6);
+      box-shadow: 0 6px 20px rgba(236, 72, 153, 0.5);
     }
 
     .mic-btn.listening::before {
@@ -277,14 +304,14 @@
     }
 
     .mic-btn svg {
-      width: 36px;
-      height: 36px;
+      width: 32px;
+      height: 32px;
       fill: white;
     }
 
     .status-label {
       font-family: var(--font-display);
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: 600;
       color: var(--text-muted);
       text-transform: uppercase;
@@ -299,20 +326,19 @@
       color: var(--accent-color);
     }
 
-    /* Console de Debug para Celular */
+    /* Console de Debug Fino */
     .debug-log {
       width: 100%;
       max-width: 500px;
       margin-top: 15px;
-      padding: 12px;
+      padding: 10px;
       background: rgba(0, 0, 0, 0.4);
       border-radius: 12px;
       font-family: monospace;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       color: hsl(120, 100%, 75%);
-      max-height: 110px;
+      max-height: 80px;
       overflow-y: auto;
-      text-align: left;
       border: 1px solid rgba(255, 255, 255, 0.05);
     }
 
@@ -322,18 +348,29 @@
         opacity: 0.4;
       }
       100% {
-        transform: scale(1.4);
+        transform: scale(1.3);
         opacity: 0;
       }
     }
 
     @keyframes pop-in {
       0% {
-        transform: scale(0.8);
+        transform: scale(0.9);
         opacity: 0;
       }
       100% {
         transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slide-up {
+      0% {
+        transform: translateY(15px);
+        opacity: 0;
+      }
+      100% {
+        transform: translateY(0);
         opacity: 1;
       }
     }
@@ -348,139 +385,380 @@
   </div>
 
   <header>
-    <h1>Construtor - Inteligência de Voz</h1>
-    <p>Toque no botão e fale "Mostre" ou "Fale"</p>
+    <h1>Construtor Incremental</h1>
+    <p>Fale a frase inteira ou toque nos cards</p>
   </header>
 
   <main>
-    <!-- Breadcrumbs do Comando -->
-    <section class="breadcrumbs-container" id="breadcrumbs">
-      <div class="breadcrumb-placeholder" id="placeholder-text">Nenhum bloco de comando ativo. Fale ou toque em um card.</div>
-    </section>
-
-    <!-- Cards Dinâmicos de Opções -->
-    <section class="options-card">
-      <div class="options-header" id="options-header">Passo 1: Selecione a Ação</div>
-      
+    <!-- Cards Dinâmicos de Opções (Tocar) -->
+    <section class="options-card" id="options-card">
+      <div class="options-header" id="options-header">Carregando...</div>
       <div class="options-grid" id="options-grid">
-        <button class="option-btn" id="btn-mostre" onclick="selectAction('mostre')">
-          <span>Mostre</span>
-        </button>
-        <button class="option-btn" id="btn-fale" onclick="selectAction('fale')">
-          <span>Fale</span>
-        </button>
+        <!-- Inserido dinamicamente -->
       </div>
     </section>
 
-    <!-- Controles -->
-    <section class="controls-container">
-      <button class="mic-btn" id="mic-btn" aria-label="Ativar Reconhecimento de Voz">
-        <svg viewBox="0 0 24 24">
-          <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z" />
-          <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" />
-        </svg>
-      </button>
-      <div class="status-label" id="status-label">Pronto</div>
-      <div style="font-size: 0.75rem; color: var(--text-muted); font-style: italic; margin-top: -5px; text-align: center; max-width: 250px; line-height: 1.3;" id="tip-label">Aguarde o sinal vermelho "FALE AGORA!" antes de começar</div>
+    <!-- Console de Ação -->
+    <section class="action-console" id="action-console">
+      <span style="color: var(--text-muted); font-style: italic;">Aguardando comandos...</span>
     </section>
 
-    <!-- Console de Debug -->
-    <div style="width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 8px;">
+    <!-- Seção de Controles na Base (Pilha e Botão) -->
+    <section class="bottom-controls-section">
+      <!-- Breadcrumbs Empilhados de Baixo para Cima -->
+      <div class="breadcrumbs-stack" id="breadcrumbs">
+        <!-- Blocos inseridos dinamicamente sobem a partir daqui -->
+      </div>
+
+      <!-- Microfone -->
+      <div class="mic-container">
+        <button class="mic-btn" id="mic-btn" aria-label="Microfone de comando">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z" />
+            <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" />
+          </svg>
+        </button>
+        <div class="status-label" id="status-label">Pronto</div>
+        <div style="font-size: 0.7rem; color: var(--text-muted); font-style: italic; text-align: center; margin-top: -3px;" id="tip-label">Espere ficar vermelho e fale a frase completa</div>
+      </div>
+    </section>
+
+    <!-- Depuração -->
+    <div style="width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 6px; margin-top: 10px;">
       <div style="display: flex; justify-content: space-between; align-items: center;">
-        <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: bold; letter-spacing: 0.05em;">Logs de Depuração</span>
-        <button id="clear-debug-btn" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.7rem; padding: 4px 8px; border-radius: 6px; cursor: pointer; font-family: var(--font-display); transition: all 0.2s;">Limpar Logs</button>
+        <span style="font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); font-weight: bold; letter-spacing: 0.05em;">Logs do Parser</span>
+        <button id="clear-debug-btn" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; cursor: pointer;">Limpar</button>
       </div>
       <div class="debug-log" id="debug-log">
-        Sistemas prontos para depuração fonética.
+        Parser pronto. Aguardando fala completa...
       </div>
     </div>
   </main>
 
   <script>
-    // --- Configuração da Inteligência Fonética ---
-    // Mapeamento fonético expandido e ultra resiliente para celulares
+    // --- Configuração das Intenções e Mapeamentos Fonéticos ---
     const COMANDOS_MAPEADOS = {
-      "mostre": [
-        "mostre", "mostrar", "mostra", "monstro", "mestre", "ver", "exiba", "exibir",
-        "mostro", "monstra", "morte", "monte", "host", "moste", "mostrá", "mostrei"
+      action: {
+        "mostre": ["mostre", "mostrar", "mostra", "monstro", "mestre", "ver", "exiba", "exibir", "mostro", "monstra", "morte", "monte", "host", "moste", "mostrá", "mostrei"],
+        "fale": ["fale", "falar", "diga", "ouvir", "vale", "fali", "falei", "falando", "valer", "fales", "fala", "falou", "olhe", "folhe", "lê", "cali", "ali", "sal", "sul", "palha", "vile", "fale-me", "faria", "falou-se", "balde"]
+      },
+      topic: {
+        "visita de hoje": ["visita", "visitas", "hoje", "agenda", "agendadas"],
+        "assistidos": ["assistido", "assistidos", "assistidas", "pessoa", "pessoas", "família", "familias", "lar", "lares", "assistida"],
+        "confrades": ["confrade", "confrades", "membros", "irmãos"],
+        "consócias": ["consócia", "consócias", "consocia", "consocias", "irmãs"],
+        "regra": ["regra", "regulamento", "estatuto", "regras"],
+        "hábitos": ["hábito", "hábitos", "rotina", "rotinas", "costume", "costumes"]
+      },
+      entity: [
+        { id: "Maria Silva", aliases: ["maria", "silva", "maria silva", "dona maria", "marina", "faria"] },
+        { id: "José Santos", aliases: ["josé", "santos", "seo josé", "seu josé", "josé santos", "jose"] },
+        { id: "Francisca Souza", aliases: ["francisca", "souza", "dona francisca", "francisca souza"] },
+        { id: "Antônio Oliveira", aliases: ["antônio", "oliveira", "seo antônio", "seu antônio", "antonio", "antonio oliveira"] },
+        { id: "Ana Pereira", aliases: ["ana", "pereira", "dona ana", "ana pereira"] }
       ],
-      "fale": [
-        "fale", "falar", "diga", "ouvir", "vale", "fali", "falei", "falando", 
-        "valer", "fales", "fala", "falou", "olhe", "folhe", "lê", "cali", 
-        "ali", "sal", "sul", "fábio", "vôlei", "palha", "vile", "fale-me"
-      ]
+      attribute: {
+        "últimos relatos": ["relato", "relatos", "histórico", "visitas anteriores", "relatório", "relatorios"],
+        "metas": ["meta", "metas", "objetivo", "objetivos", "plano", "planos"],
+        "endereço": ["endereço", "endereco", "rota", "rotas", "mapa", "onde mora", "localização", "localizacao"]
+      }
     };
 
-    let selectedAction = null; // Ação ativa
+    // Estado do Comando Incremental
+    let commandState = {
+      step: 1, // 1: Ação, 2: Tópico, 3: Entidade (se topic=assistidos), 4: Detalhe (se topic=assistidos)
+      action: null,
+      topic: null,
+      entity: null,
+      attribute: null
+    };
+
     let isListening = false;
 
     // Elementos DOM
     const micBtn = document.getElementById('mic-btn');
     const statusLabel = document.getElementById('status-label');
     const debugLog = document.getElementById('debug-log');
-    const btnMostre = document.getElementById('btn-mostre');
-    const btnFale = document.getElementById('btn-fale');
+    const optionsCard = document.getElementById('options-card');
+    const optionsHeader = document.getElementById('options-header');
+    const optionsGrid = document.getElementById('options-grid');
     const breadcrumbs = document.getElementById('breadcrumbs');
+    const actionConsole = document.getElementById('action-console');
 
-    // Função de Logging
+    // Inicialização
+    window.addEventListener('DOMContentLoaded', () => {
+      renderCurrentStepOptions();
+    });
+
+    // Logging
     function logDebug(msg) {
       const time = new Date().toLocaleTimeString();
       debugLog.innerHTML = `[${time}] ${msg}<br>` + debugLog.innerHTML;
     }
 
-    // Processamento e Intenção de Voz
-    function processarIntencaoVoz(textoFalado) {
-      const textoLimpo = textoFalado.toLowerCase().trim();
-      logDebug(`Texto recebido no parser: "${textoLimpo}"`);
+    // --- Parser de Frase Completa ---
+    function processarFraseCompleta(texto) {
+      const t = texto.toLowerCase().trim();
+      logDebug(`Processando fala: "${t}"`);
 
-      let intencaoEncontrada = null;
-
-      // Percorre o dicionário fonético
-      for (const [comandoReal, aliases] of Object.entries(COMANDOS_MAPEADOS)) {
-        if (aliases.some(alias => textoLimpo.includes(alias))) {
-          intencaoEncontrada = comandoReal;
-          break;
+      // Passo 1: Ação (Se não tiver selecionado ainda)
+      if (!commandState.action) {
+        for (const [key, aliases] of Object.entries(COMANDOS_MAPEADOS.action)) {
+          if (aliases.some(alias => t.includes(alias))) {
+            commandState.action = key;
+            logDebug(`Ação reconhecida na frase: <strong style="color:#10b981;">${key.toUpperCase()}</strong>`);
+            break;
+          }
         }
       }
 
-      if (intencaoEncontrada) {
-        logDebug(`Intenção mapeada com sucesso: <strong style="color:#10b981;">${intencaoEncontrada.toUpperCase()}</strong> (com base em "${textoLimpo}")`);
-        selectAction(intencaoEncontrada);
+      // Passo 2: Tópico (Se ação já existe e tópico está vazio)
+      if (commandState.action && !commandState.topic) {
+        for (const [key, aliases] of Object.entries(COMANDOS_MAPEADOS.topic)) {
+          if (aliases.some(alias => t.includes(alias))) {
+            commandState.topic = key;
+            logDebug(`Tópico reconhecido na frase: <strong style="color:#10b981;">${key.toUpperCase()}</strong>`);
+            break;
+          }
+        }
+      }
+
+      // Passo 3: Entidade (Se tópico for assistidos e entidade está vazia)
+      if (commandState.topic === 'assistidos' && !commandState.entity) {
+        for (const item of COMANDOS_MAPEADOS.entity) {
+          if (item.aliases.some(alias => t.includes(alias))) {
+            commandState.entity = item.id;
+            logDebug(`Assistido reconhecido na frase: <strong style="color:#10b981;">${item.id.toUpperCase()}</strong>`);
+            break;
+          }
+        }
+      }
+
+      // Passo 4: Detalhe (Se entidade já existe e detalhe está vazio)
+      if (commandState.entity && !commandState.attribute) {
+        for (const [key, aliases] of Object.entries(COMANDOS_MAPEADOS.attribute)) {
+          if (aliases.some(alias => t.includes(alias))) {
+            commandState.attribute = key;
+            logDebug(`Detalhe reconhecido na frase: <strong style="color:#10b981;">${key.toUpperCase()}</strong>`);
+            break;
+          }
+        }
+      }
+
+      // Determina próximo passo lógico
+      atualizarPassoLógico();
+      renderCurrentStepOptions();
+    }
+
+    function atualizarPassoLógico() {
+      if (!commandState.action) {
+        commandState.step = 1;
+      } else if (!commandState.topic) {
+        commandState.step = 2;
+      } else if (commandState.topic === 'assistidos' && !commandState.entity) {
+        commandState.step = 3;
+      } else if (commandState.topic === 'assistidos' && !commandState.attribute) {
+        commandState.step = 4;
       } else {
-        logDebug(`Nenhuma intenção reconhecida para: "${textoLimpo}"`);
+        executarAcaoFinal();
       }
     }
 
-    // Seleção de Ação
-    function selectAction(action) {
-      selectedAction = action;
+    // --- Renderização Dinâmica das Opções ---
+    function renderCurrentStepOptions() {
+      optionsGrid.innerHTML = '';
+      optionsGrid.className = "options-grid";
       
-      // Atualiza visual dos cards
-      btnMostre.classList.toggle('selected', action === 'mostre');
-      btnFale.classList.toggle('selected', action === 'fale');
+      switch (commandState.step) {
+        case 1:
+          optionsHeader.textContent = "Passo 1: Selecione ou Fale a Ação";
+          createOptionCard("Mostre", () => selectAction("mostre"));
+          createOptionCard("Fale", () => selectAction("fale"));
+          break;
 
-      // Atualiza Breadcrumbs (Blocos Verdes)
-      breadcrumbs.innerHTML = `
-        <div class="breadcrumb-chip">
-          <span>${action}</span>
-          <button class="remove-btn" onclick="clearAction()">×</button>
-        </div>
-      `;
+        case 2:
+          optionsHeader.textContent = "Passo 2: Selecione ou Fale o Assunto";
+          createOptionCard("Visita de hoje", () => selectTopic("visita de hoje"));
+          createOptionCard("Assistidos", () => selectTopic("assistidos"));
+          createOptionCard("Confrades", () => selectTopic("confrades"));
+          createOptionCard("Consócias", () => selectTopic("consócias"));
+          createOptionCard("Regra", () => selectTopic("regra"));
+          createOptionCard("Hábitos", () => selectTopic("hábitos"));
+          break;
 
-      logDebug(`Ação selecionada via ${isListening ? 'Voz' : 'Toque'}: ${action.toUpperCase()}`);
+        case 3:
+          optionsHeader.textContent = "Passo 3: Selecione ou Fale o Assistido(a)";
+          optionsGrid.className = "options-grid list-view";
+          COMANDOS_MAPEADOS.entity.forEach(item => {
+            createOptionCard(item.id, () => selectEntity(item.id));
+          });
+          break;
+
+        case 4:
+          optionsHeader.textContent = "Passo 4: Selecione ou Fale o Detalhe";
+          createOptionCard("Últimos relatos", () => selectAttribute("últimos relatos"));
+          createOptionCard("Metas", () => selectAttribute("metas"));
+          createOptionCard("Endereço (Rota)", () => selectAttribute("endereço"));
+          break;
+      }
+
+      updateStackUI();
     }
 
-    // Limpa a ação selecionada
-    function clearAction() {
-      selectedAction = null;
-      btnMostre.classList.remove('selected');
-      btnFale.classList.remove('selected');
-      breadcrumbs.innerHTML = `
-        <div class="breadcrumb-placeholder" id="placeholder-text">
-          Nenhum bloco de comando ativo. Fale ou toque em um card.
-        </div>
+    function createOptionCard(label, onClick) {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.textContent = label;
+      btn.onclick = onClick;
+      optionsGrid.appendChild(btn);
+    }
+
+    // --- Seleções Manuais ou via Parser ---
+    function selectAction(val) {
+      commandState.action = val;
+      commandState.step = 2;
+      renderCurrentStepOptions();
+      logDebug(`Ação definida: ${val.toUpperCase()}`);
+    }
+
+    function selectTopic(val) {
+      commandState.topic = val;
+      if (val === 'assistidos') {
+        commandState.step = 3;
+      } else {
+        executarAcaoFinal();
+      }
+      renderCurrentStepOptions();
+      logDebug(`Tópico definido: ${val.toUpperCase()}`);
+    }
+
+    function selectEntity(val) {
+      commandState.entity = val;
+      commandState.step = 4;
+      renderCurrentStepOptions();
+      logDebug(`Assistido definido: ${val.toUpperCase()}`);
+    }
+
+    function selectAttribute(val) {
+      commandState.attribute = val;
+      executarAcaoFinal();
+      renderCurrentStepOptions();
+      logDebug(`Detalhe definido: ${val.toUpperCase()}`);
+    }
+
+    // --- Atualização da Pilha Vertical de Breadcrumbs ---
+    function updateStackUI() {
+      breadcrumbs.innerHTML = '';
+      
+      const elements = [];
+
+      if (commandState.action) {
+        elements.push({ label: commandState.action, step: 1 });
+      }
+      if (commandState.topic) {
+        elements.push({ label: commandState.topic, step: 2 });
+      }
+      if (commandState.entity) {
+        elements.push({ label: "sobre", step: null, preposition: true });
+        elements.push({ label: commandState.entity, step: 3 });
+      }
+      if (commandState.attribute) {
+        elements.push({ label: commandState.attribute, step: 4 });
+      }
+
+      if (elements.length === 0) {
+        breadcrumbs.innerHTML = `
+          <div class="breadcrumb-placeholder" id="placeholder-text">
+            Nenhum bloco de comando ativo. Fale ou toque em um card.
+          </div>
+        `;
+        return;
+      }
+
+      // Cria os chips de baixo para cima
+      elements.forEach(item => {
+        const chip = document.createElement('div');
+        chip.className = `breadcrumb-chip ${item.preposition ? 'preposition' : ''}`;
+        
+        if (item.preposition) {
+          chip.innerHTML = `<span>sobre</span>`;
+        } else {
+          chip.innerHTML = `
+            <span>${item.label}</span>
+            <button class="remove-btn" onclick="voltarParaPasso(${item.step})">×</button>
+          `;
+        }
+        breadcrumbs.appendChild(chip);
+      });
+    }
+
+    function voltarParaPasso(step) {
+      if (step === null) return;
+      
+      commandState.step = step;
+      if (step <= 4) commandState.attribute = null;
+      if (step <= 3) commandState.entity = null;
+      if (step <= 2) commandState.topic = null;
+      if (step <= 1) commandState.action = null;
+
+      actionConsole.innerHTML = `
+        <span style="color: var(--text-muted); font-style: italic;">Aguardando comandos...</span>
       `;
-      logDebug("Ação limpa. Construtor resetado.");
+
+      logDebug(`Retornou ao Passo ${step}`);
+      renderCurrentStepOptions();
+    }
+
+    // --- Execução Final do Comando Mapeado ---
+    function executarAcaoFinal() {
+      updateStackUI();
+      let msg = "";
+
+      if (commandState.topic === 'visita de hoje') {
+        msg = "Exibindo visitas agendadas para hoje.";
+      } else if (commandState.topic === 'regra') {
+        msg = "Abrindo manual da Regra da SSVP Brasil.";
+      } else if (commandState.topic === 'confrades' || commandState.topic === 'consócias') {
+        msg = "Carregando lista de vicentinos.";
+      } else if (commandState.topic === 'hábitos') {
+        msg = "Exibindo hábitos vicentinos.";
+      } else if (commandState.entity) {
+        const nome = commandState.entity;
+        if (commandState.attribute === 'últimos relatos') {
+          msg = `Relato de ${nome}: Visita concluída com sucesso. Família estável, metas de saúde cumpridas.`;
+        } else if (commandState.attribute === 'metas') {
+          msg = `Metas de ${nome}: Providenciar óculos e agendar consulta oftalmológica.`;
+        } else if (commandState.attribute === 'endereço') {
+          msg = `Calculando rota de navegação para a residência de ${nome}.`;
+        }
+      }
+
+      actionConsole.innerHTML = `
+        <span style="color: var(--success-color); font-weight: bold;">Executado: </span>
+        <span>${msg}</span>
+      `;
+
+      logDebug(`Comando concluído: ${msg}`);
+
+      // Auto reset após 6 segundos
+      setTimeout(() => {
+        resetCompleto();
+      }, 6000);
+    }
+
+    function resetCompleto() {
+      commandState = {
+        step: 1,
+        action: null,
+        topic: null,
+        entity: null,
+        attribute: null
+      };
+      actionConsole.innerHTML = `
+        <span style="color: var(--text-muted); font-style: italic;">Aguardando comandos...</span>
+      `;
+      logDebug("Reset geral do construtor.");
+      renderCurrentStepOptions();
     }
 
     // --- Configuração da Web Speech API ---
@@ -491,33 +769,26 @@
       logDebug("SpeechRecognition detectado.");
       recognition = new SpeechRecognition();
       recognition.lang = 'pt-BR';
-      
-      // Desativado continuous para comandos de palavra única (melhora a consolidação do buffer no iOS)
-      recognition.continuous = false; 
-      recognition.interimResults = true; // Transcrição dinâmica
+      recognition.continuous = false; // Desativado para processar frase completa de uma vez ao silenciar
+      recognition.interimResults = false; // Mantém falso para processar apenas a transcrição final e segura
 
       recognition.onresult = (event) => {
-        let transcript = '';
-        for (let i = 0; i < event.results.length; i++) {
-          transcript += event.results[i][0].transcript;
-        }
-        
-        // Interpreta em tempo real
-        processarIntencaoVoz(transcript);
+        const transcricaoFinal = event.results[0][0].transcript;
+        processarFraseCompleta(transcricaoFinal);
       };
 
       recognition.onstart = () => {
-        logDebug("onstart: Pronto para Falar.");
+        logDebug("onstart: Pronto para ouvir a frase.");
         isListening = true;
         micBtn.classList.remove('preparing');
         micBtn.classList.add('listening');
-        statusLabel.textContent = "Fale agora!";
+        statusLabel.textContent = "FALE A FRASE AGORA!";
         statusLabel.classList.remove('preparing');
         statusLabel.classList.add('listening');
       };
 
       recognition.onend = () => {
-        logDebug("onend: Gravação encerrada.");
+        logDebug("onend: Concluído.");
         isListening = false;
         micBtn.classList.remove('preparing', 'listening');
         statusLabel.textContent = "Pronto";
@@ -539,16 +810,14 @@
       micBtn.style.cursor = 'not-allowed';
     }
 
-    // Clique físico no botão
+    // Evento de Clique Físico no Microfone
     micBtn.addEventListener('click', () => {
       if (!recognition) return;
 
       if (isListening) {
-        logDebug("Parando gravação manualmente...");
         recognition.stop();
       } else {
-        logDebug("Preparando áudio (inicializando microfone)...");
-        clearAction(); // Reseta para novo comando
+        logDebug("Inicializando gravação de frase completa...");
         
         micBtn.classList.add('preparing');
         statusLabel.textContent = "Aguardando...";
@@ -557,19 +826,18 @@
         try {
           recognition.start();
         } catch (e) {
-          logDebug(`Erro ao iniciar: ${e.message}`);
+          logDebug(`Erro: ${e.message}`);
           micBtn.classList.remove('preparing');
           statusLabel.classList.remove('preparing');
         }
       }
     });
 
-    // Limpar console e transcrição
+    // Limpar console
     const clearDebugBtn = document.getElementById('clear-debug-btn');
     clearDebugBtn.addEventListener('click', () => {
       debugLog.innerHTML = "Logs limpos.";
-      clearAction();
-      logDebug("Console e estado resetados.");
+      resetCompleto();
     });
   </script>
 </body>
