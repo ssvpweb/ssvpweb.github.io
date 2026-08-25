@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Laboratório de Testes SSVP</title>
-  
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -236,16 +237,20 @@
     }
 
     @keyframes spin {
-      to { transform: rotate(360deg); }
+      to {
+        transform: rotate(360deg);
+      }
     }
   </style>
 </head>
+
 <body>
 
   <div class="container">
     <div class="header">
       <h1>Laboratório de Testes SSVP</h1>
-      <p style="margin-top: 4px; font-size: 0.8rem; opacity: 0.8;">Os dados usados são fictícios e destinados apenas a fins de teste.</p>
+      <p style="margin-top: 4px; font-size: 0.8rem; opacity: 0.8;">Os dados usados são fictícios e destinados apenas a
+        fins de teste.</p>
       <div id="status-banner" class="status-banner"></div>
     </div>
 
@@ -333,7 +338,9 @@
       {
         folder: "sincronizacao",
         files: [
-          { name: "v1_sinc_fila_offline.html" }
+          { name: "index.html" },
+          { name: "v1_fotos.html" },
+          { name: "v2_problemas.html" }
         ]
       },
       {
@@ -395,20 +402,33 @@
       const banner = document.getElementById('status-banner');
 
       try {
+        // Detecta se está rodando localmente (IP local, localhost ou túnel ngrok/localtunnel)
+        // para exibir os arquivos locais que ainda não foram comitados/enviados ao GitHub.
+        const isLocal = window.location.hostname === 'localhost' ||
+          window.location.hostname === '127.0.0.1' ||
+          window.location.hostname.startsWith('192.168.') ||
+          window.location.hostname.startsWith('10.') ||
+          window.location.hostname.includes('ngrok') ||
+          window.location.hostname.includes('loca.lt');
+
+        if (isLocal) {
+          throw new Error('Ambiente de desenvolvimento local: utilizando base estática do workspace.');
+        }
+
         // Consulta recursiva na árvore de commits (Git Trees API)
         const response = await fetch(`https://api.github.com/repos/${user}/${repo}/git/trees/main?recursive=true`);
         if (!response.ok) throw new Error('Limite da API do GitHub atingido ou offline');
 
         const data = await response.json();
-        
+
         // Filtra caminhos que estão dentro de "testes/", terminam com ".html" e não são "index.html" na raiz
         const testsPrefix = `${baseFolder}/`;
         const testFiles = data.tree.filter(item => {
           return item.type === 'blob' &&
-                 item.path.startsWith(testsPrefix) &&
-                 item.path.endsWith('.html') &&
-                 !(item.path === `${testsPrefix}index.html`) &&
-                 item.path.substring(testsPrefix.length).includes('/');
+            item.path.startsWith(testsPrefix) &&
+            item.path.endsWith('.html') &&
+            !(item.path === `${testsPrefix}index.html`) &&
+            item.path.substring(testsPrefix.length).includes('/');
         });
 
         if (testFiles.length === 0) {
@@ -423,7 +443,7 @@
           const relativePath = file.path.substring(testsPrefix.length);
           const pathParts = relativePath.split('/');
           const fileName = pathParts.pop(); // Remove arquivo
-          
+
           const rawFolderName = pathParts.join('/');
           const displayFolderName = pathParts.join(' / ');
 
@@ -458,7 +478,7 @@
 
       } catch (error) {
         console.warn("GitHub API indisponível, usando fallback estático local: ", error);
-        
+
         if (banner) {
           banner.innerText = "Modo de Desenvolvimento Local (API Offline/Limitada)";
           banner.style.display = "block";
@@ -572,4 +592,5 @@
   </script>
 
 </body>
+
 </html>

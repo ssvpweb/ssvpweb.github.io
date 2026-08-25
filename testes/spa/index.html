@@ -498,7 +498,7 @@
         document.body.style.paddingBottom = "calc(var(--nav-height) + 0.625rem)";
       }
 
-      // Parar qualquer síntese de voz ativa ao trocar de tela
+      // Parar qualquer síntese de voz activa ao trocar de tela
       if (window.speechSynthesis) {
         window.speechSynthesis.cancel();
         speaking = false;
@@ -1268,6 +1268,7 @@
       };
     }
 
+    // Toggle para ditado de voz
     function toggleRelatoVoz() {
       if (!localRecognition) return;
       if (isRecordingRelato) {
@@ -1594,7 +1595,7 @@
       renderizarRegrasList();
     }
 
-    function executarCustomCSS() {
+    function ejecutarCustomCSS() {
       const regras = JSON.parse(localStorage.getItem("tuner_custom_css") || "[]");
       regras.forEach(r => {
         try {

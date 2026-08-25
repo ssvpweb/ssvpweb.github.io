@@ -1,0 +1,8 @@
+{
+  "liveServer.settings.https": {
+    "enable": true,
+    "cert": "c:\\github\\ssvpweb.github.io\\cert.crt",
+    "key": "c:\\github\\ssvpweb.github.io\\cert.key",
+    "passphrase": ""
+  }
+}
