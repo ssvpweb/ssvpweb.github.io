@@ -337,36 +337,36 @@
 
     // Banco de Dados Local Estático de Redundância (fallback completo para offline)
     const fallbackTestes = [
-      { folder: "google_login", files: [{ name: "v1_google_login_autenticacao.html" }] },
+      { folder: "google_login", files: [{ name: "t1_google_login_autenticacao.html" }] },
       {
         folder: "google_maps",
         files: [
-          { name: "v1_lista_botoes.html" },
-          { name: "v2_mapa_local.html" },
-          { name: "v3_mapa_leaflet_geral.html" },
-          { name: "v4_dropdown_selecao_enderecos.html" },
-          { name: "v4.1_voz_comandos_mapa.html" },
-          { name: "v4.2_voz_feedback_mapa.html" },
-          { name: "v5_simulador_visita_basico.html" },
-          { name: "v5.1_simulador_visita_voz_referencias.html" }
+          { name: "t1_lista_botoes.html" },
+          { name: "t2_mapa_local.html" },
+          { name: "t3_mapa_leaflet_geral.html" },
+          { name: "t4_dropdown_selecao_enderecos.html" },
+          { name: "t4.1_voz_comandos_mapa.html" },
+          { name: "t4.2_voz_feedback_mapa.html" },
+          { name: "t5_simulador_visita_basico.html" },
+          { name: "t5.1_simulador_visita_voz_referencias.html" }
         ]
       },
-      { folder: "google_sheets", files: [{ name: "LEIA_ME.html" }, { name: "v1_sheets_crud_pessoas.html" }] },
-      { folder: "login", files: [{ name: "v1_pin.html" }, { name: "v2_senha.html" }] },
-      { folder: "open_street_maps", files: [{ name: "v1_osm_busca_raio.html" }] },
+      { folder: "google_sheets", files: [{ name: "LEIA_ME.html" }, { name: "t1_sheets_crud_pessoas.html" }] },
+      { folder: "login", files: [{ name: "t1_pin.html" }, { name: "t2_senha.html" }] },
+      { folder: "open_street_maps", files: [{ name: "t1_osm_busca_raio.html" }] },
       { folder: "pastoral_de_rua", files: [{ name: "relato.html" }] },
       { folder: "pwa", files: [{ name: "index.html" }] },
       { folder: "sem_internet", files: [{ name: "LEIA_ME.html" }] },
-      { folder: "simuladores", files: [{ name: "v1_sincronizador_visitas_local_nuvem.html" }, { name: "v2_sincronizador_visitas_local_nuvem.html" }] },
+      { folder: "simuladores", files: [{ name: "t1_sincronizador_visitas_local_nuvem.html" }, { name: "t2_sincronizador_visitas_local_nuvem.html" }] },
       { folder: "sincronizacao", files: [{ name: "v1_sinc_fila_offline.html" }] },
-      { folder: "spa", files: [{ name: "index.html" }, { name: "v1_login_spa.html" }] },
+      { folder: "spa", files: [{ name: "index.html" }, { name: "t1_login_spa.html" }] },
       { folder: "ux", files: [{ name: "index.html" }, { name: "login.html" }] },
       { folder: "ux/barra_inferior", files: [{ name: "index.html" }] },
       { folder: "ux/cards_expand", files: [{ name: "index.html" }] },
       { folder: "ux/cards_slide", files: [{ name: "index.html" }] },
       { folder: "ux/voz_com_toque", files: [{ name: "index.html" }] },
-      { folder: "ux/app", files: [{ name: "v1_layout_basico.html" }] },
-      { folder: "voz", files: [{ name: "LEIA_ME.html" }, { name: "v1_gravacao_audio_simples.html" }, { name: "v2_comandos_de_voz.html" }] }
+      { folder: "ux/app", files: [{ name: "t1_layout_basico.html" }] },
+      { folder: "voz", files: [{ name: "LEIA_ME.html" }, { name: "t1_gravacao_audio_simples.html" }, { name: "t2_comandos_de_voz.html" }] }
     ];
 
     const toolbar = document.getElementById('dev-toolbar');
@@ -387,6 +387,22 @@
     // --- 1. Inicialização e Carregamento de Testes ---
     async function loadTestMenu() {
       try {
+        const manifestResponse = await fetch('./testes/testes.json', { cache: 'no-store' });
+        if (manifestResponse.ok) {
+          const manifest = await manifestResponse.json();
+          const groups = {};
+
+          manifest.forEach(item => {
+            groups[item.folder] = item.files.map(file => ({
+              name: file.name,
+              path: `./${baseFolder}/${item.folder.replace(/ \/ /g, '/')}/${file.name}`
+            }));
+          });
+
+          renderSelector(groups);
+          return;
+        }
+
         const response = await fetch(`https://api.github.com/repos/${user}/${repo}/git/trees/main?recursive=true`);
         if (!response.ok) throw new Error('API Offline ou Limitada');
 

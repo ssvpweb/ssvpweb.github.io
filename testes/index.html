@@ -274,40 +274,40 @@
       {
         folder: "google_login",
         files: [
-          { name: "v1_google_login_autenticacao.html" }
+          { name: "t1_google_login_autenticacao.html" }
         ]
       },
       {
         folder: "google_maps",
         files: [
-          { name: "v1_lista_botoes.html" },
-          { name: "v2_mapa_local.html" },
-          { name: "v3_mapa_leaflet_geral.html" },
-          { name: "v4_dropdown_selecao_enderecos.html" },
-          { name: "v4.1_voz_comandos_mapa.html" },
-          { name: "v4.2_voz_feedback_mapa.html" },
-          { name: "v5_simulador_visita_basico.html" },
-          { name: "v5.1_simulador_visita_voz_referencias.html" }
+          { name: "t1_lista_botoes.html" },
+          { name: "t2_mapa_local.html" },
+          { name: "t3_mapa_leaflet_geral.html" },
+          { name: "t4_dropdown_selecao_enderecos.html" },
+          { name: "t4.1_voz_comandos_mapa.html" },
+          { name: "t4.2_voz_feedback_mapa.html" },
+          { name: "t5_simulador_visita_basico.html" },
+          { name: "t5.1_simulador_visita_voz_referencias.html" }
         ]
       },
       {
         folder: "google_sheets",
         files: [
           { name: "LEIA_ME.html" },
-          { name: "v1_sheets_crud_pessoas.html" }
+          { name: "t1_sheets_crud_pessoas.html" }
         ]
       },
       {
         folder: "login",
         files: [
-          { name: "v1_pin.html" },
-          { name: "v2_senha.html" }
+          { name: "t1_pin.html" },
+          { name: "t2_senha.html" }
         ]
       },
       {
         folder: "open_street_maps",
         files: [
-          { name: "v1_osm_busca_raio.html" }
+          { name: "t1_osm_busca_raio.html" }
         ]
       },
       {
@@ -331,23 +331,23 @@
       {
         folder: "simuladores",
         files: [
-          { name: "v1_sincronizador_visitas_local_nuvem.html" },
-          { name: "v2_sincronizador_visitas_local_nuvem.html" }
+          { name: "t1_sincronizador_visitas_local_nuvem.html" },
+          { name: "t2_sincronizador_visitas_local_nuvem.html" }
         ]
       },
       {
         folder: "sincronizacao",
         files: [
           { name: "index.html" },
-          { name: "v1_fotos.html" },
-          { name: "v2_problemas.html" }
+          { name: "t1_fotos.html" },
+          { name: "t2_problemas.html" }
         ]
       },
       {
         folder: "spa",
         files: [
           { name: "index.html" },
-          { name: "v1_login_spa.html" }
+          { name: "t1_login_spa.html" }
         ]
       },
       {
@@ -384,15 +384,15 @@
       {
         folder: "ux / app",
         files: [
-          { name: "v1_layout_basico.html" }
+          { name: "t1_layout_basico.html" }
         ]
       },
       {
         folder: "voz",
         files: [
           { name: "LEIA_ME.html" },
-          { name: "v1_gravacao_audio_simples.html" },
-          { name: "v2_comandos_de_voz.html" }
+          { name: "t1_gravacao_audio_simples.html" },
+          { name: "t2_comandos_de_voz.html" }
         ]
       }
     ];
@@ -402,6 +402,12 @@
       const banner = document.getElementById('status-banner');
 
       try {
+        const manifestResponse = await fetch('./testes.json', { cache: 'no-store' });
+        if (manifestResponse.ok) {
+          renderFolders(await manifestResponse.json());
+          return;
+        }
+
         // Detecta se está rodando localmente (IP local, localhost ou túnel ngrok/localtunnel)
         // para exibir os arquivos locais que ainda não foram comitados/enviados ao GitHub.
         const isLocal = window.location.hostname === 'localhost' ||

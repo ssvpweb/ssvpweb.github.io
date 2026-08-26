@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Segurança e Roteador (v4.2) - SSVP</title>
+  <title>Segurança e Roteador (v4.3) - SSVP</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -421,8 +421,8 @@
 
   <!-- Barra Superior Discreta -->
   <div class="bar-sup">
-    <div class="bar-circle">4.2</div>
-    <span class="file-name-label">v4.2_roteador.html</span>
+    <div class="bar-circle">4.3</div>
+    <span class="file-name-label">t4.3_roteador.html</span>
     <div class="bar-circle" style="opacity: 0;"></div>
   </div>
 
@@ -452,8 +452,9 @@
           </svg>
         </div>
         <div class="card-body">
+          <!-- Texto Inicial do Card 1 -->
           <p class="card-description">
-            O SSVPweb roda no navegador do smartphone, é muito leve e funciona offline nas visitas. Ele envia os dados automaticamente para a planilha da sua Conferência no Google Sheets assim que detecta WiFi.
+            O SSVPweb é um aplicativo super leve que roda direto no navegador do seu celular. Ele funciona de forma segura mesmo em locais onde não há sinal de internet.
           </p>
 
           <!-- Ilustração SVG 1.1: 5 Celulares subindo dados para a nuvem de planilhas de Sheets -->
@@ -561,7 +562,7 @@
             </svg>
           </div>
 
-          <!-- Ilustração SVG 1.2 (Nova): Fluxo de dados simplificado em 3 etapas com Planilha única, maior, smartphones maiores, casas laterais de sincronização e pontas de seta 50% maiores -->
+          <!-- Ilustração SVG 1.2 (Nova): Sincronização em 3 etapas com Planilha central, celulares com dobro do tamanho, casas nas pontas e setas consistentes -->
           <div style="width: 100%; margin-bottom: 14px; box-sizing: border-box;">
             <svg viewBox="0 0 360 185" width="100%" height="auto" style="background: rgba(0,0,0,0.2); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); padding: 8px; display: block;">
               <defs>
@@ -593,13 +594,13 @@
               <!-- ================= CASAS À ESQUERDA E À DIREITA ================= -->
               <!-- Casa da Esquerda -->
               <g transform="translate(0, 10)">
-                <polygon points="60,25 22,55 98,55" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.12)" stroke-width="1" />
+                <polygon points="60,25 10,55 110,55" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.12)" stroke-width="1" />
                 <rect x="22" y="55" width="76" height="96" rx="4" fill="url(#gradHouseBg)" stroke="rgba(255,255,255,0.08)" stroke-width="1" />
               </g>
 
               <!-- Casa da Direita -->
               <g transform="translate(0, 10)">
-                <polygon points="300,25 262,55 338,55" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.12)" stroke-width="1" />
+                <polygon points="300,25 250,55 350,55" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.12)" stroke-width="1" />
                 <rect x="262" y="55" width="76" height="96" rx="4" fill="url(#gradHouseBg)" stroke="rgba(255,255,255,0.08)" stroke-width="1" />
               </g>
 
@@ -699,13 +700,18 @@
             </svg>
           </div>
 
-          <!-- Texto explicativo sob a Ilustração 1.2 -->
-          <p class="card-description" style="font-size: 0.72rem; line-height: 1.4; color: var(--cor-subtexto); margin-top: 4px; padding: 0 4px;">
-            Os dados de visitas e famílias são gravados com segurança na memória privada do seu smartphone (IndexedDB/localStorage), funcionando como um banco de dados local. Isso permite acesso instantâneo e seguro mesmo sem internet em áreas remotas.
+          <!-- Texto explicativo sob a Ilustração 1.2 (Nova redação v4.3) -->
+          <p class="card-description" style="font-size: 0.8rem; line-height: 1.5; color: var(--cor-texto); margin-top: 12px; padding: 0 4px;">
+            <strong>Veja como funciona:</strong>
+          </p>
+          <p class="card-description" style="font-size: 0.75rem; line-height: 1.5; color: var(--cor-subtexto); margin-top: 4px; padding: 0 4px; display: flex; flex-direction: column; gap: 8px;">
+            <span><strong>1. Em casa (com WiFi):</strong> O celular carrega a lista de famílias, histórico de visitas e metas pelo WiFi.</span>
+            <span><strong>2. Na visita (sem WiFi):</strong> As decisões tomadas com o assistido, relatos e metas ficam gravados temporariamente no banco de dados do celular.</span>
+            <span><strong>3. Na volta (com WiFi):</strong> Ao detectar o WiFi, o aplicativo envia automaticamente os dados para a planilha na nuvem e os apaga do celular.</span>
           </p>
 
           <!-- Interativo A: Teste de Fala (Texto-para-Voz) -->
-          <div class="interactive-box" style="margin-top: 10px;">
+          <div class="interactive-box" style="margin-top: 18px;">
             <div class="interactive-box-title">
               <!-- Ícone SVG Material: Volume Up -->
               <svg viewBox="0 0 24 24" fill="currentColor">

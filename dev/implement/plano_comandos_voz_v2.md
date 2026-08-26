@@ -42,6 +42,6 @@ O aplicativo interpreta a frase transcrita. Se o primeiro termo coincidir com um
 
 ## 4. Estrutura do Novo Arquivo
 
-- **Arquivo Target:** [ux_v2_barra_acessibilidade.html](file:///c:/webappssvp/webappssvp.github.io/testes/ux/barra_inferior/ux_v2_barra_acessibilidade.html)
+- **Arquivo Target:** [ux_t2_barra_acessibilidade.html](file:///c:/webappssvp/webappssvp.github.io/testes/ux/barra_inferior/ux_t2_barra_acessibilidade.html)
 - **Localização:** `testes/ux/barra_inferior/`
 - **Metatags Open Graph:** Título configurado como `"Testes de Usabilidade"` para compartilhamento ideal no WhatsApp.

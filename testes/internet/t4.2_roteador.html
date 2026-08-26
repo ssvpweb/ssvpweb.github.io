@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Segurança e Roteador (v3) - SSVP</title>
+  <title>Segurança e Roteador (v4.2) - SSVP</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -174,7 +174,7 @@
     }
 
     .expandable-card.active .card-body {
-      max-height: 1200px;
+      max-height: 2400px;
       opacity: 1;
       padding: 1rem 1.2rem 1.5rem 1.2rem;
       transition: max-height var(--tempo-transicao) cubic-bezier(1, 0, 1, 0), opacity var(--tempo-transicao) ease;
@@ -421,8 +421,8 @@
 
   <!-- Barra Superior Discreta -->
   <div class="bar-sup">
-    <div class="bar-circle">3</div>
-    <span class="file-name-label">v3_roteador.html</span>
+    <div class="bar-circle">4.2</div>
+    <span class="file-name-label">t4.2_roteador.html</span>
     <div class="bar-circle" style="opacity: 0;"></div>
   </div>
 
@@ -437,7 +437,7 @@
       </div>
 
       <!-- Card 1: Por que um WebApp? -->
-      <div class="expandable-card" id="card-pwa">
+      <div class="expandable-card active" id="card-pwa">
         <div class="card-header" onclick="toggleCard('card-pwa')">
           <div class="card-title-group">
             <!-- Ícone SVG Material: Smartphone -->
@@ -456,16 +456,256 @@
             O SSVPweb roda no navegador do smartphone, é muito leve e funciona offline nas visitas. Ele envia os dados automaticamente para a planilha da sua Conferência no Google Sheets assim que detecta WiFi.
           </p>
 
-          <!-- Retângulo de Ilustração 1 (Placeholder) -->
-          <div class="placeholder-illustration">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM19 18H6c-2.21 0-4-1.79-4-4 0-2.05 1.53-3.76 3.56-3.97l1.07-.11.5-.95C8.08 7.14 9.94 6 12 6c2.62 0 4.88 1.86 5.39 4.43l.3 1.5 1.53.11c1.56.1 2.78 1.41 2.78 2.96 0 1.65-1.35 3-3 3z"/>
+          <!-- Ilustração SVG 1.1: 5 Celulares subindo dados para a nuvem de planilhas de Sheets -->
+          <div style="width: 100%; margin-bottom: 14px; box-sizing: border-box;">
+            <svg viewBox="0 0 360 140" width="100%" height="auto" style="background: rgba(0,0,0,0.2); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); padding: 8px; display: block;">
+              <defs>
+                <linearGradient id="gradCelSmall" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#475569" />
+                  <stop offset="100%" stop-color="#1e293b" />
+                </linearGradient>
+                <linearGradient id="gradSheetSmall" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#10b981" />
+                  <stop offset="100%" stop-color="#047857" />
+                </linearGradient>
+                <marker id="arrowSmall" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
+                  <path d="M 0 1 L 10 5 L 0 9 z" fill="#94a3b8" />
+                </marker>
+              </defs>
+
+              <!-- Desenho de Nuvem Esticada em SVG Azul por trás das planilhas -->
+              <path d="M 45,35 
+                       a 12,12 0 0,1 12,-16 
+                       a 18,18 0 0,1 25,-8 
+                       a 22,22 0 0,1 36,-4 
+                       h 140 
+                       a 22,22 0 0,1 36,4 
+                       a 18,18 0 0,1 25,8 
+                       a 12,12 0 0,1 12,16 
+                       a 8,8 0 0,1 -6,8 
+                       H 51 
+                       a 8,8 0 0,1 -6,-8 z" 
+                    fill="rgba(0, 127, 255, 0.06)" 
+                    stroke="rgba(0, 127, 255, 0.35)" 
+                    stroke-width="1.5" />
+
+              <!-- 5 Planilhas no Topo (aninhadas na nuvem e centralizadas) -->
+              <g transform="translate(0, 10)">
+                <!-- Planilha 1 -->
+                <g transform="translate(88,0)">
+                  <rect x="0" y="0" width="24" height="28" rx="3" fill="url(#gradSheetSmall)" />
+                  <path d="M 4 8 L 20 8 M 4 13 L 20 13 M 4 18 L 20 18 M 10 4 L 10 24" stroke="rgba(255,255,255,0.4)" stroke-width="1" />
+                </g>
+                <!-- Planilha 2 -->
+                <g transform="translate(128,0)">
+                  <rect x="0" y="0" width="24" height="28" rx="3" fill="url(#gradSheetSmall)" />
+                  <path d="M 4 8 L 20 8 M 4 13 L 20 13 M 4 18 L 20 18 M 10 4 L 10 24" stroke="rgba(255,255,255,0.4)" stroke-width="1" />
+                </g>
+                <!-- Planilha 3 -->
+                <g transform="translate(168,0)">
+                  <rect x="0" y="0" width="24" height="28" rx="3" fill="url(#gradSheetSmall)" />
+                  <path d="M 4 8 L 20 8 M 4 13 L 20 13 M 4 18 L 20 18 M 10 4 L 10 24" stroke="rgba(255,255,255,0.4)" stroke-width="1" />
+                </g>
+                <!-- Planilha 4 -->
+                <g transform="translate(208,0)">
+                  <rect x="0" y="0" width="24" height="28" rx="3" fill="url(#gradSheetSmall)" />
+                  <path d="M 4 8 L 20 8 M 4 13 L 20 13 M 4 18 L 20 18 M 10 4 L 10 24" stroke="rgba(255,255,255,0.4)" stroke-width="1" />
+                </g>
+                <!-- Planilha 5 -->
+                <g transform="translate(248,0)">
+                  <rect x="0" y="0" width="24" height="28" rx="3" fill="url(#gradSheetSmall)" />
+                  <path d="M 4 8 L 20 8 M 4 13 L 20 13 M 4 18 L 20 18 M 10 4 L 10 24" stroke="rgba(255,255,255,0.4)" stroke-width="1" />
+                </g>
+              </g>
+
+              <!-- 5 Celulares embaixo -->
+              <g transform="translate(30, 92)">
+                <!-- Celular 1 -->
+                <g transform="translate(0,0)">
+                  <rect x="0" y="0" width="20" height="34" rx="4" fill="url(#gradCelSmall)" stroke="rgba(255,255,255,0.1)" stroke-width="1" />
+                  <circle cx="10" cy="29" r="1.2" fill="#94a3b8" />
+                  <path d="M 10 4 L 10 4" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round" />
+                </g>
+                <!-- Celular 2 -->
+                <g transform="translate(65,0)">
+                  <rect x="0" y="0" width="20" height="34" rx="4" fill="url(#gradCelSmall)" stroke="rgba(255,255,255,0.1)" stroke-width="1" />
+                  <circle cx="10" cy="29" r="1.2" fill="#94a3b8" />
+                  <path d="M 10 4 L 10 4" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round" />
+                </g>
+                <!-- Celular 3 -->
+                <g transform="translate(130,0)">
+                  <rect x="0" y="0" width="20" height="34" rx="4" fill="url(#gradCelSmall)" stroke="rgba(255,255,255,0.1)" stroke-width="1" />
+                  <circle cx="10" cy="29" r="1.2" fill="#94a3b8" />
+                  <path d="M 10 4 L 10 4" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round" />
+                </g>
+                <!-- Celular 4 -->
+                <g transform="translate(195,0)">
+                  <rect x="0" y="0" width="20" height="34" rx="4" fill="url(#gradCelSmall)" stroke="rgba(255,255,255,0.1)" stroke-width="1" />
+                  <circle cx="10" cy="29" r="1.2" fill="#94a3b8" />
+                  <path d="M 10 4 L 10 4" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round" />
+                </g>
+                <!-- Celular 5 -->
+                <g transform="translate(260,0)">
+                  <rect x="0" y="0" width="20" height="34" rx="4" fill="url(#gradCelSmall)" stroke="rgba(255,255,255,0.1)" stroke-width="1" />
+                  <circle cx="10" cy="29" r="1.2" fill="#94a3b8" />
+                  <path d="M 10 4 L 10 4" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round" />
+                </g>
+              </g>
+
+              <!-- Linhas de Envio mais largas e nítidas ligando celulares às planilhas correspondentes e centralizadas -->
+              <path d="M 40 92 L 100 38" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="2.2" stroke-dasharray="3,3" marker-end="url(#arrowSmall)" />
+              <path d="M 105 92 L 140 38" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="2.2" stroke-dasharray="3,3" marker-end="url(#arrowSmall)" />
+              <path d="M 170 92 L 180 38" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="2.2" stroke-dasharray="3,3" marker-end="url(#arrowSmall)" />
+              <path d="M 235 92 L 220 38" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="2.2" stroke-dasharray="3,3" marker-end="url(#arrowSmall)" />
+              <path d="M 300 92 L 260 38" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="2.2" stroke-dasharray="3,3" marker-end="url(#arrowSmall)" />
             </svg>
-            <span>[Ilustração: Funcionamento Offline e Envio ao WiFi]</span>
           </div>
 
+          <!-- Ilustração SVG 1.2 (Nova): Fluxo de dados simplificado em 3 etapas com Planilha única, maior, smartphones maiores, casas laterais de sincronização e pontas de seta 50% maiores -->
+          <div style="width: 100%; margin-bottom: 14px; box-sizing: border-box;">
+            <svg viewBox="0 0 360 185" width="100%" height="auto" style="background: rgba(0,0,0,0.2); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); padding: 8px; display: block;">
+              <defs>
+                <linearGradient id="gradCelBig" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#334155" />
+                  <stop offset="100%" stop-color="#0f172a" />
+                </linearGradient>
+                <linearGradient id="gradPlanilhaBig" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#10b981" />
+                  <stop offset="100%" stop-color="#047857" />
+                </linearGradient>
+                <linearGradient id="gradHouseBg" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="rgba(255,255,255,0.015)" />
+                  <stop offset="100%" stop-color="rgba(255,255,255,0.04)" />
+                </linearGradient>
+                
+                <!-- Pontas das setas 50% maiores -->
+                <marker id="arrowBlueBig" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
+                  <path d="M 0 1 L 10 5 L 0 9 z" fill="#007fff" />
+                </marker>
+                <marker id="arrowGreenBig" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
+                  <path d="M 0 1 L 10 5 L 0 9 z" fill="#10b981" />
+                </marker>
+                <marker id="arrowWhiteBig" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 1 L 10 5 L 0 9 z" fill="#94a3b8" />
+                </marker>
+              </defs>
+
+              <!-- ================= CASAS À ESQUERDA E À DIREITA ================= -->
+              <!-- Casa da Esquerda -->
+              <g transform="translate(0, 10)">
+                <polygon points="60,25 22,55 98,55" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.12)" stroke-width="1" />
+                <rect x="22" y="55" width="76" height="96" rx="4" fill="url(#gradHouseBg)" stroke="rgba(255,255,255,0.08)" stroke-width="1" />
+              </g>
+
+              <!-- Casa da Direita -->
+              <g transform="translate(0, 10)">
+                <polygon points="300,25 262,55 338,55" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.12)" stroke-width="1" />
+                <rect x="262" y="55" width="76" height="96" rx="4" fill="url(#gradHouseBg)" stroke="rgba(255,255,255,0.08)" stroke-width="1" />
+              </g>
+
+              <!-- ================= PLANILHA CENTRAL ÚNICA E MAIOR NO TOPO ================= -->
+              <g transform="translate(180, 5)">
+                <!-- Nuvem de Carga no Topo (Centralizada) -->
+                <path d="M -30,16 a 4,4 0 0,1 4,-5 a 6,6 0 0,1 8,-3 a 7,7 0 0,1 12,-1 h 12 a 7,7 0 0,1 12,1 a 6,6 0 0,1 8,3 a 4,4 0 0,1 4,5 a 3,3 0 0,1 -2,2 H -28 a 3,3 0 0,1 -2,-2 z" fill="rgba(0, 127, 255, 0.08)" stroke="rgba(0, 127, 255, 0.3)" stroke-width="1.2" transform="scale(1.3) translate(-10, -3)" />
+                <!-- Planilha Verde Única e Maior -->
+                <rect x="-16" y="2" width="32" height="38" rx="4" fill="url(#gradPlanilhaBig)" />
+                <path d="M -10 12 L 10 12 M -10 18 L 10 18 M -10 24 L 10 24 M -1 6 L -1 32" stroke="rgba(255,255,255,0.45)" stroke-width="1.5" />
+              </g>
+
+              <!-- ================= ETAPA 1: ESQUERDA (Celular com WiFi e Banco de Dados) ================= -->
+              <g transform="translate(0, 10)">
+                <!-- Celular Vertical com o dobro de tamanho (46x80) -->
+                <g transform="translate(37, 65)">
+                  <rect x="0" y="0" width="46" height="80" rx="8" fill="url(#gradCelBig)" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" />
+                  <circle cx="23" cy="73" r="2.5" fill="#94a3b8" />
+                  <line x1="17" y1="5" x2="29" y2="5" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round" />
+                  
+                  <!-- WiFi Ativo (Comum a 1 e 3) -->
+                  <path d="M 13 18 A 10 10 0 0 1 33 18 M 16 23 A 6 6 0 0 1 30 23 M 20 27 A 3 3 0 0 1 26 27" fill="none" stroke="#007fff" stroke-width="1.5" stroke-linecap="round" />
+                  
+                  <!-- Banco de Dados Interno Comum (Cilindros na Base) -->
+                  <g transform="translate(10, 36)">
+                    <ellipse cx="13" cy="18" rx="13" ry="3.5" fill="#007fff" stroke="rgba(255,255,255,0.2)" stroke-width="0.5" />
+                    <path d="M 0 10 L 0 18 A 13 3.5 0 0 0 26 18 L 26 10" fill="#007fff" stroke="rgba(255,255,255,0.2)" stroke-width="0.5" />
+                    <ellipse cx="13" cy="10" rx="13" ry="3.5" fill="#005fcf" stroke="rgba(255,255,255,0.2)" stroke-width="0.5" />
+                    <path d="M 0 2 L 0 10 A 13 3.5 0 0 0 26 10 L 26 2" fill="#005fcf" stroke="rgba(255,255,255,0.2)" stroke-width="0.5" />
+                    <ellipse cx="13" cy="2" rx="13" ry="3.5" fill="#003faf" stroke="rgba(255,255,255,0.2)" stroke-width="0.5" />
+                  </g>
+                </g>
+
+                <!-- Seta de Download descendo da planilha central para o topo do celular (Com curva Bezier) -->
+                <path d="M 160 18 Q 80 18 60 72" fill="none" stroke="#007fff" stroke-width="2.5" stroke-dasharray="3,2" marker-end="url(#arrowBlueBig)" />
+                <!-- Seta do topo do celular para o banco de dados interno -->
+                <path d="M 60 90 L 60 106" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrowWhiteBig)" />
+              </g>
+
+              <!-- ================= ETAPA 2: CENTRO (Campo/Offline - WiFi desligado, DB e WiFi iguais) ================= -->
+              <g transform="translate(0, 10)">
+                <!-- Celular Vertical com o dobro de tamanho (46x80) -->
+                <g transform="translate(157, 65)">
+                  <rect x="0" y="0" width="46" height="80" rx="8" fill="#1e293b" stroke="rgba(255,255,255,0.25)" stroke-width="1.8" />
+                  <circle cx="23" cy="73" r="2.5" fill="#94a3b8" />
+                  <line x1="17" y1="5" x2="29" y2="5" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round" />
+                  
+                  <!-- WiFi Desligado (WiFi de mesmo tamanho, porém riscado vermelho) -->
+                  <g>
+                    <path d="M 13 18 A 10 10 0 0 1 33 18 M 16 23 A 6 6 0 0 1 30 23 M 20 27 A 3 3 0 0 1 26 27" fill="none" stroke="#64748b" stroke-width="1.5" stroke-linecap="round" opacity="0.4" />
+                    <line x1="9" y1="12" x2="37" y2="30" stroke="#d32f2f" stroke-width="2.5" stroke-linecap="round" />
+                  </g>
+
+                  <!-- Banco de Dados Interno Comum (Cilindros na Base, idênticos) -->
+                  <g transform="translate(10, 36)">
+                    <ellipse cx="13" cy="18" rx="13" ry="3.5" fill="#007fff" stroke="rgba(255,255,255,0.2)" stroke-width="0.5" />
+                    <path d="M 0 10 L 0 18 A 13 3.5 0 0 0 26 18 L 26 10" fill="#007fff" stroke="rgba(255,255,255,0.2)" stroke-width="0.5" />
+                    <ellipse cx="13" cy="10" rx="13" ry="3.5" fill="#005fcf" stroke="rgba(255,255,255,0.2)" stroke-width="0.5" />
+                    <path d="M 0 2 L 0 10 A 13 3.5 0 0 0 26 10 L 26 2" fill="#005fcf" stroke="rgba(255,255,255,0.2)" stroke-width="0.5" />
+                    <ellipse cx="13" cy="2" rx="13" ry="3.5" fill="#003faf" stroke="rgba(255,255,255,0.2)" stroke-width="0.5" />
+                    <!-- Brilho de Destaque no DB em campo -->
+                    <circle cx="13" cy="10" r="20" fill="none" stroke="rgba(0, 127, 255, 0.4)" stroke-width="1" stroke-dasharray="2,2" />
+                  </g>
+                </g>
+              </g>
+
+              <!-- ================= ETAPA 3: DIREITA (Celular com WiFi e Banco de Dados) ================= -->
+              <g transform="translate(0, 10)">
+                <!-- Celular Vertical com o dobro de tamanho (46x80) -->
+                <g transform="translate(277, 65)">
+                  <rect x="0" y="0" width="46" height="80" rx="8" fill="url(#gradCelBig)" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" />
+                  <circle cx="23" cy="73" r="2.5" fill="#94a3b8" />
+                  <line x1="17" y1="5" x2="29" y2="5" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round" />
+                  
+                  <!-- WiFi Ativo (Comum a 1 e 3) -->
+                  <path d="M 13 18 A 10 10 0 0 1 33 18 M 16 23 A 6 6 0 0 1 30 23 M 20 27 A 3 3 0 0 1 26 27" fill="none" stroke="#007fff" stroke-width="1.5" stroke-linecap="round" />
+                  
+                  <!-- Banco de Dados Interno Comum (Cilindros na Base, idênticos) -->
+                  <g transform="translate(10, 36)">
+                    <ellipse cx="13" cy="18" rx="13" ry="3.5" fill="#007fff" stroke="rgba(255,255,255,0.2)" stroke-width="0.5" />
+                    <path d="M 0 10 L 0 18 A 13 3.5 0 0 0 26 18 L 26 10" fill="#007fff" stroke="rgba(255,255,255,0.2)" stroke-width="0.5" />
+                    <ellipse cx="13" cy="10" rx="13" ry="3.5" fill="#005fcf" stroke="rgba(255,255,255,0.2)" stroke-width="0.5" />
+                    <path d="M 0 2 L 0 10 A 13 3.5 0 0 0 26 10 L 26 2" fill="#005fcf" stroke="rgba(255,255,255,0.2)" stroke-width="0.5" />
+                    <ellipse cx="13" cy="2" rx="13" ry="3.5" fill="#003faf" stroke="rgba(255,255,255,0.2)" stroke-width="0.5" />
+                  </g>
+                </g>
+
+                <!-- Seta de Sincronização subindo do topo do celular da direita até a planilha (Com curva Bezier) -->
+                <path d="M 300 72 Q 280 18 200 18" fill="none" stroke="#10b981" stroke-width="2.5" stroke-dasharray="3,2" marker-end="url(#arrowGreenBig)" />
+                <!-- Seta interna subindo do banco de dados local para o topo/WiFi -->
+                <path d="M 300 106 L 300 90" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrowWhiteBig)" />
+              </g>
+
+              <!-- Conexões/Divisores pontilhados entre as 3 etapas -->
+              <line x1="120" y1="15" x2="120" y2="165" stroke="rgba(255,255,255,0.06)" stroke-width="1" stroke-dasharray="4,4" />
+              <line x1="240" y1="15" x2="240" y2="165" stroke="rgba(255,255,255,0.06)" stroke-width="1" stroke-dasharray="4,4" />
+            </svg>
+          </div>
+
+          <!-- Texto explicativo sob a Ilustração 1.2 -->
+          <p class="card-description" style="font-size: 0.72rem; line-height: 1.4; color: var(--cor-subtexto); margin-top: 4px; padding: 0 4px;">
+            Os dados de visitas e famílias são gravados com segurança na memória privada do seu smartphone (IndexedDB/localStorage), funcionando como um banco de dados local. Isso permite acesso instantâneo e seguro mesmo sem internet em áreas remotas.
+          </p>
+
           <!-- Interativo A: Teste de Fala (Texto-para-Voz) -->
-          <div class="interactive-box">
+          <div class="interactive-box" style="margin-top: 10px;">
             <div class="interactive-box-title">
               <!-- Ícone SVG Material: Volume Up -->
               <svg viewBox="0 0 24 24" fill="currentColor">

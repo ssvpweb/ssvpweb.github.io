@@ -1,4 +1,4 @@
-# Plano de Implementação: Protótipo v5_mensagens.html (Mensagens Contextuais e Banners)
+# Plano de Implementação: Protótipo t5_mensagens.html (Mensagens Contextuais e Banners)
 
 **Data:** 21 de Agosto de 2026  
 **Status:** Planejado  
@@ -7,7 +7,7 @@
 ---
 
 ## 1. Objetivo
-Criar a página `v5_mensagens.html` focada na exibição de mensagens contextuais inteligentes (preparação WiFi/offline, alertas de trânsito/proximidade) e banners de notificação ergonômicos deslizantes a partir da barra superior, otimizados para vicentinos idosos em trânsito.
+Criar a página `t5_mensagens.html` focada na exibição de mensagens contextuais inteligentes (preparação WiFi/offline, alertas de trânsito/proximidade) e banners de notificação ergonômicos deslizantes a partir da barra superior, otimizados para vicentinos idosos em trânsito.
 
 ---
 
@@ -32,7 +32,7 @@ O protótipo simulará um ciclo contínuo de eventos reais de campo:
 
 ## 3. Estrutura de Arquivos
 
-### [NEW] `testes/ux/app/v5_mensagens.html`
+### [NEW] `testes/ux/app/t5_mensagens.html`
 * Interface com a barra superior indicadora e a barra inferior.
 * Banner deslizante superior oculto (`#notification-banner`) posicionado logo abaixo da barra superior.
 * Botões de simulação manual no display central para acionar cada mensagem (simulando WiFi, Trânsito e Chegada) para que o usuário possa testar e analisar.

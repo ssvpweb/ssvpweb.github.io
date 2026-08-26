@@ -1,0 +1,35 @@
+name: Atualizar indice de testes
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'testes/**'
+      - 'scripts/gerar-indice-testes.ps1'
+      - '.github/workflows/atualizar-indice-testes.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  atualizar-indice:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar repositorio
+        uses: actions/checkout@v4
+
+      - name: Gerar manifesto
+        shell: pwsh
+        run: ./scripts/gerar-indice-testes.ps1
+
+      - name: Publicar manifesto atualizado
+        shell: bash
+        run: |
+          if git diff --quiet -- testes/testes.json; then
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add testes/testes.json
+          git commit -m 'Atualizar indice de testes [skip ci]'
+          git push

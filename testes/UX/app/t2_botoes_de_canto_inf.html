@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Layout Básico (v3) - SSVP</title>
+  <title>Layout Básico (v2) - SSVP</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,65 +13,34 @@
 </head>
 <body>
 
-  <!-- Barra Superior (2 Círculos de Canto com o nome do arquivo ativo) -->
+  <!-- Barra Superior (2 Círculos de Canto) -->
   <div class="bar-sup">
     <div class="bar-circle canto-circle">2</div>
-    <span class="file-name-label">v3_configuracoes.html</span>
+    <span class="file-name-label">t2_botoes_de_canto_inf.html</span>
     <div class="bar-circle canto-circle"></div>
   </div>
 
-  <!-- Área de Desenho Central (Preta Vazia e totalmente livre para simulação) -->
+  <!-- Área de Desenho Central (Preta Vazia) -->
   <div class="display-area" onclick="closeActiveCard()">
     
-    <!-- Card da Esquerda (Configurações Rápidas integradas no aplicativo) -->
+    <!-- Card da Esquerda (Engrenagem/Configurações) -->
     <div id="card-esq" class="card-expandido card-esquerda" onclick="event.stopPropagation()">
       <div class="card-content">
         <div class="card-title">
           <svg viewBox="0 0 24 24" fill="currentColor" style="width: 20px; height: 20px; vertical-align: middle;">
             <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
           </svg>
-          <span>Ajustes do Aplicativo</span>
+          <span>Configurações Rápidas</span>
         </div>
-        <div class="card-text" style="display: flex; flex-direction: column; gap: 1rem; margin-top: 0.5rem; overflow-y: auto;">
-          
-          <!-- Escolha de Tema: Modo Claro / Escuro -->
-          <div class="setting-item">
-            <span class="setting-label">Tema Visual:</span>
-            <div class="theme-buttons">
-              <button id="btn-theme-claro" onclick="setAppTheme('claro')">Claro</button>
-              <button id="btn-theme-escuro" onclick="setAppTheme('escuro')" class="active">Escuro</button>
-            </div>
-          </div>
-          
-          <!-- Tamanho das Letras: P, M, G (Acessibilidade elástica) -->
-          <div class="setting-item">
-            <span class="setting-label">Tamanho das letras:</span>
-            <div class="font-buttons">
-              <button id="btn-font-p" onclick="setAppFontSize('P')">P</button>
-              <button id="btn-font-m" onclick="setAppFontSize('M')" class="active">M</button>
-              <button id="btn-font-g" onclick="setAppFontSize('G')">G</button>
-            </div>
-          </div>
-          
-          <!-- Velocidade de Abertura: + e - -->
-          <div class="setting-item">
-            <span class="setting-label">Veloc. de abertura dos menus:</span>
-            <div class="counter-control">
-              <button onclick="adjustAppSpeed(-1)">−</button>
-              <span id="lbl-app-speed">0.08s</span>
-              <button onclick="adjustAppSpeed(1)">+</button>
-            </div>
-          </div>
-
-          <p style="font-size: 0.65rem; color: var(--cor-card-subtexto); margin-top: auto; line-height: 1.4; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px;">
-            A escala elástica em <strong>rem</strong> garante que, ao selecionar a fonte <strong>G</strong>, todos os paddings, margens e textos cresçam simetricamente.
-          </p>
-
+        <div class="card-text">
+          <p style="margin-bottom: 12px;">Simulação do painel de ajustes locais do aplicativo. Este card expande dinamicamente a partir do botão de canto inferior esquerdo.</p>
+          <p style="margin-bottom: 12px;">Repare que a cor de fundo do card se adapta de acordo com o modo de tela: fica mais escura que o branco no modo claro e mais clara que o preto no modo escuro.</p>
+          <p>Dê um toque em qualquer área livre do fundo preto para recolher este card.</p>
         </div>
       </div>
     </div>
 
-    <!-- Card da Direita (Ajuda/Suporte) -->
+    <!-- Card da Direita (Ajuda/Interrogação) -->
     <div id="card-dir" class="card-expandido card-direita" onclick="event.stopPropagation()">
       <div class="card-content">
         <div class="card-title">
@@ -88,6 +57,81 @@
       </div>
     </div>
     
+    <!-- Painel de Configurações (Colapsado por padrão) -->
+    <div id="panel-config" class="panel-config collapsed" onclick="event.stopPropagation()">
+      <div class="panel-header" onclick="togglePanel()">
+        <span>⚙️ Painel de Configurações</span>
+        <span id="panel-toggle-icon" class="panel-toggle-btn">+</span>
+      </div>
+      <div id="panel-body" class="panel-body">
+        
+        <!-- Ajuste do raio dos círculos de canto -->
+        <div class="config-row">
+          <span class="config-label">Raio Cantos:</span>
+          <div class="counter-control">
+            <button onclick="adjustVal('canto', -1)">−</button>
+            <span id="lbl-canto">2.50rem</span>
+            <button onclick="adjustVal('canto', 1)">+</button>
+          </div>
+        </div>
+
+        <!-- Ajuste do raio do círculo de áudio -->
+        <div class="config-row">
+          <span class="config-label">Raio Áudio:</span>
+          <div class="counter-control">
+            <button onclick="adjustVal('audio', -1)">−</button>
+            <span id="lbl-audio">3.50rem</span>
+            <button onclick="adjustVal('audio', 1)">+</button>
+          </div>
+        </div>
+
+        <!-- Ajuste do padding vertical das barras -->
+        <div class="config-row">
+          <span class="config-label">Padding Barras:</span>
+          <div class="counter-control">
+            <button onclick="adjustVal('padding', -1)">−</button>
+            <span id="lbl-padding">0.50rem</span>
+            <button onclick="adjustVal('padding', 1)">+</button>
+          </div>
+        </div>
+
+        <!-- Ajuste da velocidade de abertura do card -->
+        <div class="config-row">
+          <span class="config-label">Velocidade Card:</span>
+          <div class="counter-control">
+            <button onclick="adjustVal('speed', -1)">−</button>
+            <span id="lbl-speed">0.08s</span>
+            <button onclick="adjustVal('speed', 1)">+</button>
+          </div>
+        </div>
+
+        <!-- Configuração de Modo de Tela -->
+        <div class="config-row">
+          <span class="config-label">Modo de Tela:</span>
+          <select id="theme-select" class="color-select" onchange="toggleTheme(this.value)">
+            <option value="escuro">Modo Escuro (7)</option>
+            <option value="claro">Modo Claro (6)</option>
+          </select>
+        </div>
+
+        <!-- Cores do Manual SSVP -->
+        <div class="config-color-section">
+          <div class="config-row">
+            <span class="config-label">Escolher Alvo:</span>
+            <select id="color-target" class="color-select" onchange="highlightSelectedColor()">
+              <option value="barras">Barras (Sup/Inf)</option>
+              <option value="canto">Círculos de Canto</option>
+              <option value="audio">Círculo de Áudio</option>
+              <option value="fundo">Fundo da Tela</option>
+            </select>
+          </div>
+          <div class="color-palette" id="color-palette">
+            <!-- Gerado dinamicamente com numeração sob as cores -->
+          </div>
+        </div>
+
+      </div>
+    </div>
   </div>
 
   <!-- Barra Inferior (2 Círculos de Canto com ícone e 1 Central de Áudio) -->

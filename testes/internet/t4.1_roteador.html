@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Segurança e Roteador (v2) - SSVP</title>
+  <title>Segurança e Roteador (v4.1) - SSVP</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -174,7 +174,7 @@
     }
 
     .expandable-card.active .card-body {
-      max-height: 1000px; /* Suficiente para expandir todo o conteúdo */
+      max-height: 1800px;
       opacity: 1;
       padding: 1rem 1.2rem 1.5rem 1.2rem;
       transition: max-height var(--tempo-transicao) cubic-bezier(1, 0, 1, 0), opacity var(--tempo-transicao) ease;
@@ -196,6 +196,30 @@
 
     .card-description strong {
       color: #ffffff;
+    }
+
+    /* Caixa de Placeholder para Ilustrações Conceituais */
+    .placeholder-illustration {
+      background-color: rgba(0, 0, 0, 0.15);
+      border: 2px dashed rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      padding: 1.2rem 1rem;
+      text-align: center;
+      margin-bottom: 14px;
+      color: var(--cor-subtexto);
+      font-size: 0.72rem;
+      font-weight: 600;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .placeholder-illustration svg {
+      width: 32px;
+      height: 32px;
+      color: rgba(255, 255, 255, 0.35);
     }
 
     /* Subseções Interativas */
@@ -397,8 +421,8 @@
 
   <!-- Barra Superior Discreta -->
   <div class="bar-sup">
-    <div class="bar-circle">2</div>
-    <span class="file-name-label">v2_roteador.html</span>
+    <div class="bar-circle">4.1</div>
+    <span class="file-name-label">t4.1_roteador.html</span>
     <div class="bar-circle" style="opacity: 0;"></div>
   </div>
 
@@ -429,26 +453,187 @@
         </div>
         <div class="card-body">
           <p class="card-description">
-            O SSVPweb é um aplicativo construído como **PWA (Progressive Web App)**. Isso significa que ele roda diretamente no navegador do seu smartphone, é super leve, pode ser instalado como um aplicativo comum e **funciona perfeitamente sem sinal de internet**.
+            O SSVPweb roda no navegador do smartphone, é muito leve e funciona offline nas visitas. Ele envia os dados automaticamente para a planilha da sua Conferência no Google Sheets assim que detecta WiFi.
           </p>
-          <p class="card-description">
-            Nas visitas, você anota tudo de forma offline. Quando você chega em casa e se conecta ao WiFi, as anotações são enviadas de forma automática e organizada para a sua planilha do **Google Sheets**.
+
+          <!-- Ilustração SVG 1.1: 5 Celulares subindo dados para a nuvem de planilhas de Sheets -->
+          <div style="width: 100%; margin-bottom: 14px; box-sizing: border-box;">
+            <svg viewBox="0 0 360 140" width="100%" height="auto" style="background: rgba(0,0,0,0.2); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); padding: 8px; display: block;">
+              <defs>
+                <linearGradient id="gradCelSmall" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#475569" />
+                  <stop offset="100%" stop-color="#1e293b" />
+                </linearGradient>
+                <linearGradient id="gradSheetSmall" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#10b981" />
+                  <stop offset="100%" stop-color="#047857" />
+                </linearGradient>
+                <marker id="arrowSmall" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
+                  <path d="M 0 1 L 10 5 L 0 9 z" fill="#94a3b8" />
+                </marker>
+              </defs>
+
+              <!-- Desenho de Nuvem Esticada em SVG Azul por trás das planilhas -->
+              <path d="M 45,35 
+                       a 12,12 0 0,1 12,-16 
+                       a 18,18 0 0,1 25,-8 
+                       a 22,22 0 0,1 36,-4 
+                       h 140 
+                       a 22,22 0 0,1 36,4 
+                       a 18,18 0 0,1 25,8 
+                       a 12,12 0 0,1 12,16 
+                       a 8,8 0 0,1 -6,8 
+                       H 51 
+                       a 8,8 0 0,1 -6,-8 z" 
+                    fill="rgba(0, 127, 255, 0.06)" 
+                    stroke="rgba(0, 127, 255, 0.35)" 
+                    stroke-width="1.5" />
+
+              <!-- 5 Planilhas no Topo (aninhadas na nuvem e centralizadas) -->
+              <g transform="translate(0, 10)">
+                <!-- Planilha 1 -->
+                <g transform="translate(88,0)">
+                  <rect x="0" y="0" width="24" height="28" rx="3" fill="url(#gradSheetSmall)" />
+                  <path d="M 4 8 L 20 8 M 4 13 L 20 13 M 4 18 L 20 18 M 10 4 L 10 24" stroke="rgba(255,255,255,0.4)" stroke-width="1" />
+                </g>
+                <!-- Planilha 2 -->
+                <g transform="translate(128,0)">
+                  <rect x="0" y="0" width="24" height="28" rx="3" fill="url(#gradSheetSmall)" />
+                  <path d="M 4 8 L 20 8 M 4 13 L 20 13 M 4 18 L 20 18 M 10 4 L 10 24" stroke="rgba(255,255,255,0.4)" stroke-width="1" />
+                </g>
+                <!-- Planilha 3 -->
+                <g transform="translate(168,0)">
+                  <rect x="0" y="0" width="24" height="28" rx="3" fill="url(#gradSheetSmall)" />
+                  <path d="M 4 8 L 20 8 M 4 13 L 20 13 M 4 18 L 20 18 M 10 4 L 10 24" stroke="rgba(255,255,255,0.4)" stroke-width="1" />
+                </g>
+                <!-- Planilha 4 -->
+                <g transform="translate(208,0)">
+                  <rect x="0" y="0" width="24" height="28" rx="3" fill="url(#gradSheetSmall)" />
+                  <path d="M 4 8 L 20 8 M 4 13 L 20 13 M 4 18 L 20 18 M 10 4 L 10 24" stroke="rgba(255,255,255,0.4)" stroke-width="1" />
+                </g>
+                <!-- Planilha 5 -->
+                <g transform="translate(248,0)">
+                  <rect x="0" y="0" width="24" height="28" rx="3" fill="url(#gradSheetSmall)" />
+                  <path d="M 4 8 L 20 8 M 4 13 L 20 13 M 4 18 L 20 18 M 10 4 L 10 24" stroke="rgba(255,255,255,0.4)" stroke-width="1" />
+                </g>
+              </g>
+
+              <!-- 5 Celulares embaixo -->
+              <g transform="translate(30, 92)">
+                <!-- Celular 1 -->
+                <g transform="translate(0,0)">
+                  <rect x="0" y="0" width="20" height="34" rx="4" fill="url(#gradCelSmall)" stroke="rgba(255,255,255,0.1)" stroke-width="1" />
+                  <circle cx="10" cy="29" r="1.2" fill="#94a3b8" />
+                  <path d="M 10 4 L 10 4" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round" />
+                </g>
+                <!-- Celular 2 -->
+                <g transform="translate(65,0)">
+                  <rect x="0" y="0" width="20" height="34" rx="4" fill="url(#gradCelSmall)" stroke="rgba(255,255,255,0.1)" stroke-width="1" />
+                  <circle cx="10" cy="29" r="1.2" fill="#94a3b8" />
+                  <path d="M 10 4 L 10 4" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round" />
+                </g>
+                <!-- Celular 3 -->
+                <g transform="translate(130,0)">
+                  <rect x="0" y="0" width="20" height="34" rx="4" fill="url(#gradCelSmall)" stroke="rgba(255,255,255,0.1)" stroke-width="1" />
+                  <circle cx="10" cy="29" r="1.2" fill="#94a3b8" />
+                  <path d="M 10 4 L 10 4" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round" />
+                </g>
+                <!-- Celular 4 -->
+                <g transform="translate(195,0)">
+                  <rect x="0" y="0" width="20" height="34" rx="4" fill="url(#gradCelSmall)" stroke="rgba(255,255,255,0.1)" stroke-width="1" />
+                  <circle cx="10" cy="29" r="1.2" fill="#94a3b8" />
+                  <path d="M 10 4 L 10 4" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round" />
+                </g>
+                <!-- Celular 5 -->
+                <g transform="translate(260,0)">
+                  <rect x="0" y="0" width="20" height="34" rx="4" fill="url(#gradCelSmall)" stroke="rgba(255,255,255,0.1)" stroke-width="1" />
+                  <circle cx="10" cy="29" r="1.2" fill="#94a3b8" />
+                  <path d="M 10 4 L 10 4" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round" />
+                </g>
+              </g>
+
+              <!-- Linhas de Envio mais largas e nítidas ligando celulares às planilhas correspondentes e centralizadas -->
+              <path d="M 40 92 L 100 38" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="2.2" stroke-dasharray="3,3" marker-end="url(#arrowSmall)" />
+              <path d="M 105 92 L 140 38" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="2.2" stroke-dasharray="3,3" marker-end="url(#arrowSmall)" />
+              <path d="M 170 92 L 180 38" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="2.2" stroke-dasharray="3,3" marker-end="url(#arrowSmall)" />
+              <path d="M 235 92 L 220 38" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="2.2" stroke-dasharray="3,3" marker-end="url(#arrowSmall)" />
+              <path d="M 300 92 L 260 38" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="2.2" stroke-dasharray="3,3" marker-end="url(#arrowSmall)" />
+            </svg>
+          </div>
+
+          <!-- Ilustração SVG 1.2: O banco de dados interno do smartphone (Sem textos) -->
+          <div style="width: 100%; margin-bottom: 8px; box-sizing: border-box;">
+            <svg viewBox="0 0 360 90" width="100%" height="auto" style="background: rgba(0,0,0,0.2); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); padding: 8px; display: block;">
+              <defs>
+                <linearGradient id="gradCelBig" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#334155" />
+                  <stop offset="100%" stop-color="#0f172a" />
+                </linearGradient>
+                <linearGradient id="gradDB" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#007fff" />
+                  <stop offset="100%" stop-color="#002d62" />
+                </linearGradient>
+              </defs>
+
+              <!-- Celular Deitado para demonstrar a memória -->
+              <g transform="translate(10, 8)">
+                <rect x="0" y="0" width="140" height="72" rx="8" fill="url(#gradCelBig)" stroke="rgba(255,255,255,0.15)" stroke-width="1.5" />
+                <!-- Câmera do Celular -->
+                <circle cx="8" cy="36" r="3" fill="#1e293b" />
+                <!-- Tela Interna -->
+                <rect x="20" y="6" width="112" height="60" rx="4" fill="rgba(0,0,0,0.3)" />
+
+                <!-- Banco de Dados Interno (Cilindros) -->
+                <g transform="translate(56, 16)">
+                  <!-- Cilindro 3 -->
+                  <ellipse cx="20" cy="32" rx="14" ry="4" fill="#007fff" stroke="rgba(255,255,255,0.4)" stroke-width="0.75" />
+                  <path d="M 6 22 L 6 32 A 14 4 0 0 0 34 32 L 34 22" fill="#007fff" stroke="rgba(255,255,255,0.4)" stroke-width="0.75" />
+                  <!-- Cilindro 2 -->
+                  <ellipse cx="20" cy="22" rx="14" ry="4" fill="#005fcf" stroke="rgba(255,255,255,0.4)" stroke-width="0.75" />
+                  <path d="M 6 12 L 6 22 A 14 4 0 0 0 34 22 L 34 12" fill="#005fcf" stroke="rgba(255,255,255,0.4)" stroke-width="0.75" />
+                  <!-- Cilindro 1 -->
+                  <ellipse cx="20" cy="12" rx="14" ry="4" fill="#003faf" stroke="rgba(255,255,255,0.4)" stroke-width="0.75" />
+                </g>
+              </g>
+
+              <!-- Seta de fluxo de dados local -->
+              <path d="M 162 44 L 192 44" fill="none" stroke="#007fff" stroke-width="2" marker-end="url(#arrowSmall)" />
+
+              <!-- Bloco Ficha de Visitas no Celular (Skeleton Lines) -->
+              <g transform="translate(204, 8)">
+                <rect x="0" y="0" width="134" height="72" rx="6" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.08)" stroke-width="1" />
+                
+                <!-- Linhas de Skeleton Representando Fichas -->
+                <rect x="12" y="12" width="60" height="6" rx="1" fill="rgba(255,255,255,0.15)" />
+                
+                <rect x="12" y="26" width="110" height="8" rx="2" fill="rgba(0,127,255,0.15)" />
+                <rect x="20" y="29" width="80" height="2" rx="1" fill="rgba(255,255,255,0.2)" />
+
+                <rect x="12" y="42" width="110" height="8" rx="2" fill="rgba(0,127,255,0.15)" />
+                <rect x="20" y="45" width="70" height="2" rx="1" fill="rgba(255,255,255,0.2)" />
+              </g>
+            </svg>
+          </div>
+
+          <!-- Texto explicativo sob a Ilustração 2 -->
+          <p class="card-description" style="font-size: 0.72rem; line-height: 1.4; color: var(--cor-subtexto); margin-top: 4px; padding: 0 4px;">
+            Os dados de visitas e famílias são gravados com segurança na memória privada do seu smartphone (IndexedDB/localStorage), funcionando como um banco de dados local. Isso permite acesso instantâneo e seguro mesmo sem internet em áreas remotas.
           </p>
 
           <!-- Interativo A: Teste de Fala (Texto-para-Voz) -->
-          <div class="interactive-box">
+          <div class="interactive-box" style="margin-top: 10px;">
             <div class="interactive-box-title">
               <!-- Ícone SVG Material: Volume Up -->
               <svg viewBox="0 0 24 24" fill="currentColor">
                 <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
               </svg>
-              <span>Teste Prático: Ouvir Mensagem de Trânsito</span>
+              <span>Ouvir Alerta de Voz no Trânsito</span>
             </div>
             <p class="card-description" style="font-size: 0.7rem;">
-              Digite ou mantenha o exemplo e aperte o botão para ouvir o sistema ditar o alerta contextual (simula o vicentino dirigindo).
+              Digite e aperte o botão para ouvir o sistema ditar o alerta (simula o vicentino dirigindo).
             </p>
             <div class="input-row">
-              <input type="text" id="tts-input" value="Atenção vicentino! Você está chegando na casa da Família Silva. Lembrete: Levar cesta básica.">
+              <input type="text" id="tts-input" value="Atenção! Você está chegando na casa da Família Silva. Lembrete: Levar cesta básica.">
               <button class="icon-btn" onclick="speakText(event)" title="Ouvir texto">
                 <!-- Ícone SVG Material: Play Arrow -->
                 <svg viewBox="0 0 24 24" fill="currentColor">
@@ -465,10 +650,10 @@
               <svg viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
               </svg>
-              <span>Teste Prático: Digitar Falando (Relato de Visita)</span>
+              <span>Digitar Falando (Relato de Visita)</span>
             </div>
             <p class="card-description" style="font-size: 0.7rem;">
-              Clique no microfone, autorize o acesso se solicitado, fale o relato e assista a transcrição automática no campo.
+              Clique no microfone, fale o relato e assista a transcrição automática no campo.
             </p>
             <div class="input-row">
               <input type="text" id="stt-output" placeholder="O resultado de sua fala aparecerá aqui..." readonly>
@@ -501,17 +686,19 @@
         </div>
         <div class="card-body">
           <p class="card-description">
-            Os dados de cadastro e visitas das famílias são protegidos pela segurança corporativa da **Google** (Google Drive e Google Sheets), considerada uma das infraestruturas mais seguras do planeta.
-          </p>
-          <p class="card-description" style="color: #a7f3d0; font-weight: 500;">
-            <strong>O Conceito de Segurança Descentralizada (Compartimentada):</strong>
+            Os dados de cadastro e visitas das famílias são protegidos pela segurança do Google Drive e Google Sheets.
           </p>
           <p class="card-description">
-            Ao contrário de sistemas comerciais onde todas as informações do Brasil ficam salvas em um único servidor gigante (se invadido, vaza tudo), no SSVPweb cada **Conselho Central** possui seus arquivos independentes.
+            As planilhas de dados são descentralizadas. Cada Conselho Central tem seus arquivos de forma isolada. Se um acesso for comprometido por descuido, apenas os dados daquela conferência correm risco. As demais permanecem seguras.
           </p>
-          <p class="card-description" style="border-left: 3px solid var(--cor-audio); padding-left: 8px; font-style: italic;">
-            "Se as credenciais ou a senha de uma conferência vazarem ou forem comprometidas por descuido, **apenas os relatórios daquela conferência** correm risco. Todas as outras conferências da região e do país permanecem 100% protegidas e inacessíveis, pois estão armazenadas em planilhas totalmente distintas."
-          </p>
+
+          <!-- Retângulo de Ilustração 2 (Placeholder) -->
+          <div class="placeholder-illustration">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/>
+            </svg>
+            <span>[Ilustração: Compartimentação de Planilhas e Isolamento de Riscos]</span>
+          </div>
         </div>
       </div>
 
@@ -532,8 +719,16 @@
         </div>
         <div class="card-body">
           <p class="card-description">
-            A conta central **`ssvpweb@gmail.com`** funciona como um **Porteiro Blindado**. O aplicativo no celular do vicentino se comunica apenas com o Porteiro, ocultando o endereço real dos drives e planilhas secundárias.
+            A conta ssvpweb funciona como um porteiro. Ela oculta a ID e o link das planilhas das conferências, evitando que fiquem expostos no celular ou em redes públicas de internet.
           </p>
+
+          <!-- Retângulo de Ilustração 3 (Placeholder) -->
+          <div class="placeholder-illustration">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+            </svg>
+            <span>[Ilustração: O Porteiro Blindando a URL das Planilhas]</span>
+          </div>
 
           <!-- Simulador Comparativo Interativo -->
           <div class="interactive-box">
@@ -545,7 +740,7 @@
               <span>Simulador de Tráfego de Rede</span>
             </div>
             <p class="card-description" style="font-size: 0.7rem;">
-              Escolha uma opção de conexão abaixo para visualizar a simulação de tempo de resposta e a segurança da URL gerada.
+              Escolha uma opção de conexão abaixo para visualizar o tempo de resposta e a segurança da URL gerada.
             </p>
 
             <div class="sim-btn-group">
@@ -614,7 +809,7 @@
       if (event) event.stopPropagation();
       const text = document.getElementById('tts-input').value;
       if (!text) {
-        showToast("Por favor, digite um texto para ouvir.");
+        showToast("Por favor, digite um text para ouvir.");
         return;
       }
 
@@ -764,8 +959,8 @@
           <span style="color: #e2e8f0;">https://script.google.com/macros/s/</span><span class="vulnerable-highlight">AKfycbzDirectIDPlanilhaCentroMoema1234567</span><span style="color: #e2e8f0;">/exec?action=save&user=vicentino_jose</span>
           <br><br>
           <span style="color: #ff8a80; font-weight: bold;">⚠️ ANÁLISE DO COMPROMETIMENTO:</span><br>
-          A área destacada em vermelho tracejado contém o **ID único do Drive do Conselho Central**. 
-          Qualquer hacker monitorando uma rede Wi-Fi pública (como a da padaria ou do posto de combustível) consegue ler essa URL, descobrir a ID da planilha e forçar acessos diretos para extrair dados das famílias (Nome, CPF, Endereço).
+          A área destacada em vermelho tracejado contém o ID único do Drive do Conselho Central. 
+          Qualquer hacker monitorando uma rede Wi-Fi pública consegue ler essa URL, descobrir a ID da planilha e forçar acessos diretos para extrair dados das famílias (Nome, CPF, Endereço).
         `;
       } else {
         simLog.innerHTML = `
@@ -777,9 +972,9 @@
           <span style="color: #e2e8f0;">https://script.google.com/macros/s/</span><span class="secure-highlight">AKfycbRouterSeguroSSVPweb</span><span style="color: #e2e8f0;">/exec?id=</span><span style="color: #027fff; font-weight: bold;">1042</span><span style="color: #e2e8f0;">&action=save</span>
           <br><br>
           <span class="secure-highlight">🛡️ ANÁLISE DE BLINDAGEM:</span><br>
-          Na conexão roteada, a única URL que transita na rede pública aponta para o script central seguro do **ssvpweb**. 
-          O ID real da planilha foi mascarado pelo número de roteamento **1042**.<br>
-          Se o hacker capturar a requisição, ele **não saberá o ID real da planilha**, **não saberá qual conta a hospeda** e **não terá caminhos diretos de ataque** ao Drive do Conselho Central.
+          Na conexão roteada, a única URL que transita na rede pública aponta para o script central seguro do ssvpweb. 
+          O ID real da planilha foi mascarado pelo número de roteamento 1042.<br>
+          Se o hacker capturar a requisição, ele não saberá o ID real da planilha, não saberá qual conta a hospeda e não terá caminhos diretos de ataque ao Drive do Conselho Central.
         `;
       }
     }

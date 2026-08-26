@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Modelo de Teste Padronizado - SSVP</title>
+  <!-- CSS Compartilhado dos Testes -->
+  <link rel="stylesheet" href="testes.css">
+  <style>
+    /* =========================================================================
+       REGRAS CSS ESPECÍFICAS DESTE TESTE
+       Se o seu teste precisar de estilos exclusivos, escreva-os nesta tag.
+       ========================================================================= */
+  </style>
+</head>
+<body>
+
+  <!-- Barra de Ações do Topo -->
+  <div class="topo-acoes-teste">
+    <div class="teste-nome-arquivo" id="topoNomeArquivo"></div>
+    <div class="teste-versao-topo">
+      v1.0
+    </div>
+  </div>
+
+  <!-- Card Principal (Inicialmente Fechado) -->
+  <div class="card-principal" id="cardPrincipal">
+    <div class="cabecalho-principal" onclick="toggleCardPrincipal()">
+      <span class="titulo-principal">📊 Instruções & Informações do Teste</span>
+      <span class="seta-principal" id="setaPrincipal">+</span>
+    </div>
+    
+    <div class="conteudo-principal-wrapper">
+      <div class="conteudo-principal">
+        <div class="corpo-principal">
+          
+          <!-- SUB-CARD 1: Por que testar? -->
+          <div class="sub-card" id="subCardPorQue">
+            <div class="sub-card-header" onclick="toggleSubCard('subCardPorQue')">
+              <span>❓ Por que testar esta funcionalidade?</span>
+              <span class="sub-card-seta">+</span>
+            </div>
+            <div class="sub-card-content-wrapper">
+              <div class="sub-card-content">
+                <!-- ================================================================= -->
+                <!-- COLOQUE AQUI O TEXTO EXPLICATIVO (LINGUAGEM LEIGA / DE NEGÓCIO) -->
+                <!-- ================================================================= -->
+                Este teste serve para avaliar a utilidade da tela no dia a dia.
+                <ul>
+                  <li><strong>Valor Prático:</strong> Evita o uso de planilhas complexas locais que podem se perder facilmente.</li>
+                  <li><strong>Centralização:</strong> Garante que as informações estejam salvas de forma segura e direta na planilha compartilhada do Google Sheets.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUB-CARD 2: O que testar? -->
+          <div class="sub-card" id="subCardOQue">
+            <div class="sub-card-header" onclick="toggleSubCard('subCardOQue')">
+              <span>🔍 O que deve ser avaliado?</span>
+              <span class="sub-card-seta">+</span>
+            </div>
+            <div class="sub-card-content-wrapper">
+              <div class="sub-card-content">
+                <!-- ================================================================= -->
+                <!-- COLOQUE AQUI O TEXTO DO QUE ESTÁ SENDO AVALIADO (CRITÉRIOS)      -->
+                <!-- ================================================================= -->
+                Preste atenção nos seguintes pontos durante a simulação:
+                <ul>
+                  <li><strong>Sincronização:</strong> Se a gravação e leitura dos dados ocorrem sem mensagens de erro na tela.</li>
+                  <li><strong>Performance:</strong> Se a listagem atualiza de forma rápida e suave no celular.</li>
+                  <li><strong>Consistência:</strong> Se as edições e exclusões atualizam perfeitamente a listagem após a ação.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUB-CARD 3: Como testar? -->
+          <div class="sub-card" id="subCardComo">
+            <div class="sub-card-header" onclick="toggleSubCard('subCardComo')">
+              <span>📋 Passo a Passo para testar</span>
+              <span class="sub-card-seta">+</span>
+            </div>
+            <div class="sub-card-content-wrapper">
+              <div class="sub-card-content">
+                <!-- ================================================================= -->
+                <!-- COLOQUE AQUI O PASSO A PASSO DA SIMULAÇÃO (INSTRUÇÕES PRÁTICAS)  -->
+                <!-- ================================================================= -->
+                Siga estes passos simples para testar a funcionalidade:
+                <ol style="padding-left: 1.2rem; margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.4rem;">
+                  <li>Preencha o formulário na área de testes abaixo com dados fictícios.</li>
+                  <li>Clique no botão para registrar e observe se a pessoa aparece na tabela/lista.</li>
+                  <li>Clique em um registro na tabela para carregá-lo de volta no formulário, altere um campo e salve novamente.</li>
+                  <li>Clique em excluir um registro e confirme se ele desaparece da tela.</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Área reservada para o teste da funcionalidade em si -->
+  <main class="teste-container">
+    <p style="color: var(--ssvp-text-muted); font-weight: 500;">
+      [A funcionalidade do teste será renderizada nesta área]
+    </p>
+  </main>
+
+  <!-- JS Compartilhado dos Testes -->
+  <script src="testes.js"></script>
+  
+  <script>
+    /* =========================================================================
+       LÓGICA JAVASCRIPT ESPECÍFICA DESTE TESTE
+       Escreva aqui as funções exclusivas para a simulação/funcionalidade do teste.
+       ========================================================================= */
+  </script>
+</body>
+</html>
