@@ -254,22 +254,144 @@
       <div id="status-banner" class="status-banner"></div>
     </div>
 
-    <!-- Div principal onde os cartões de pastas serão injetados -->
+    <!-- Lista manual de links. Atualize ao criar, remover ou renomear testes. -->
     <div id="folders-container" class="flex-column" style="gap: 12px; display: flex; flex-direction: column;">
-      <div class="loading-state">
-        <div class="spinner"></div>
-        <span>Carregando diretórios de teste...</span>
+      <div class="folder-card active">
+        <div class="folder-header">Google Maps</div>
+        <div class="folder-content" style="max-height: none;">
+          <div class="files-list">
+            <a href="./google_maps/t1_lista_botoes.html" class="file-item">t1_lista_botoes.html</a>
+            <a href="./google_maps/t2_mapa_local.html" class="file-item">t2_mapa_local.html</a>
+            <a href="./google_maps/t3_mapa_leaflet_geral.html" class="file-item">t3_mapa_leaflet_geral.html</a>
+            <a href="./google_maps/t4_dropdown_selecao_enderecos.html" class="file-item">t4_dropdown_selecao_enderecos.html</a>
+            <a href="./google_maps/t4.1_voz_comandos_mapa.html" class="file-item">t4.1_voz_comandos_mapa.html</a>
+            <a href="./google_maps/t4.2_voz_feedback_mapa.html" class="file-item">t4.2_voz_feedback_mapa.html</a>
+            <a href="./google_maps/t5_simulador_visita_basico.html" class="file-item">t5_simulador_visita_basico.html</a>
+            <a href="./google_maps/t5.1_simulador_visita_voz_referencias.html" class="file-item">t5.1_simulador_visita_voz_referencias.html</a>
+          </div>
+        </div>
+      </div>
+      <div class="folder-card active">
+        <div class="folder-header">Google Sheets</div>
+        <div class="folder-content" style="max-height: none;"><div class="files-list">
+          <a href="./google_sheets/LEIA_ME.html" class="file-item">LEIA_ME.html</a>
+          <a href="./google_sheets/t1_sheets_crud_pessoas.html" class="file-item">t1_sheets_crud_pessoas.html</a>
+        </div></div>
+      </div>
+      <div class="folder-card active">
+        <div class="folder-header">Login</div>
+        <div class="folder-content" style="max-height: none;"><div class="files-list">
+          <a href="./login/t1_pin.html" class="file-item">t1_pin.html</a>
+          <a href="./login/t2_senha.html" class="file-item">t2_senha.html</a>
+        </div></div>
+      </div>
+      <div class="folder-card active">
+        <div class="folder-header">Open Street Maps</div>
+        <div class="folder-content" style="max-height: none;"><div class="files-list">
+          <a href="./open_street_maps/t1_osm_busca_raio.html" class="file-item">t1_osm_busca_raio.html</a>
+        </div></div>
+      </div>
+      <div class="folder-card active">
+        <div class="folder-header">Simuladores</div>
+        <div class="folder-content" style="max-height: none;"><div class="files-list">
+          <a href="./simuladores/t1_sincronizador_visitas_local_nuvem.html" class="file-item">t1_sincronizador_visitas_local_nuvem.html</a>
+          <a href="./simuladores/t2_sincronizador_visitas_local_nuvem.html" class="file-item">t2_sincronizador_visitas_local_nuvem.html</a>
+        </div></div>
+      </div>
+      <div class="folder-card active">
+        <div class="folder-header">Sincronização</div>
+        <div class="folder-content" style="max-height: none;"><div class="files-list">
+          <a href="./sincronizacao/t1_fotos.html" class="file-item">t1_fotos.html</a>
+          <a href="./sincronizacao/t2_problemas.html" class="file-item">t2_problemas.html</a>
+          <a href="./sincronizacao/t2.1_problemas.html" class="file-item">t2.1_problemas.html</a>
+        </div></div>
+      </div>
+      <div class="folder-card active">
+        <div class="folder-header">SPA</div>
+        <div class="folder-content" style="max-height: none;"><div class="files-list">
+          <a href="./spa/index.html" class="file-item">index.html</a>
+          <a href="./spa/t1_login_spa.html" class="file-item">t1_login_spa.html</a>
+          <a href="./spa/LEIA_ME.html" class="file-item">LEIA_ME.html</a>
+        </div></div>
+      </div>
+      <div class="folder-card active">
+        <div class="folder-header">Voz</div>
+        <div class="folder-content" style="max-height: none;"><div class="files-list">
+          <a href="./voz/LEIA_ME.html" class="file-item">LEIA_ME.html</a>
+          <a href="./voz/t1_gravacao_audio_simples.html" class="file-item">t1_gravacao_audio_simples.html</a>
+          <a href="./voz/t1_reconhecimento.html" class="file-item">t1_reconhecimento.html</a>
+          <a href="./voz/t2_comandos_de_voz.html" class="file-item">t2_comandos_de_voz.html</a>
+        </div></div>
+      </div>
+      <div class="folder-card active">
+        <div class="folder-header">UX / App</div>
+        <div class="folder-content" style="max-height: none;"><div class="files-list">
+          <a href="./ux/app/t1_layout_basico.html" class="file-item">t1_layout_basico.html</a>
+          <a href="./ux/app/t2_botoes_de_canto_inf.html" class="file-item">t2_botoes_de_canto_inf.html</a>
+          <a href="./ux/app/t3_configuracoes.html" class="file-item">t3_configuracoes.html</a>
+          <a href="./ux/app/t4_interface_com_voz.html" class="file-item">t4_interface_com_voz.html</a>
+          <a href="./ux/app/t5_mensagens.html" class="file-item">t5_mensagens.html</a>
+          <a href="./ux/app/t6_login.html" class="file-item">t6_login.html</a>
+        </div></div>
+      </div>
+      <div class="folder-card active">
+        <div class="folder-header">UX / Barra inferior</div>
+        <div class="folder-content" style="max-height: none;"><div class="files-list">
+          <a href="./ux/barra_inferior/index.html" class="file-item">index.html</a>
+          <a href="./ux/barra_inferior/t1_barra_basica.html" class="file-item">t1_barra_basica.html</a>
+          <a href="./ux/barra_inferior/t2_barra_acessibilidade.html" class="file-item">t2_barra_acessibilidade.html</a>
+          <a href="./ux/barra_inferior/t2.1_barra_layout_celular.html" class="file-item">t2.1_barra_layout_celular.html</a>
+          <a href="./ux/barra_inferior/t2.2_barra_com_tema_escuro.html" class="file-item">t2.2_barra_com_tema_escuro.html</a>
+          <a href="./ux/barra_inferior/t2.3_barra_escala_fontes.html" class="file-item">t2.3_barra_escala_fontes.html</a>
+          <a href="./ux/barra_inferior/t2.4_barra_entrada_por_voz.html" class="file-item">t2.4_barra_entrada_por_voz.html</a>
+          <a href="./ux/barra_inferior/t2.5_barra_cabecalho_compacto.html" class="file-item">t2.5_barra_cabecalho_compacto.html</a>
+          <a href="./ux/barra_inferior/t2.6_barra_voz_e_bordas_intensas.html" class="file-item">t2.6_barra_voz_e_bordas_intensas.html</a>
+          <a href="./ux/barra_inferior/t2.7_botoes_iguais_card_expansivo.html" class="file-item">t2.7_botoes_iguais_card_expansivo.html</a>
+        </div></div>
+      </div>
+      <div class="folder-card active">
+        <div class="folder-header">UX / Cards expandíveis</div>
+        <div class="folder-content" style="max-height: none;"><div class="files-list">
+          <a href="./ux/cards_expand/t1_cards_familia_simples.html" class="file-item">t1_cards_familia_simples.html</a>
+          <a href="./ux/cards_expand/t1.1_cards_com_membros.html" class="file-item">t1.1_cards_com_membros.html</a>
+          <a href="./ux/cards_expand/t1.2_cards_com_animacao.html" class="file-item">t1.2_cards_com_animacao.html</a>
+          <a href="./ux/cards_expand/t1.3_cards_com_cores.html" class="file-item">t1.3_cards_com_cores.html</a>
+          <a href="./ux/cards_expand/t1.4_cards_com_botoes.html" class="file-item">t1.4_cards_com_botoes.html</a>
+          <a href="./ux/cards_expand/t2_cards_totalmente_responsivos.html" class="file-item">t2_cards_totalmente_responsivos.html</a>
+        </div></div>
+      </div>
+      <div class="folder-card active">
+        <div class="folder-header">UX / Cards slide</div>
+        <div class="folder-content" style="max-height: none;"><div class="files-list">
+          <a href="./ux/cards_slide/t1_slide_visitas_simples.html" class="file-item">t1_slide_visitas_simples.html</a>
+          <a href="./ux/cards_slide/t2_slide_grade_2d.html" class="file-item">t2_slide_grade_2d.html</a>
+          <a href="./ux/cards_slide/t2.1_slide_grade_invertida.html" class="file-item">t2.1_slide_grade_invertida.html</a>
+          <a href="./ux/cards_slide/t2.2_slide_com_mapa.html" class="file-item">t2.2_slide_com_mapa.html</a>
+          <a href="./ux/cards_slide/t2.3_slide_com_fotos.html" class="file-item">t2.3_slide_com_fotos.html</a>
+        </div></div>
+      </div>
+      <div class="folder-card active">
+        <div class="folder-header">UX / Voz com toque</div>
+        <div class="folder-content" style="max-height: none;"><div class="files-list">
+          <a href="./ux/voz_com_toque/t1_captura_voz_simples.html" class="file-item">t1_captura_voz_simples.html</a>
+          <a href="./ux/voz_com_toque/t2_voz_ativada_por_clique.html" class="file-item">t2_voz_ativada_por_clique.html</a>
+          <a href="./ux/voz_com_toque/t2.1_voz_com_deteccao_silencio.html" class="file-item">t2.1_voz_com_deteccao_silencio.html</a>
+          <a href="./ux/voz_com_toque/t2.2_voz_com_feedback_visual.html" class="file-item">t2.2_voz_com_feedback_visual.html</a>
+          <a href="./ux/voz_com_toque/t2.3_voz_com_botoes_grandes.html" class="file-item">t2.3_voz_com_botoes_grandes.html</a>
+          <a href="./ux/voz_com_toque/t2.4_voz_com_toque_calibrado.html" class="file-item">t2.4_voz_com_toque_calibrado.html</a>
+        </div></div>
       </div>
     </div>
   </div>
 
+  <!-- O índice usa somente os links HTML acima; não depende de JSON ou API. -->
   <script>
     // Configurações do repositório
     const user = 'ssvpweb';
     const repo = 'ssvpweb.github.io';
     const baseFolder = 'testes';
 
-    // Banco de Dados Local Estático de Redundância (fallback completo e sincronizado)
+    // Lista manual de testes. Atualize esta lista ao criar ou renomear arquivos.
     const fallbackTestes = [
       {
         folder: "google_login",
@@ -399,7 +521,19 @@
 
     async function loadTestFiles() {
       const container = document.getElementById('folders-container');
-      const banner = document.getElementById('status-banner');
+      const results = fallbackTestes.map(item => {
+        const localPath = item.folder.replace(/ \/ /g, '/');
+        return {
+          folder: item.folder,
+          files: item.files.map(file => ({
+            name: file.name,
+            link: `./${localPath}/${file.name}`
+          }))
+        };
+      });
+
+      renderFolders(results);
+      return;
 
       try {
         const manifestResponse = await fetch('./testes.json', { cache: 'no-store' });
@@ -602,7 +736,6 @@
       }
     }
 
-    loadTestFiles();
   </script>
 
 </body>
