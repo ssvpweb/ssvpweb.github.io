@@ -404,7 +404,15 @@
       try {
         const manifestResponse = await fetch('./testes.json', { cache: 'no-store' });
         if (manifestResponse.ok) {
-          renderFolders(await manifestResponse.json());
+          const manifest = await manifestResponse.json();
+          const results = manifest.map(item => ({
+            folder: item.folder,
+            files: item.files.map(file => ({
+              name: file.name,
+              link: `./${item.folder}/${file.name}`
+            }))
+          }));
+          renderFolders(results);
           return;
         }
 

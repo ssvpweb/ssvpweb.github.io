@@ -9,6 +9,7 @@ Get-ChildItem $testsRoot -Recurse -File -Filter '*.html' |
   Where-Object {
     $_.Name -ne 'index.html' -and
     $_.DirectoryName -ne $testsRoot -and
+    $_.DirectoryName -notlike '*\_infra_testes' -and
     $_.DirectoryName -notlike '*\_infra_testes\*'
   } |
   ForEach-Object {
