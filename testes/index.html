@@ -520,19 +520,6 @@
 
     async function loadTestFiles() {
       const container = document.getElementById('folders-container');
-      const results = fallbackTestes.map(item => {
-        const localPath = item.folder.replace(/ \/ /g, '/');
-        return {
-          folder: item.folder,
-          files: item.files.map(file => ({
-            name: file.name,
-            link: `./${localPath}/${file.name}`
-          }))
-        };
-      });
-
-      renderFolders(results);
-      return;
 
       try {
         const manifestResponse = await fetch('./testes.json', { cache: 'no-store' });
@@ -756,6 +743,8 @@
         });
       }
     });
+
+    loadTestFiles();
 
   </script>
 
