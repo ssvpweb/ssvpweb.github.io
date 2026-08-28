@@ -1,337 +1,337 @@
 [
-  {
-    "folder": "_infra_testes",
-    "files": [
-      {
-        "name": "teste_padrao.html"
-      }
-    ]
-  },
-  {
-    "folder": "construtor_de_comandos/fase1",
-    "files": [
-      {
-        "name": "t1_construtor.html"
-      },
-      {
-        "name": "t1.10_construtor.html"
-      },
-      {
-        "name": "t1.11_construtor.html"
-      },
-      {
-        "name": "t1.2_construtor.html"
-      },
-      {
-        "name": "t1.3_construtor.html"
-      },
-      {
-        "name": "t1.4_construtor.html"
-      },
-      {
-        "name": "t1.5_construtor.html"
-      },
-      {
-        "name": "t1.6_construtor.html"
-      },
-      {
-        "name": "t1.7_construtor.html"
-      },
-      {
-        "name": "t1.8_construtor.html"
-      },
-      {
-        "name": "t1.9_construtor.html"
-      }
-    ]
-  },
-  {
-    "folder": "google_login",
-    "files": [
-      {
-        "name": "t1_google_login_autenticacao.html"
-      }
-    ]
-  },
-  {
-    "folder": "google_maps",
-    "files": [
-      {
-        "name": "t1_lista_botoes.html"
-      },
-      {
-        "name": "t2_mapa_local.html"
-      },
-      {
-        "name": "t3_mapa_leaflet_geral.html"
-      },
-      {
-        "name": "t4_dropdown_selecao_enderecos.html"
-      },
-      {
-        "name": "t4.1_voz_comandos_mapa.html"
-      },
-      {
-        "name": "t4.2_voz_feedback_mapa.html"
-      },
-      {
-        "name": "t5_simulador_visita_basico.html"
-      },
-      {
-        "name": "t5.1_simulador_visita_voz_referencias.html"
-      }
-    ]
-  },
-  {
-    "folder": "google_sheets",
-    "files": [
-      {
-        "name": "t1_sheets_crud_pessoas.html"
-      }
-    ]
-  },
-  {
-    "folder": "internet",
-    "files": [
-      {
-        "name": "t1_sem_internet.html"
-      },
-      {
-        "name": "t2_roteador.html"
-      },
-      {
-        "name": "t3_roteador.html"
-      },
-      {
-        "name": "t4_roteador.html"
-      },
-      {
-        "name": "t4.1_roteador.html"
-      },
-      {
-        "name": "t4.2_roteador.html"
-      },
-      {
-        "name": "t4.3_roteador.html"
-      },
-      {
-        "name": "t4.4_roteador.html"
-      },
-      {
-        "name": "t5_roteador.html"
-      },
-      {
-        "name": "t6_roteador.html"
-      }
-    ]
-  },
-  {
-    "folder": "login",
-    "files": [
-      {
-        "name": "t1_pin.html"
-      },
-      {
-        "name": "t2_senha.html"
-      }
-    ]
-  },
-  {
-    "folder": "open_street_maps",
-    "files": [
-      {
-        "name": "t1_osm_busca_raio.html"
-      }
-    ]
-  },
-  {
-    "folder": "pastoral_de_rua",
-    "files": [
-      {
-        "name": "relato.html"
-      }
-    ]
-  },
-  {
-    "folder": "simuladores",
-    "files": [
-      {
-        "name": "t1_sincronizador_visitas_local_nuvem.html"
-      },
-      {
-        "name": "t2_sincronizador_visitas_local_nuvem.html"
-      }
-    ]
-  },
-  {
-    "folder": "sincronizacao",
-    "files": [
-      {
-        "name": "t1_fotos.html"
-      },
-      {
-        "name": "t2_problemas.html"
-      },
-      {
-        "name": "t2.1_problemas.html"
-      }
-    ]
-  },
-  {
-    "folder": "spa",
-    "files": [
-      {
-        "name": "LEIA_ME.html"
-      },
-      {
-        "name": "t1_login_spa.html"
-      }
-    ]
-  },
-  {
-    "folder": "UX/app",
-    "files": [
-      {
-        "name": "t1_layout_basico.html"
-      },
-      {
-        "name": "t2_botoes_de_canto_inf.html"
-      },
-      {
-        "name": "t3_configuracoes.html"
-      },
-      {
-        "name": "t4_interface_com_voz.html"
-      },
-      {
-        "name": "t5_mensagens.html"
-      },
-      {
-        "name": "t6_login.html"
-      }
-    ]
-  },
-  {
-    "folder": "UX/barra_inferior",
-    "files": [
-      {
-        "name": "t1_barra_basica.html"
-      },
-      {
-        "name": "t2_barra_acessibilidade.html"
-      },
-      {
-        "name": "t2.1_barra_layout_celular.html"
-      },
-      {
-        "name": "t2.2_barra_com_tema_escuro.html"
-      },
-      {
-        "name": "t2.3_barra_escala_fontes.html"
-      },
-      {
-        "name": "t2.4_barra_entrada_por_voz.html"
-      },
-      {
-        "name": "t2.5_barra_cabecalho_compacto.html"
-      },
-      {
-        "name": "t2.6_barra_voz_e_bordas_intensas.html"
-      },
-      {
-        "name": "t2.7_botoes_iguais_card_expansivo.html"
-      }
-    ]
-  },
-  {
-    "folder": "UX/cards_expand",
-    "files": [
-      {
-        "name": "t1_cards_familia_simples.html"
-      },
-      {
-        "name": "t1.1_cards_com_membros.html"
-      },
-      {
-        "name": "t1.2_cards_com_animacao.html"
-      },
-      {
-        "name": "t1.3_cards_com_cores.html"
-      },
-      {
-        "name": "t1.4_cards_com_botoes.html"
-      },
-      {
-        "name": "t2_cards_totalmente_responsivos.html"
-      }
-    ]
-  },
-  {
-    "folder": "UX/cards_slide",
-    "files": [
-      {
-        "name": "t1_slide_visitas_simples.html"
-      },
-      {
-        "name": "t2_slide_grade_2d.html"
-      },
-      {
-        "name": "t2.1_slide_grade_invertida.html"
-      },
-      {
-        "name": "t2.2_slide_com_mapa.html"
-      },
-      {
-        "name": "t2.3_slide_com_fotos.html"
-      }
-    ]
-  },
-  {
-    "folder": "UX/padroes",
-    "files": [
-      {
-        "name": "toque_segurar.html"
-      }
-    ]
-  },
-  {
-    "folder": "UX/voz_com_toque",
-    "files": [
-      {
-        "name": "t1_captura_voz_simples.html"
-      },
-      {
-        "name": "t2_voz_ativada_por_clique.html"
-      },
-      {
-        "name": "t2.1_voz_com_deteccao_silencio.html"
-      },
-      {
-        "name": "t2.2_voz_com_feedback_visual.html"
-      },
-      {
-        "name": "t2.3_voz_com_botoes_grandes.html"
-      },
-      {
-        "name": "t2.4_voz_com_toque_calibrado.html"
-      }
-    ]
-  },
-  {
-    "folder": "voz",
-    "files": [
-      {
-        "name": "LEIA_ME.html"
-      },
-      {
-        "name": "t1_gravacao_audio_simples.html"
-      },
-      {
-        "name": "t1_reconhecimento.html"
-      },
-      {
-        "name": "t2_comandos_de_voz.html"
-      }
-    ]
-  }
+    {
+        "folder":  "construtor_de_comandos/fase1",
+        "files":  [
+                      {
+                          "name":  "t1.7_construtor.html"
+                      },
+                      {
+                          "name":  "t1.6_construtor.html"
+                      },
+                      {
+                          "name":  "t1.8_construtor.html"
+                      },
+                      {
+                          "name":  "t1_construtor.html"
+                      },
+                      {
+                          "name":  "t1.9_construtor.html"
+                      },
+                      {
+                          "name":  "t1.5_construtor.html"
+                      },
+                      {
+                          "name":  "t1.11_construtor.html"
+                      },
+                      {
+                          "name":  "t1.10_construtor.html"
+                      },
+                      {
+                          "name":  "t1.2_construtor.html"
+                      },
+                      {
+                          "name":  "t1.4_construtor.html"
+                      },
+                      {
+                          "name":  "t1.3_construtor.html"
+                      }
+                  ]
+    },
+    {
+        "folder":  "google_login",
+        "files":  [
+                      {
+                          "name":  "t1_google_login_autenticacao.html"
+                      }
+                  ]
+    },
+    {
+        "folder":  "google_maps",
+        "files":  [
+                      {
+                          "name":  "t4_dropdown_selecao_enderecos.html"
+                      },
+                      {
+                          "name":  "t4.2_voz_feedback_mapa.html"
+                      },
+                      {
+                          "name":  "t5_simulador_visita_basico.html"
+                      },
+                      {
+                          "name":  "t5.1_simulador_visita_voz_referencias.html"
+                      },
+                      {
+                          "name":  "t2_mapa_local.html"
+                      },
+                      {
+                          "name":  "t1_lista_botoes.html"
+                      },
+                      {
+                          "name":  "t4.1_voz_comandos_mapa.html"
+                      },
+                      {
+                          "name":  "t3_mapa_leaflet_geral.html"
+                      }
+                  ]
+    },
+    {
+        "folder":  "google_sheets",
+        "files":  [
+                      {
+                          "name":  "t1_sheets_crud_pessoas.html"
+                      }
+                  ]
+    },
+    {
+        "folder":  "internet",
+        "files":  [
+                      {
+                          "name":  "t4.4_roteador.html"
+                      },
+                      {
+                          "name":  "t4.3_roteador.html"
+                      },
+                      {
+                          "name":  "t4_roteador.html"
+                      },
+                      {
+                          "name":  "t6_roteador.html"
+                      },
+                      {
+                          "name":  "t5_roteador.html"
+                      },
+                      {
+                          "name":  "t2_roteador.html"
+                      },
+                      {
+                          "name":  "t1_sem_internet.html"
+                      },
+                      {
+                          "name":  "t3_roteador.html"
+                      },
+                      {
+                          "name":  "t4.2_roteador.html"
+                      },
+                      {
+                          "name":  "t4.1_roteador.html"
+                      }
+                  ]
+    },
+    {
+        "folder":  "login",
+        "files":  [
+                      {
+                          "name":  "t2_senha.html"
+                      },
+                      {
+                          "name":  "t1_pin.html"
+                      }
+                  ]
+    },
+    {
+        "folder":  "open_street_maps",
+        "files":  [
+                      {
+                          "name":  "t1_osm_busca_raio.html"
+                      }
+                  ]
+    },
+    {
+        "folder":  "pastoral_de_rua",
+        "files":  [
+                      {
+                          "name":  "relato.html"
+                      }
+                  ]
+    },
+    {
+        "folder":  "rotas",
+        "files":  [
+                      {
+                          "name":  "t1_gmaps_waze.html"
+                      }
+                  ]
+    },
+    {
+        "folder":  "simuladores",
+        "files":  [
+                      {
+                          "name":  "t2_sincronizador_visitas_local_nuvem.html"
+                      },
+                      {
+                          "name":  "t1_sincronizador_visitas_local_nuvem.html"
+                      }
+                  ]
+    },
+    {
+        "folder":  "sincronizacao",
+        "files":  [
+                      {
+                          "name":  "t2_problemas.html"
+                      },
+                      {
+                          "name":  "t2.1_problemas.html"
+                      },
+                      {
+                          "name":  "t1_fotos.html"
+                      }
+                  ]
+    },
+    {
+        "folder":  "spa",
+        "files":  [
+                      {
+                          "name":  "t1_login_spa.html"
+                      },
+                      {
+                          "name":  "LEIA_ME.html"
+                      }
+                  ]
+    },
+    {
+        "folder":  "ux/app",
+        "files":  [
+                      {
+                          "name":  "t4_interface_com_voz.html"
+                      },
+                      {
+                          "name":  "t5_mensagens.html"
+                      },
+                      {
+                          "name":  "t6_login.html"
+                      },
+                      {
+                          "name":  "t1_layout_basico.html"
+                      },
+                      {
+                          "name":  "t2_botoes_de_canto_inf.html"
+                      },
+                      {
+                          "name":  "t3_configuracoes.html"
+                      }
+                  ]
+    },
+    {
+        "folder":  "ux/barra_inferior",
+        "files":  [
+                      {
+                          "name":  "t2.6_barra_voz_e_bordas_intensas.html"
+                      },
+                      {
+                          "name":  "t2.5_barra_cabecalho_compacto.html"
+                      },
+                      {
+                          "name":  "t2_barra_acessibilidade.html"
+                      },
+                      {
+                          "name":  "t2.7_botoes_iguais_card_expansivo.html"
+                      },
+                      {
+                          "name":  "t2.4_barra_entrada_por_voz.html"
+                      },
+                      {
+                          "name":  "t2.1_barra_layout_celular.html"
+                      },
+                      {
+                          "name":  "t1_barra_basica.html"
+                      },
+                      {
+                          "name":  "t2.3_barra_escala_fontes.html"
+                      },
+                      {
+                          "name":  "t2.2_barra_com_tema_escuro.html"
+                      }
+                  ]
+    },
+    {
+        "folder":  "ux/cards_expand",
+        "files":  [
+                      {
+                          "name":  "t1.4_cards_com_botoes.html"
+                      },
+                      {
+                          "name":  "t1_cards_familia_simples.html"
+                      },
+                      {
+                          "name":  "t2_cards_totalmente_responsivos.html"
+                      },
+                      {
+                          "name":  "t1.1_cards_com_membros.html"
+                      },
+                      {
+                          "name":  "t1.2_cards_com_animacao.html"
+                      },
+                      {
+                          "name":  "t1.3_cards_com_cores.html"
+                      }
+                  ]
+    },
+    {
+        "folder":  "ux/cards_slide",
+        "files":  [
+                      {
+                          "name":  "t2.3_slide_com_fotos.html"
+                      },
+                      {
+                          "name":  "t2_slide_grade_2d.html"
+                      },
+                      {
+                          "name":  "t2.2_slide_com_mapa.html"
+                      },
+                      {
+                          "name":  "t1_slide_visitas_simples.html"
+                      },
+                      {
+                          "name":  "t2.1_slide_grade_invertida.html"
+                      }
+                  ]
+    },
+    {
+        "folder":  "ux/padroes",
+        "files":  [
+                      {
+                          "name":  "toque_segurar.html"
+                      }
+                  ]
+    },
+    {
+        "folder":  "ux/voz_com_toque",
+        "files":  [
+                      {
+                          "name":  "t2.3_voz_com_botoes_grandes.html"
+                      },
+                      {
+                          "name":  "t2.4_voz_com_toque_calibrado.html"
+                      },
+                      {
+                          "name":  "t2_voz_ativada_por_clique.html"
+                      },
+                      {
+                          "name":  "t1_captura_voz_simples.html"
+                      },
+                      {
+                          "name":  "t2.1_voz_com_deteccao_silencio.html"
+                      },
+                      {
+                          "name":  "t2.2_voz_com_feedback_visual.html"
+                      }
+                  ]
+    },
+    {
+        "folder":  "voz",
+        "files":  [
+                      {
+                          "name":  "t1_reconhecimento.html"
+                      },
+                      {
+                          "name":  "t2_comandos_de_voz.html"
+                      },
+                      {
+                          "name":  "LEIA_ME.html"
+                      },
+                      {
+                          "name":  "t1_gravacao_audio_simples.html"
+                      }
+                  ]
+    }
 ]
