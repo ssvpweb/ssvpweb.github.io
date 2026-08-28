@@ -1,13 +1,5 @@
 [
   {
-    "folder": "_infra_testes",
-    "files": [
-      {
-        "name": "teste_padrao.html"
-      }
-    ]
-  },
-  {
     "folder": "construtor_de_comandos/fase1",
     "files": [
       {

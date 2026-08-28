@@ -562,6 +562,7 @@
             item.path.startsWith(testsPrefix) &&
             item.path.endsWith('.html') &&
             !(item.path === `${testsPrefix}index.html`) &&
+            !item.path.substring(testsPrefix.length).startsWith('_infra_testes/') &&
             item.path.substring(testsPrefix.length).includes('/');
         });
 
