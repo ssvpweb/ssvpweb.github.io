@@ -86,9 +86,6 @@
     "folder": "google_sheets",
     "files": [
       {
-        "name": "LEIA_ME.html"
-      },
-      {
         "name": "t1_sheets_crud_pessoas.html"
       }
     ]
