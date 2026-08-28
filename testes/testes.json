@@ -8,6 +8,14 @@
     ]
   },
   {
+    "folder": "construtor_de_comandos",
+    "files": [
+      {
+        "name": "t2_app_construtor.html"
+      }
+    ]
+  },
+  {
     "folder": "construtor_de_comandos/fase1",
     "files": [
       {
