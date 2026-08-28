@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Laboratório de Testes SSVP</title>
+  <title>Testes</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -248,7 +248,7 @@
 
   <div class="container">
     <div class="header">
-      <h1>Laboratório de Testes SSVP</h1>
+      <h1>Testes</h1>
       <p style="margin-top: 4px; font-size: 0.8rem; opacity: 0.8;">Os dados usados são fictícios e destinados apenas a
         fins de teste.</p>
       <div id="status-banner" class="status-banner"></div>
@@ -734,6 +734,28 @@
         if (chevron) chevron.innerText = '−';
       }
     }
+
+    // Liga os cartões definidos manualmente ao controle de expansão.
+    document.querySelectorAll('.folder-card').forEach((card, index) => {
+      const header = card.querySelector('.folder-header');
+      const content = card.querySelector('.folder-content');
+
+      card.id = `folder-card-${index}`;
+      if (content) {
+        content.id = `folder-content-${index}`;
+      }
+      if (header) {
+        header.setAttribute('role', 'button');
+        header.setAttribute('tabindex', '0');
+        header.addEventListener('click', () => toggleFolder(index));
+        header.addEventListener('keydown', event => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            toggleFolder(index);
+          }
+        });
+      }
+    });
 
   </script>
 
