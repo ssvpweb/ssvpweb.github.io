@@ -205,7 +205,7 @@
     ]
   },
   {
-    "folder": "ux/app",
+    "folder": "UX/app",
     "files": [
       {
         "name": "t1_layout_basico.html"
