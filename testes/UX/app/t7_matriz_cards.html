@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>T7 - Matriz de Cards</title>
+  <style>
+    :root {
+      --navy: #002d62;
+      --navy-2: #0f3a6b;
+      --blue: #007fff;
+      --red: #d32f2f;
+      --green: #10b981;
+      --amber: #f59e0b;
+      --bg: #f4f7fb;
+      --panel: #ffffff;
+      --line: #dfe7f1;
+      --text: #13263f;
+      --muted: #5f6f86;
+      --shadow: 0 10px 24px rgba(0, 45, 98, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      height: 100%;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      padding: 18px;
+    }
+
+    .app {
+      width: min(1100px, 100%);
+      min-height: 100%;
+      background: transparent;
+    }
+
+    .topbar {
+      background: linear-gradient(135deg, var(--navy), var(--navy-2));
+      color: white;
+      padding: 14px 18px 12px;
+      border-radius: 18px 18px 0 0;
+      box-shadow: var(--shadow);
+    }
+
+    .breadcrumb {
+      font-size: 0.72rem;
+      opacity: 0.8;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .title-row h1 {
+      font-size: clamp(1.1rem, 2vw, 1.6rem);
+      margin: 0;
+    }
+
+    .pill {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.15);
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+
+    .filters {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 12px 10px 10px;
+      background: rgba(255,255,255,0.6);
+      border-bottom: 1px solid var(--line);
+      scrollbar-width: none;
+    }
+
+    .filters::-webkit-scrollbar { display: none; }
+
+    .filter {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .filter.active {
+      background: var(--navy);
+      border-color: var(--navy);
+      color: white;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      padding: 18px;
+      background: rgba(255,255,255,0.35);
+      border-radius: 0 0 18px 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: 0 8px 18px rgba(15, 58, 107, 0.04);
+      padding: 14px;
+      min-height: 180px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 26px rgba(15, 58, 107, 0.08);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: rgba(0, 127, 255, 0.12);
+      color: var(--navy);
+      font-size: 0.8rem;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .card-title {
+      flex: 1;
+      min-width: 0;
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .status-tag {
+      border-radius: 999px;
+      font-size: 0.66rem;
+      font-weight: 800;
+      padding: 6px 8px;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .status-agendada { background: rgba(0,127,255,0.12); color: var(--navy); }
+    .status-em-rota { background: rgba(245,158,11,0.15); color: #9b5d00; }
+    .status-concluida { background: rgba(16,185,129,0.14); color: #0c8a62; }
+    .status-ativa { background: rgba(0,127,255,0.12); color: var(--navy); }
+    .status-disponivel { background: rgba(16,185,129,0.14); color: #0c8a62; }
+    .status-em-trânsito { background: rgba(245,158,11,0.15); color: #9b5d00; }
+    .status-prioritaria { background: rgba(211,47,47,0.12); color: var(--red); }
+    .status-nova { background: rgba(0,127,255,0.12); color: var(--navy); }
+    .status-em-acompanhamento { background: rgba(16,185,129,0.12); color: #0f7d5c; }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 0.76rem;
+      color: var(--muted);
+    }
+
+    .meta-item {
+      background: #f4f7fb;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 6px 8px;
+    }
+
+    .card-body {
+      display: grid;
+      gap: 8px;
+      font-size: 0.82rem;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .label {
+      color: var(--muted);
+      font-weight: 700;
+      margin-right: 4px;
+    }
+
+    .list {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      display: grid;
+      gap: 4px;
+      font-size: 0.76rem;
+    }
+
+    .empty-state {
+      display: none;
+      padding: 28px 18px;
+      text-align: center;
+      color: var(--muted);
+      background: rgba(255,255,255,0.7);
+      border: 1px dashed var(--line);
+      border-radius: 16px;
+      margin: 18px;
+    }
+
+    @media (max-width: 720px) {
+      body { padding: 10px; }
+      .grid { grid-template-columns: 1fr; padding: 12px; }
+      .title-row { align-items: flex-start; flex-direction: column; }
+      .topbar { border-radius: 14px 14px 0 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="breadcrumb">Visitas / Hoje / Matriz</div>
+      <div class="title-row">
+        <h1>Cartões de acompanhamento</h1>
+        <div class="pill" id="summary-pill">0 itens</div>
+      </div>
+    </header>
+
+    <nav class="filters" id="filters" aria-label="filtros de status"></nav>
+
+    <main>
+      <div id="empty-state" class="empty-state">Nenhum cartão encontrado para este filtro.</div>
+      <section id="card-grid" class="grid" aria-live="polite"></section>
+    </main>
+  </div>
+
+  <script>
+    const filters = ['Todas', 'Agendada', 'Em rota', 'Concluída', 'Ativa', 'Disponível', 'Em trânsito', 'Nova', 'Em acompanhamento', 'Prioritária'];
+
+    const dataSources = [
+      './data/planilha_visitas.json',
+      './data/planilha_familias.json',
+      './data/planilha_rotas.json'
+    ];
+
+    let state = {
+      filter: 'Todas'
+    };
+
+    function normalizeStatus(value) {
+      return String(value || '').trim().toLowerCase().replace(/\s+/g, '-');
+    }
+
+    function slugify(value) {
+      return String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    }
+
+    function statusClass(status) {
+      const key = normalizeStatus(status);
+      if (key.includes('agendada')) return 'status-agendada';
+      if (key.includes('rota')) return 'status-em-rota';
+      if (key.includes('concluida')) return 'status-concluida';
+      if (key.includes('ativa')) return 'status-ativa';
+      if (key.includes('disponivel')) return 'status-disponivel';
+      if (key.includes('transito')) return 'status-em-trânsito';
+      if (key.includes('prioritaria')) return 'status-prioritaria';
+      if (key.includes('nova')) return 'status-nova';
+      if (key.includes('acompanhamento')) return 'status-em-acompanhamento';
+      return 'status-agendada';
+    }
+
+    function createFilterButtons() {
+      const container = document.getElementById('filters');
+      filters.forEach((filterName) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'filter' + (state.filter === filterName ? ' active' : '');
+        btn.textContent = filterName;
+        btn.addEventListener('click', () => {
+          state.filter = filterName;
+          render();
+        });
+        container.appendChild(btn);
+      });
+    }
+
+    function buildCards(visitas, familias, rotas) {
+      const cards = [];
+
+      visitas.forEach((item, index) => {
+        cards.push({
+          id: item.id,
+          badge: index + 1,
+          title: item.nome,
+          status: item.status,
+          meta: [item.bairro, item.horario, item.tempoEstimado],
+          body: [
+            { label: 'Tipo', value: item.tipo },
+            { label: 'Responsável', value: item.responsavel },
+            { label: 'Observação', value: item.obs }
+          ],
+          type: 'visita'
+        });
+      });
+
+      familias.forEach((item, index) => {
+        cards.push({
+          id: item.id,
+          badge: String.fromCharCode(65 + index),
+          title: item.nome,
+          status: item.status,
+          meta: [item.bairro, `${item.membros} membros`, item.situacao],
+          body: [
+            { label: 'Próximo passo', value: item.proximoPasso },
+            { label: 'Últimos pontos', value: item.ultimosPontos.join(' • ') }
+          ],
+          type: 'familia'
+        });
+      });
+
+      rotas.forEach((item, index) => {
+        cards.push({
+          id: item.id,
+          badge: `R${item.ordem}`,
+          title: item.nome,
+          status: item.status,
+          meta: [item.bairro, `${item.qtdVisitas} visitas`, item.tempoMedio],
+          body: [
+            { label: 'Distância', value: item.distancia },
+            { label: 'Indicador', value: `Rota ${item.ordem} em ${item.status.toLowerCase()}` }
+          ],
+          type: 'rota'
+        });
+      });
+
+      return cards;
+    }
+
+    function filteredCards(cards) {
+      if (state.filter === 'Todas') return cards;
+      return cards.filter((card) => {
+        const normalized = normalizeStatus(card.status);
+        const selected = normalizeStatus(state.filter);
+        return normalized === selected || card.status === state.filter;
+      });
+    }
+
+    function renderCard(card) {
+      const article = document.createElement('article');
+      article.className = 'card';
+
+      const header = document.createElement('div');
+      header.className = 'card-header';
+
+      const badge = document.createElement('div');
+      badge.className = 'badge';
+      badge.textContent = card.badge;
+
+      const title = document.createElement('div');
+      title.className = 'card-title';
+      title.textContent = card.title;
+
+      const tag = document.createElement('span');
+      tag.className = 'status-tag ' + statusClass(card.status);
+      tag.textContent = card.status;
+
+      header.appendChild(badge);
+      header.appendChild(title);
+      header.appendChild(tag);
+
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+      card.meta.forEach((item) => {
+        const block = document.createElement('span');
+        block.className = 'meta-item';
+        block.textContent = item;
+        meta.appendChild(block);
+      });
+
+      const body = document.createElement('div');
+      body.className = 'card-body';
+
+      card.body.forEach((row) => {
+        const line = document.createElement('div');
+        const label = document.createElement('span');
+        label.className = 'label';
+        label.textContent = row.label + ':';
+        const value = document.createElement('span');
+        value.textContent = row.value;
+        line.appendChild(label);
+        line.appendChild(value);
+        body.appendChild(line);
+      });
+
+      article.appendChild(header);
+      article.appendChild(meta);
+      article.appendChild(body);
+      return article;
+    }
+
+    function render() {
+      const grid = document.getElementById('card-grid');
+      const emptyState = document.getElementById('empty-state');
+      const summary = document.getElementById('summary-pill');
+
+      const allCards = buildCards(window.__visitas || [], window.__familias || [], window.__rotas || []);
+      const cards = filteredCards(allCards);
+
+      summary.textContent = `${cards.length} itens`;
+      grid.innerHTML = '';
+
+      if (!cards.length) {
+        emptyState.style.display = 'block';
+        return;
+      }
+
+      emptyState.style.display = 'none';
+      cards.forEach((card) => grid.appendChild(renderCard(card)));
+
+      const filterButtons = document.querySelectorAll('.filter');
+      filterButtons.forEach((btn) => {
+        btn.classList.toggle('active', btn.textContent === state.filter);
+      });
+    }
+
+    Promise.all(dataSources.map((source) => fetch(source).then((response) => response.json())))
+      .then(([visitas, familias, rotas]) => {
+        window.__visitas = visitas;
+        window.__familias = familias;
+        window.__rotas = rotas;
+        render();
+      })
+      .catch((error) => {
+        console.error('Erro ao carregar JSONs:', error);
+        const grid = document.getElementById('card-grid');
+        grid.innerHTML = '<div class="card"><h3>Falha ao carregar dados</h3><p>Verifique se os arquivos JSON estão presentes e o servidor está sendo servido localmente.</p></div>';
+      });
+
+    createFilterButtons();
+  </script>
+</body>
+</html>

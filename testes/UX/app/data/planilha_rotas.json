@@ -1,0 +1,52 @@
+[
+  {
+    "id": "RTA-01",
+    "nome": "Rota Centro",
+    "bairro": "Centro",
+    "qtdVisitas": 3,
+    "tempoMedio": "44 min",
+    "status": "Ativa",
+    "distancia": "2,1 km",
+    "ordem": 1
+  },
+  {
+    "id": "RTA-02",
+    "nome": "Rota Norte",
+    "bairro": "Vila Nova",
+    "qtdVisitas": 2,
+    "tempoMedio": "38 min",
+    "status": "Em trânsito",
+    "distancia": "1,8 km",
+    "ordem": 2
+  },
+  {
+    "id": "RTA-03",
+    "nome": "Rota Leste",
+    "bairro": "Bela Vista",
+    "qtdVisitas": 3,
+    "tempoMedio": "52 min",
+    "status": "Ativa",
+    "distancia": "2,9 km",
+    "ordem": 3
+  },
+  {
+    "id": "RTA-04",
+    "nome": "Rota Sul",
+    "bairro": "Santa Luzia",
+    "qtdVisitas": 2,
+    "tempoMedio": "30 min",
+    "status": "Disponível",
+    "distancia": "1,5 km",
+    "ordem": 4
+  },
+  {
+    "id": "RTA-05",
+    "nome": "Rota Oeste",
+    "bairro": "Jardim das Flores",
+    "qtdVisitas": 2,
+    "tempoMedio": "41 min",
+    "status": "Ativa",
+    "distancia": "2,4 km",
+    "ordem": 5
+  }
+]

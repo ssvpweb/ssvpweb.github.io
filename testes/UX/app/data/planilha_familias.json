@@ -1,0 +1,62 @@
+[
+  {
+    "id": "FAM-01",
+    "nome": "Família Oliveira",
+    "bairro": "Centro",
+    "membros": 4,
+    "situacao": "Ativa",
+    "ultimosPontos": ["Visita de acolhimento", "Reunião de equipe", "Material entregue"],
+    "status": "Em acompanhamento",
+    "proximoPasso": "Confirmar retorno em 3 dias"
+  },
+  {
+    "id": "FAM-02",
+    "nome": "Família Costa",
+    "bairro": "Santa Luzia",
+    "membros": 5,
+    "situacao": "Nova",
+    "ultimosPontos": ["Cadastro realizado", "Primeiro contato concluído"],
+    "status": "Agendada",
+    "proximoPasso": "Entregar kit inicial"
+  },
+  {
+    "id": "FAM-03",
+    "nome": "Família Souza",
+    "bairro": "Vila Nova",
+    "membros": 3,
+    "situacao": "Ativa",
+    "ultimosPontos": ["Apoio financeiro", "Acompanhamento espiritual"],
+    "status": "Concluída",
+    "proximoPasso": "Encaminhar para memória de ação"
+  },
+  {
+    "id": "FAM-04",
+    "nome": "Família Mendes",
+    "bairro": "Jardim das Flores",
+    "membros": 6,
+    "situacao": "Prioritária",
+    "ultimosPontos": ["Checklist de risco revisado", "Visita reforçada"],
+    "status": "Em rota",
+    "proximoPasso": "Finalizar suporte do bairro"
+  },
+  {
+    "id": "FAM-05",
+    "nome": "Família Almeida",
+    "bairro": "Bela Vista",
+    "membros": 2,
+    "situacao": "Ativa",
+    "ultimosPontos": ["Contato com responsável", "Pedido de acompanhamento"],
+    "status": "Em acompanhamento",
+    "proximoPasso": "Revisar necessidades de apoio"
+  },
+  {
+    "id": "FAM-06",
+    "nome": "Família Nunes",
+    "bairro": "Centro",
+    "membros": 7,
+    "situacao": "Ativa",
+    "ultimosPontos": ["Material distribuído", "Reunião familiar registrada"],
+    "status": "Agendada",
+    "proximoPasso": "Conferir disponibilidade da família"
+  }
+]
