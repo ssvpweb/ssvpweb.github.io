@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compartilhar Fotos - SSVP</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      padding: 30px;
+      max-width: 500px;
+      width: 100%;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 8px;
+      font-size: 24px;
+    }
+
+    .subtitle {
+      color: #999;
+      font-size: 14px;
+      margin-bottom: 30px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      color: #555;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    input[type="file"],
+    input[type="number"],
+    input[type="text"],
+    textarea {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.3s;
+    }
+
+    textarea {
+      font-family: inherit;
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    input[type="file"] {
+      padding: 10px;
+      cursor: pointer;
+    }
+
+    input[type="number"]:focus,
+    input[type="text"]:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .input-file {
+      display: none;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-bottom: 10px;
+    }
+
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-whatsapp {
+      background: #25D366;
+      color: white;
+    }
+
+    .btn-whatsapp:hover {
+      background: #20BA58;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3);
+    }
+
+    .btn-whatsapp:active {
+      transform: translateY(0);
+    }
+
+    .preview-section {
+      margin: 30px 0;
+      padding: 20px;
+      background: #f9f9f9;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .preview-section h3 {
+      color: #333;
+      font-size: 14px;
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
+
+    #previewCanvas {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: 8px;
+      border: 2px solid #ddd;
+      display: none;
+      margin: 0 auto;
+    }
+
+    .file-info {
+      font-size: 12px;
+      color: #999;
+      margin-top: 10px;
+      display: none;
+    }
+
+    .placeholder {
+      color: #bbb;
+      font-size: 14px;
+      padding: 40px 20px;
+    }
+
+    .status {
+      padding: 12px;
+      border-radius: 8px;
+      margin: 15px 0;
+      text-align: center;
+      display: none;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .status.show {
+      display: block;
+    }
+
+    .status.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .status.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .status.info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+    }
+
+    .info-box {
+      background: #e7f3ff;
+      border-left: 4px solid #2196F3;
+      padding: 12px;
+      border-radius: 6px;
+      margin: 20px 0;
+      font-size: 13px;
+      color: #0066cc;
+    }
+
+    .divider {
+      height: 1px;
+      background: #e0e0e0;
+      margin: 25px 0;
+    }
+
+    .slider-container {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    input[type="range"] {
+      flex: 1;
+      height: 6px;
+      cursor: pointer;
+      border-radius: 3px;
+      background: linear-gradient(to right, #667eea 0%, #667eea 50%, #e0e0e0 50%, #e0e0e0 100%);
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #667eea;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #667eea;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    }
+
+    .slider-value {
+      background: #667eea;
+      color: white;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: bold;
+      min-width: 60px;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .size-comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin: 20px 0;
+    }
+
+    .size-box {
+      padding: 16px;
+      border-radius: 12px;
+      text-align: center;
+      border: 2px solid #e0e0e0;
+    }
+
+    .size-box.original {
+      background: #fff3e0;
+      border-color: #ffb74d;
+    }
+
+    .size-box.minificada {
+      background: #e8f5e9;
+      border-color: #81c784;
+    }
+
+    .size-label {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 6px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .size-value {
+      font-size: 24px;
+      font-weight: bold;
+      margin: 6px 0;
+    }
+
+    .size-box.original .size-value {
+      color: #e65100;
+    }
+
+    .size-box.minificada .size-value {
+      color: #2e7d32;
+    }
+
+    .size-percent {
+      font-size: 12px;
+      margin-top: 6px;
+      font-weight: 600;
+    }
+
+    .size-box.original .size-percent {
+      color: #e65100;
+    }
+
+    .size-box.minificada .size-percent {
+      color: #2e7d32;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📸 Compartilhar Fotos</h1>
+    <p class="subtitle">Tire fotos e compartilhe com o grupo do WhatsApp</p>
+
+    <!-- Tirar Foto -->
+    <div class="form-group">
+      <label for="inputFoto">📷 Tirar ou Escolher Foto</label>
+      <button class="btn btn-primary" id="btnFoto">
+        Abrir Câmera / Galeria
+      </button>
+      <input type="file" id="inputFoto" accept="image/*" capture="camera" class="input-file" />
+    </div>
+
+    <!-- Largura -->
+    <div class="form-group">
+      <label for="inputLargura">📐 Minificar para Largura</label>
+      <div class="slider-container">
+        <input type="range" id="sliderLargura" min="400" max="800" value="600" step="50" />
+        <span class="slider-value" id="larguraValue">600px</span>
+      </div>
+    </div>
+
+    <!-- Preview -->
+    <div class="preview-section">
+      <h3>Prévia da Foto Minificada</h3>
+      <canvas id="previewCanvas"></canvas>
+      <div class="placeholder" id="placeholder">Nenhuma foto selecionada</div>
+
+      <!-- Comparação de Tamanho -->
+      <div class="size-comparison" id="sizeComparison" style="display: none;">
+        <div class="size-box original">
+          <div class="size-label">📁 Original</div>
+          <div class="size-value" id="sizeOriginal">0</div>
+          <div class="size-percent">KB</div>
+        </div>
+        <div class="size-box minificada">
+          <div class="size-label">✨ Minificada</div>
+          <div class="size-value" id="sizeMinificada">0</div>
+          <div class="size-percent">KB</div>
+        </div>
+      </div>
+
+      <div class="file-info" id="fileInfo"></div>
+    </div>
+
+    <div class="status" id="status"></div>
+
+    <div class="info-box">
+      💡 A foto será comprimida para ~100-200KB. Você pode ajustar a largura para controlar o tamanho.
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Texto a Enviar -->
+    <div class="form-group">
+      <label for="inputTexto">💬 Mensagem (opcional)</label>
+      <textarea id="inputTexto" placeholder="Digite uma mensagem para acompanhar a foto..." rows="3" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; font-family: inherit; resize: vertical;"></textarea>
+    </div>
+
+    <!-- Enviar -->
+    <button class="btn btn-whatsapp" id="btnEnviar" disabled>
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" style="vertical-align: middle; margin-right: 8px;">
+        <path d="M10 0C4.477 0 0 4.477 0 10c0 1.657.424 3.254 1.209 4.636L0 20l5.527-1.198C7.232 19.417 8.575 20 10 20c5.523 0 10-4.477 10-10S15.523 0 10 0zm5.6 14.6c-.245.68-.93 1.163-1.63 1.192-.357.015-.717.067-1.06-.045-1.156-.378-2.666-1.14-4.418-2.809-1.752-1.67-2.47-3.207-2.809-4.363-.112-.343-.06-.703-.045-1.06.03-.7.513-1.385 1.192-1.63 1.13-.507 1.945.232 2.25.632.305.4.814 1.16.939 1.408.124.248.008.463-.186.651-.194.188-.464.5-.67.708-.154.154-.28.313-.087.62.193.307.864 1.416 1.852 2.293.987.877 2.024 1.435 2.33 1.589.307.154.466.03.62-.087.208-.206.52-.476.708-.67.188-.194.403-.31.651-.186.248.125 1.008.634 1.408.939.4.305 1.139 1.12.632 2.25z" />
+      </svg>
+      Enviar para WhatsApp
+    </button>
+  </div>
+
+  <script>
+    let fotoMinificada = null;
+    let fotoOriginal = null;
+    let nomeFoto = '';
+
+    // Sincronizar slider com display de valor
+    document.getElementById('sliderLargura').addEventListener('input', (e) => {
+      const valor = e.target.value;
+      document.getElementById('larguraValue').textContent = valor + 'px';
+      
+      // Atualizar o background do slider para mostrar progresso
+      const percent = ((valor - 400) / (800 - 400)) * 100;
+      e.target.style.background = `linear-gradient(to right, #667eea 0%, #667eea ${percent}%, #e0e0e0 ${percent}%, #e0e0e0 100%)`;
+      
+      // Se houver foto, atualizar preview
+      if (fotoOriginal) {
+        processarFoto();
+      }
+    });
+
+    // Abrir câmera/galeria
+    document.getElementById('btnFoto').onclick = () => {
+      document.getElementById('inputFoto').click();
+    };
+
+    // Processar foto
+    document.getElementById('inputFoto').onchange = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      fotoOriginal = file;
+      mostrarStatus('⏳ Redimensionando foto...', 'info');
+      
+      await processarFoto();
+      
+      nomeFoto = `Visita_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.jpg`;
+      document.getElementById('btnEnviar').disabled = false;
+      mostrarStatus(`✅ Foto pronta para compartilhar!`, 'success');
+    };
+
+    // Processar a foto com a largura atual do slider
+    async function processarFoto() {
+      const larguraMax = parseInt(document.getElementById('sliderLargura').value);
+      fotoMinificada = await minificarFoto(fotoOriginal, larguraMax);
+      atualizarPreview();
+    }
+
+    // Atualizar preview
+    function atualizarPreview() {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.getElementById('previewCanvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+          
+          // Adicionar marca d'água
+          adicionarMarcaDAgua(ctx, canvas.width, canvas.height);
+          
+          canvas.style.display = 'block';
+          document.getElementById('placeholder').style.display = 'none';
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(fotoMinificada);
+
+      // Mostrar comparação de tamanhos
+      const tamanhoOriginalKB = (fotoOriginal.size / 1024).toFixed(1);
+      const tamanhoMinificadoKB = (fotoMinificada.size / 1024).toFixed(1);
+      const percentualRedução = (((fotoOriginal.size - fotoMinificada.size) / fotoOriginal.size) * 100).toFixed(0);
+
+      document.getElementById('sizeOriginal').textContent = tamanhoOriginalKB;
+      document.getElementById('sizeMinificada').textContent = tamanhoMinificadoKB;
+      document.getElementById('sizeComparison').style.display = 'grid';
+
+      // Info detalhada
+      document.getElementById('fileInfo').innerHTML = `
+        <strong>Redução: ${percentualRedução}% (${tamanhoOriginalKB} KB → ${tamanhoMinificadoKB} KB)</strong>
+      `;
+      document.getElementById('fileInfo').style.display = 'block';
+    }
+
+    // Adicionar marca d'água ao canvas
+    function adicionarMarcaDAgua(ctx, largura, altura) {
+      const texto = 'não compartilhar';
+      const tamanhoFonte = Math.max(16, largura / 10);
+      
+      ctx.save();
+      ctx.font = `bold ${tamanhoFonte}px Arial`;
+      ctx.fillStyle = 'rgba(128, 128, 128, 0.25)';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      
+      // Rotacionar 30 graus
+      ctx.translate(largura / 2, altura / 2);
+      ctx.rotate(-Math.PI / 6);
+      
+      // Desenhar marcas d'água mais próximas (8 vezes ao invés de 4)
+      const espacamento = altura / 7;
+      for (let i = 0; i < 8; i++) {
+        const y = -altura / 2 + espacamento * i;
+        ctx.fillText(texto, 0, y);
+      }
+      
+      ctx.restore();
+    }
+
+    // Minificar foto
+    async function minificarFoto(file, larguraMax = 600, alturaMax = 800, qualidade = 0.6) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            let width = img.width;
+            let height = img.height;
+
+            // Calcular novo tamanho mantendo proporção
+            if (width > height) {
+              if (width > larguraMax) {
+                height = Math.round(height * (larguraMax / width));
+                width = larguraMax;
+              }
+            } else {
+              if (height > alturaMax) {
+                width = Math.round(width * (alturaMax / height));
+                height = alturaMax;
+              }
+            }
+
+            // Criar canvas
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            // Adicionar marca d'água para inibir compartilhamento
+            adicionarMarcaDAgua(ctx, width, height);
+
+            // Converter para JPEG comprimido
+            canvas.toBlob(
+              (blob) => {
+                resolve(blob);
+              },
+              'image/jpeg',
+              qualidade
+            );
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // Enviar via WhatsApp
+    document.getElementById('btnEnviar').onclick = async () => {
+      if (!fotoMinificada) return;
+
+      const textoUsuario = document.getElementById('inputTexto').value;
+      const mensagem = textoUsuario ? `${textoUsuario}\n\nFoto da Visita SSVP` : 'Compartilhamento de fotos - Reunião SSVP';
+
+      // Método 1: Web Share API (Android/iOS)
+      if (navigator.share) {
+        try {
+          const file = new File([fotoMinificada], nomeFoto, { type: 'image/jpeg' });
+
+          await navigator.share({
+            files: [file],
+            title: 'Foto da Visita SSVP',
+            text: mensagem
+          });
+
+          mostrarStatus('✅ Foto compartilhada com sucesso!', 'success');
+        } catch (err) {
+          if (err.name !== 'AbortError') {
+            console.error(err);
+            metodoAlternativoWhatsApp(textoUsuario);
+          }
+        }
+      } else {
+        // Método 2: Fallback
+        metodoAlternativoWhatsApp(textoUsuario);
+      }
+    };
+
+    function metodoAlternativoWhatsApp(textoUsuario) {
+      const msg = encodeURIComponent(textoUsuario || 'Compartilhamento de fotos - Reunião SSVP');
+      window.open(`https://wa.me/?text=${msg}`, '_blank');
+      mostrarStatus(
+        '📱 WhatsApp aberto! Anexe a foto manualmente.',
+        'info'
+      );
+    }
+
+    function mostrarStatus(msg, tipo) {
+      const status = document.getElementById('status');
+      status.textContent = msg;
+      status.className = `status show ${tipo}`;
+
+      if (tipo === 'success') {
+        setTimeout(() => status.classList.remove('show'), 3000);
+      }
+    }
+  </script>
+</body>
+</html>

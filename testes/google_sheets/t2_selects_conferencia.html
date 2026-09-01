@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>T2 - Fluxo de dados</title>
+  <style>
+    :root {
+      --ssvp-blue: #0b5bc8;
+      --ssvp-blue-dark: #083f8f;
+      --ssvp-blue-soft: #eaf3ff;
+      --white: #ffffff;
+      --text: #163251;
+      --muted: #4a5d78;
+      --line: #d7e7ff;
+      --shadow: rgba(13, 60, 120, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(180deg, #eef5ff 0%, #f7fbff 100%);
+      color: var(--text);
+    }
+
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      height: 58px;
+      background: linear-gradient(90deg, var(--ssvp-blue-dark), var(--ssvp-blue));
+      color: var(--white);
+      padding: 0 20px;
+      box-shadow: 0 6px 18px rgba(11, 91, 200, 0.2);
+    }
+
+    .topbar-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .brand {
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      font-size: 1.62rem;
+      text-transform: lowercase;
+    }
+
+    .content {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 78px 14px 78px;
+    }
+
+    .hero {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: 0 10px 24px var(--shadow);
+      padding: 18px 16px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--ssvp-blue);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-size: 0.68rem;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.5rem, 6vw, 2.1rem);
+      line-height: 1.2;
+      color: var(--text);
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.94rem;
+      line-height: 1.5;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .card {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px 14px;
+      box-shadow: 0 8px 18px var(--shadow);
+    }
+
+    .num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      background: var(--ssvp-blue-soft);
+      color: var(--ssvp-blue-dark);
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      margin: 0 0 8px;
+      font-size: 1.05rem;
+      color: var(--text);
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 0.88rem;
+    }
+
+    .callout {
+      margin-top: 18px;
+      background: linear-gradient(135deg, var(--ssvp-blue-soft), #f8fbff);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px 16px;
+      color: var(--text);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .callout strong {
+      color: var(--ssvp-blue-dark);
+    }
+
+    .bottombar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      height: 58px;
+      background: linear-gradient(90deg, var(--ssvp-blue-dark), var(--ssvp-blue));
+      color: var(--white);
+      padding: 0 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      letter-spacing: 0.04em;
+    }
+
+    .corner-buttons {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 25;
+    }
+
+    .corner-button {
+      position: absolute;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: transparent;
+      border: 2px solid var(--white);
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.62rem;
+      font-weight: 700;
+      pointer-events: auto;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.12);
+    }
+
+    .corner-button.top-left { top: 8px; left: 8px; }
+    .corner-button.top-right { top: 8px; right: 8px; }
+    .corner-button.bottom-left { bottom: 8px; left: 8px; }
+    .corner-button.bottom-right { bottom: 8px; right: 8px; }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">não conectado</div>
+    </div>
+  </header>
+
+  <div class="corner-buttons" aria-hidden="true">
+    <button class="corner-button top-left" type="button" aria-label="Versão do teste">t2</button>
+    <button class="corner-button top-right" type="button" aria-label="Botão canto superior direito"></button>
+    <button class="corner-button bottom-left" type="button" aria-label="Botão canto inferior esquerdo"></button>
+    <button class="corner-button bottom-right" type="button" aria-label="Botão canto inferior direito"></button>
+  </div>
+
+  <main class="content">
+    <section class="hero">
+      <p class="eyebrow">webapp</p>
+      <h1>WebApp &lt;&gt; Google Sheets</h1>
+      <p class="subtitle">não conectado</p>
+    </section>
+
+    <section class="cards" aria-label="Fluxo de dados do sistema">
+      <article class="card">
+        <div class="num">1</div>
+        <h2>Escolhe o conselho</h2>
+        <p>O usuário abre a tela e escolhe o conselho que quer ver.</p>
+      </article>
+
+      <article class="card">
+        <div class="num">2</div>
+        <h2>Consulta o índice</h2>
+        <p>O WebApp lê o índice central para encontrar o caminho do conselho.</p>
+      </article>
+
+      <article class="card">
+        <div class="num">3</div>
+        <h2>Entra no drive</h2>
+        <p>Ele acessa a pasta do conselho e encontra a conferência correta.</p>
+      </article>
+
+      <article class="card">
+        <div class="num">4</div>
+        <h2>Mostra as pessoas</h2>
+        <p>Depois, o sistema exibe as pessoas daquela conferência na tela.</p>
+      </article>
+    </section>
+
+    <div class="callout">
+      <strong>Resumo:</strong> índice central → drive do conselho → conferência → pessoas.
+    </div>
+  </main>
+
+  <footer class="bottombar">
+    SSVP · Fluxo de dados · Entendimento para todos
+  </footer>
+</body>
+</html>

@@ -1,563 +1,163 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PWA Testador de Alarmes v1.1.0</title>
-
-  <!-- Manifesto do PWA -->
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#3b82f6">
-
-  <!-- Fontes Premium -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=Share+Tech+Mono&display=swap"
-    rel="stylesheet">
-
+  <title>pwa</title>
   <style>
     :root {
-      --bg-color: #080c14;
-      --card-bg: rgba(21, 28, 44, 0.6);
-      --primary-color: #3b82f6;
-      --primary-hover: #2563eb;
-      --success-color: #10b981;
-      --warning-color: #f59e0b;
-      --danger-color: #ef4444;
-      --text-main: #f3f4f6;
-      --text-muted: #9ca3af;
-      --font-title: 'Outfit', sans-serif;
-      --font-body: 'Montserrat', sans-serif;
-      --font-mono: 'Share Tech Mono', monospace;
+      --bg: #0b1220;
+      --panel: #111b2d;
+      --line: rgba(255,255,255,0.08);
+      --text: #e7ecf7;
+      --muted: #a6b4cf;
+      --primary: #5aa7ff;
+      --primary-strong: #2a75d7;
+      --shadow: rgba(8, 15, 30, 0.45);
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; }
 
     body {
-      background: radial-gradient(circle at top, #0f1c30 0%, var(--bg-color) 70%);
-      color: var(--text-main);
-      font-family: var(--font-body);
+      margin: 0;
       min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(180deg, #09111b 0%, #0f1a2d 100%);
+      color: var(--text);
       display: flex;
-      flex-direction: column;
-      align-items: center;
       justify-content: center;
-      padding: 2rem 1rem;
-      line-height: 1.6;
+      padding: 32px 18px;
+      line-height: 1.4;
     }
 
-    .container {
-      width: 100%;
-      max-width: 500px;
+    .page {
+      width: min(100%, 980px);
+    }
+
+    .topbar {
       display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-      animation: fadeIn 0.8s ease-out;
+      justify-content: flex-start;
+      margin-bottom: 20px;
     }
 
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    header {
-      text-align: center;
-      margin-bottom: 0.5rem;
-    }
-
-    header h1 {
-      font-family: var(--font-title);
-      font-size: 2rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 8px;
-    }
-
-    header p {
-      font-size: 0.95rem;
-      color: var(--text-muted);
-    }
-
-    /* Card PWA */
-    .pwa-card {
-      background: var(--card-bg);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 20px;
-      padding: 2rem;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-      position: relative;
-    }
-
-    /* Botão de Instalação PWA */
-    #btn-install {
-      display: none;
-      /* Mostrado dinamicamente via JS */
-      background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
-      color: #fff;
-      border: none;
-      padding: 12px;
+    .back-button {
+      display: inline-block;
+      text-decoration: none;
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      border: 1px solid var(--line);
       border-radius: 10px;
+      padding: 10px 16px;
       font-weight: 700;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+      transition: transform 0.15s ease, border-color 0.15s ease;
     }
 
-    #btn-install:hover {
+    .back-button:hover,
+    .back-button:focus-visible {
+      transform: translateY(-1px);
+      border-color: rgba(90,167,255,0.8);
+      outline: none;
+    }
+
+    .header {
+      background: linear-gradient(135deg, var(--primary-strong), var(--primary));
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 28px 24px;
+      box-shadow: 0 14px 30px var(--shadow);
+      margin-bottom: 24px;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-size: 0.72rem;
+      opacity: 0.9;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.8rem, 2.5vw, 2.7rem);
+      line-height: 1.15;
+    }
+
+    .subtitle {
+      margin: 10px 0 0;
+      color: rgba(255,255,255,0.85);
+      font-size: 0.95rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      display: block;
+      text-decoration: none;
+      background: rgba(17,27,45,0.96);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 22px 18px;
+      min-height: 120px;
+      color: var(--text);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.18);
+      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .card:hover,
+    .card:focus-visible {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
+      border-color: rgba(90,167,255,0.7);
+      box-shadow: 0 14px 28px rgba(90,167,255,0.18);
+      outline: none;
     }
 
-    /* Indicador de Status */
-    .status-panel {
-      padding: 12px;
-      border-radius: 10px;
-      text-align: center;
+    .empty-card {
+      opacity: 0.75;
+      background: rgba(17,27,45,0.7);
+    }
+
+    .card-title {
+      display: block;
+      font-size: 1.08rem;
       font-weight: 700;
-      text-transform: uppercase;
-      font-size: 0.9rem;
-      letter-spacing: 0.05em;
-      border: 1px solid transparent;
+      margin-bottom: 6px;
+      word-break: break-word;
     }
 
-    .status-inactive {
-      background-color: rgba(239, 68, 68, 0.08);
-      border-color: rgba(239, 68, 68, 0.25);
-      color: var(--danger-color);
+    .card-meta {
+      display: block;
+      color: var(--muted);
+      font-size: 0.84rem;
     }
 
-    .status-active {
-      background-color: rgba(16, 185, 129, 0.08);
-      border-color: rgba(16, 185, 129, 0.25);
-      color: var(--success-color);
-    }
-
-    /* Painel Regressivo */
-    .timer-display {
-      font-family: var(--font-mono);
-      font-size: 3.5rem;
-      text-align: center;
-      color: #fff;
-      background: rgba(0, 0, 0, 0.3);
-      padding: 15px;
-      border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
-    }
-
-    /* Controles */
-    .control-group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .control-label {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      font-weight: 600;
-    }
-
-    .input-row {
-      display: flex;
-      gap: 10px;
-    }
-
-    input[type="number"] {
-      background: rgba(0, 0, 0, 0.4);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 8px;
-      color: #fff;
-      padding: 10px;
-      font-size: 1rem;
-      width: 80px;
-      text-align: center;
-      font-family: var(--font-mono);
-    }
-
-    select {
-      background: rgba(0, 0, 0, 0.4);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 8px;
-      color: #fff;
-      padding: 10px;
-      font-size: 1rem;
-      flex-grow: 1;
-      font-family: var(--font-body);
-    }
-
-    .btn-row {
-      display: flex;
-      gap: 10px;
-    }
-
-    .btn {
-      flex: 1;
-      padding: 12px;
-      border-radius: 8px;
-      font-weight: 700;
-      font-size: 0.95rem;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      border: none;
-    }
-
-    .btn-primary {
-      background-color: var(--primary-color);
-      color: #fff;
-    }
-
-    .btn-primary:hover {
-      background-color: var(--primary-hover);
-    }
-
-    .btn-danger {
-      background-color: rgba(239, 68, 68, 0.15);
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      color: var(--danger-color);
-    }
-
-    .btn-danger:hover {
-      background-color: var(--danger-color);
-      color: #fff;
-    }
-
-    .btn-secondary {
-      background-color: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: var(--text-main);
-      width: 100%;
-    }
-
-    .btn-secondary:hover {
-      background-color: rgba(255, 255, 255, 0.1);
+    @media (max-width: 560px) {
+      .header { padding: 22px 18px; }
+      .grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
-
 <body>
-
-  <div class="container">
-
-    <header>
-      <h1>PWA Alarme SSVP v1.1.0</h1>
-      <p>Testador de Temporização e Notificações com App Fechado</p>
-    </header>
-
-    <div class="pwa-card">
-      <!-- Botão de Instalação (PWA) -->
-      <button id="btn-install">📲 Instalar no Celular</button>
-
-      <!-- Status do Alarme -->
-      <div id="alarm-status" class="status-panel status-inactive">🔴 Alarme Inativo</div>
-
-      <!-- Temporizador Regressivo -->
-      <div id="timer-display" class="timer-display">00:00</div>
-
-      <!-- Configurações de Espaçamento -->
-      <div class="control-group">
-        <label class="control-label" for="interval-value">Intervalo do Alarme:</label>
-        <div class="input-row">
-          <input type="number" id="interval-value" value="2" min="1">
-          <select id="interval-unit">
-            <option value="minutos">Minutos</option>
-            <option value="segundos">Segundos (para testes rápidos)</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Ações -->
-      <div class="btn-row">
-        <button class="btn btn-primary" onclick="iniciarAlarme()">⚡ Iniciar / Atualizar</button>
-        <button class="btn btn-danger" onclick="cancelarAlarme()">⏹️ Cancelar</button>
-      </div>
-
-      <!-- Teste de Som Direto -->
-      <button class="btn btn-secondary" onclick="tocarBipAlerta()">🔊 Testar Som de Bip</button>
+  <main class="page">
+    <div class="topbar">
+      <a class="back-button" href="../index.html">Voltar</a>
     </div>
 
-  </div>
+    <header class="header">
+      <p class="eyebrow">SSVP / Testes</p>
+      <h1>pwa</h1>
+      <p class="subtitle">Navegação estática em HTML e CSS, compatível com uso local e com GitHub.</p>
+    </header>
 
-  <script>
-    // ----------------------------------------------------
-    // REGISTRO DO SERVICE WORKER E CARREGAMENTO
-    // ----------------------------------------------------
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js')
-          .then(reg => {
-            console.log('Service Worker registrado!', reg);
-            
-            // Tenta recuperar alarme persistente assim que o SW estiver pronto
-            navigator.serviceWorker.ready.then(() => {
-              recuperarAlarmePersistente();
-            });
-          })
-          .catch(err => console.error('Falha ao registrar Service Worker:', err));
-      });
-
-      // Escuta notificações enviadas de volta pelo Service Worker
-      navigator.serviceWorker.addEventListener('message', (event) => {
-        if (event.data.action === 'alarme_disparado_sw') {
-          // Se a página estiver aberta, garante que toca o bip sonoro local
-          tocarBipAlerta();
-        }
-      });
-    }
-
-    // Solicitando permissão de notificações do sistema
-    if ('Notification' in window) {
-      Notification.requestPermission().then(permission => {
-        console.log(`Permissão de notificações: ${permission}`);
-      });
-    }
-
-    // ----------------------------------------------------
-    // SUPORTE A INSTALAÇÃO DO PWA
-    // ----------------------------------------------------
-    let deferredPrompt;
-    const btnInstall = document.getElementById('btn-install');
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      btnInstall.style.display = 'block';
-    });
-
-    btnInstall.addEventListener('click', () => {
-      if (!deferredPrompt) return;
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then((choiceResult) => {
-        if (choiceResult.outcome === 'accepted') {
-          console.log('Usuário aceitou a instalação do PWA');
-        }
-        btnInstall.style.display = 'none';
-        deferredPrompt = null;
-      });
-    });
-
-    // ----------------------------------------------------
-    // LÓGICA DO TEMPORIZADOR E ALARMES COM LOCALSTORAGE E SW
-    // ----------------------------------------------------
-    let countdownIntervalId = null;
-    let tempoRestante = 0; // em segundos
-
-    /**
-     * INICIA OU ATUALIZA O ALARME PROGRAMADO
-     */
-    function iniciarAlarme() {
-      pararTemporizadores();
-
-      const val = parseInt(document.getElementById('interval-value').value) || 2;
-      const unit = document.getElementById('interval-unit').value;
-
-      // Converte o tempo selecionado para segundos
-      const totalSegundos = (unit === 'minutos') ? val * 60 : val;
-      tempoRestante = totalSegundos;
-
-      // Calcula e salva o momento futuro do alarme
-      const limiteAlarme = Date.now() + (totalSegundos * 1000);
-      localStorage.setItem('alarme_ativo', 'true');
-      localStorage.setItem('alarme_limite', limiteAlarme);
-      localStorage.setItem('alarme_intervalo_s', totalSegundos);
-
-      // Atualiza painel e status
-      atualizarStatusInterface(true);
-      atualizarDisplayRegressivo(tempoRestante);
-
-      // 1. Inicia a contagem regressiva visual no frontend (enquanto o app estiver aberto)
-      iniciarLoopContagem(totalSegundos);
-
-      // 2. Avisa o Service Worker para agendar a notificação nativa em segundo plano
-      agendarNotificacaoNoSW(totalSegundos * 1000, totalSegundos);
-
-      console.log(`Alarme ativado a cada ${val} ${unit}. Sincronizado com o Service Worker.`);
-    }
-
-    /**
-     * CANCELA TOTALMENTE OS ALARMES
-     */
-    function cancelarAlarme() {
-      pararTemporizadores();
-      tempoRestante = 0;
-      atualizarDisplayRegressivo(0);
-      atualizarStatusInterface(false);
-      
-      // Limpa dados de persistência
-      localStorage.removeItem('alarme_ativo');
-      localStorage.removeItem('alarme_limite');
-      localStorage.removeItem('alarme_intervalo_s');
-
-      // Avisa o Service Worker para cancelar o timer de segundo plano
-      if (navigator.serviceWorker.controller) {
-        navigator.serviceWorker.controller.postMessage({
-          action: 'cancelar_alarme'
-        });
-      }
-
-      console.log("Alarme cancelado no celular e no Service Worker.");
-    }
-
-    /**
-     * RECUPERA O ALARME PERSISTIDO SE O APP TIVER SIDO FECHADO
-     */
-    function recuperarAlarmePersistente() {
-      const ativo = localStorage.getItem('alarme_ativo') === 'true';
-      if (!ativo) return;
-
-      const limite = parseInt(localStorage.getItem('alarme_limite'));
-      const totalSegundos = parseInt(localStorage.getItem('alarme_intervalo_s'));
-      const agora = Date.now();
-
-      if (!limite || !totalSegundos) return;
-
-      // Calcula o tempo que falta comparando com o relógio do sistema
-      tempoRestante = Math.round((limite - agora) / 1000);
-
-      if (tempoRestante <= 0) {
-        // Se o tempo expirou com o app fechado, o Service Worker já deve ter mandado a notificação.
-        // Toca o bip na abertura por redundância e reinicia o ciclo
-        tocarBipAlerta();
-        
-        tempoRestante = totalSegundos;
-        const novoLimite = Date.now() + (totalSegundos * 1000);
-        localStorage.setItem('alarme_limite', novoLimite);
-        
-        // Sincroniza Service Worker com o novo ciclo
-        agendarNotificacaoNoSW(totalSegundos * 1000, totalSegundos);
-      } else {
-        // Se ainda não expirou, agenda o tempo restante no Service Worker para sincronia perfeita
-        agendarNotificacaoNoSW(tempoRestante * 1000, totalSegundos);
-      }
-
-      // Restaura o visual
-      atualizarStatusInterface(true);
-      atualizarDisplayRegressivo(tempoRestante);
-
-      // Retoma os loops do frontend
-      iniciarLoopContagem(totalSegundos);
-      console.log(`Estado do alarme retomado. Restam ${tempoRestante}s.`);
-    }
-
-    /**
-     * ENVIA COMANDO PARA O SERVICE WORKER AGENDAR O ALERTA FUTURO
-     */
-    function agendarNotificacaoNoSW(tempoMs, totalSegundos) {
-      if (navigator.serviceWorker.controller) {
-        navigator.serviceWorker.controller.postMessage({
-          action: 'agendar_alarme',
-          tempoMs: tempoMs,
-          totalSegundos: totalSegundos
-        });
-      }
-    }
-
-    /**
-     * DISPARA E MANTÉM O LOOP DA CONTAGEM REGRESSIVA DO FRONTEND
-     */
-    function iniciarLoopContagem(totalSegundos) {
-      countdownIntervalId = setInterval(() => {
-        tempoRestante--;
-        
-        if (tempoRestante < 0) {
-          tempoRestante = totalSegundos;
-          // Atualiza limite do próximo ciclo
-          const proximoLimite = Date.now() + (totalSegundos * 1000);
-          localStorage.setItem('alarme_limite', proximoLimite);
-          
-          // Re-agenda o próximo alarme no Service Worker
-          agendarNotificacaoNoSW(totalSegundos * 1000, totalSegundos);
-        }
-        
-        atualizarDisplayRegressivo(tempoRestante);
-      }, 1000);
-    }
-
-    /**
-     * PARA OS INTERVALOS DO JAVASCRIPT LOCAL DO FRONTEND
-     */
-    function pararTemporizadores() {
-      if (countdownIntervalId) clearInterval(countdownIntervalId);
-      countdownIntervalId = null;
-    }
-
-    /**
-     * TOCA UM BIP ELETRÔNICO USANDO A WEB AUDIO API
-     */
-    function tocarBipAlerta() {
-      try {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const oscillator = audioCtx.createOscillator();
-        const gainNode = audioCtx.createGain();
-
-        oscillator.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
-
-        oscillator.type = 'sine';
-        oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // Tom agudo 880Hz
-
-        gainNode.gain.setValueAtTime(1, audioCtx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
-
-        oscillator.start();
-        oscillator.stop(audioCtx.currentTime + 0.6);
-        console.log("Bip tocado localmente no frontend.");
-      } catch (e) {
-        console.error("Erro ao reproduzir som:", e);
-      }
-    }
-
-    /**
-     * ATUALIZA O TEXTO DE CONTAGEM REGRESSIVA EM TELA
-     */
-    function atualizarDisplayRegressivo(segundos) {
-      const min = Math.floor(segundos / 60);
-      const seg = segundos % 60;
-
-      const displayMin = String(min).padStart(2, '0');
-      const displaySeg = String(seg).padStart(2, '0');
-
-      document.getElementById('timer-display').innerText = `${displayMin}:${displaySeg}`;
-    }
-
-    /**
-     * ALTERA O COR E O TEXTO DO BADGE DE STATUS DO ALARME
-     */
-    function atualizarStatusInterface(ativo) {
-      const statusPanel = document.getElementById('alarm-status');
-      if (ativo) {
-        statusPanel.className = "status-panel status-active";
-        statusPanel.innerText = "🟢 Alarme Ativo";
-      } else {
-        statusPanel.className = "status-panel status-inactive";
-        statusPanel.innerText = "🔴 Alarme Inativo";
-      }
-    }
-  </script>
-
+    <nav class="grid" aria-label="Itens desta pasta">
+      <div class="card empty-card">
+        <span class="card-title">Nenhum item</span>
+        <span class="card-meta">Esta pasta ainda não possui páginas de teste.</span>
+      </div>
+    </nav>
+  </main>
 </body>
-
 </html>

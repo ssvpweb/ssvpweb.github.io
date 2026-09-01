@@ -1,816 +1,171 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Protótipo: Sincronização Inteligente por Geolocalização</title>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --accent-primary: #3b82f6;
-            --accent-success: #10b981;
-            --accent-warning: #f59e0b;
-            --text-main: #f8fafc;
-            --text-secondary: #94a3b8;
-            --border-color: #334155;
-            --font-main: 'Outfit', sans-serif;
-            --safe-area-inset-top: env(safe-area-inset-top, 0px);
-            --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>sincronizacao</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #111b2d;
+      --line: rgba(255,255,255,0.08);
+      --text: #e7ecf7;
+      --muted: #a6b4cf;
+      --primary: #5aa7ff;
+      --primary-strong: #2a75d7;
+      --shadow: rgba(8, 15, 30, 0.45);
+    }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+    * { box-sizing: border-box; }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            font-family: var(--font-main);
-            padding-top: calc(var(--safe-area-inset-top) + 40px);
-            padding-bottom: calc(var(--safe-area-inset-bottom) + 30px);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(180deg, #09111b 0%, #0f1a2d 100%);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      padding: 32px 18px;
+      line-height: 1.4;
+    }
 
-        /* Barra de Versão Superior Obrigatória */
-        .version-bar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background: rgba(30, 41, 59, 0.9);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--border-color);
-            text-align: center;
-            padding: 8px 16px;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            font-weight: 500;
-            z-index: 1000;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    .page {
+      width: min(100%, 980px);
+    }
 
-        .version-tag {
-            background: rgba(59, 130, 246, 0.2);
-            color: #60a5fa;
-            padding: 2px 8px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            border: 1px solid rgba(59, 130, 246, 0.3);
-        }
+    .topbar {
+      display: flex;
+      justify-content: flex-start;
+      margin-bottom: 20px;
+    }
 
-        .container {
-            width: 100%;
-            max-width: 600px;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
+    .back-button {
+      display: inline-block;
+      text-decoration: none;
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-weight: 700;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+    }
 
-        header {
-            text-align: center;
-            margin-bottom: 10px;
-        }
+    .back-button:hover,
+    .back-button:focus-visible {
+      transform: translateY(-1px);
+      border-color: rgba(90,167,255,0.8);
+      outline: none;
+    }
 
-        header h1 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            background: linear-gradient(to right, #60a5fa, #34d399);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 6px;
-        }
+    .header {
+      background: linear-gradient(135deg, var(--primary-strong), var(--primary));
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 28px 24px;
+      box-shadow: 0 14px 30px var(--shadow);
+      margin-bottom: 24px;
+    }
 
-        header p {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-        }
+    .eyebrow {
+      margin: 0 0 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-size: 0.72rem;
+      opacity: 0.9;
+    }
 
-        /* Card Geral */
-        .card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            transition: transform 0.2s ease, border-color 0.2s ease;
-        }
+    h1 {
+      margin: 0;
+      font-size: clamp(1.8rem, 2.5vw, 2.7rem);
+      line-height: 1.15;
+    }
 
-        .card:hover {
-            border-color: #475569;
-        }
+    .subtitle {
+      margin: 10px 0 0;
+      color: rgba(255,255,255,0.85);
+      font-size: 0.95rem;
+    }
 
-        .card-title {
-            font-size: 1.15rem;
-            font-weight: 600;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+    }
 
-        /* Configuração de Locais */
-        .local-item {
-            background: rgba(15, 23, 42, 0.4);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.95rem;
-        }
+    .card {
+      display: block;
+      text-decoration: none;
+      background: rgba(17,27,45,0.96);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 22px 18px;
+      min-height: 120px;
+      color: var(--text);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.18);
+      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+    }
 
-        .local-info {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
+    .card:hover,
+    .card:focus-visible {
+      transform: translateY(-2px);
+      border-color: rgba(90,167,255,0.7);
+      box-shadow: 0 14px 28px rgba(90,167,255,0.18);
+      outline: none;
+    }
 
-        .local-coords {
-            font-family: monospace;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-        }
+    .empty-card {
+      opacity: 0.75;
+      background: rgba(17,27,45,0.7);
+    }
 
-        .btn-delete {
-            background: none;
-            border: none;
-            color: #ef4444;
-            font-size: 0.85rem;
-            cursor: pointer;
-            padding: 6px;
-            border-radius: 6px;
-            transition: background 0.2s;
-        }
+    .card-title {
+      display: block;
+      font-size: 1.08rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      word-break: break-word;
+    }
 
-        .btn-delete:hover {
-            background: rgba(239, 68, 68, 0.1);
-        }
+    .card-meta {
+      display: block;
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
 
-        /* Simulador de Localização */
-        .controls-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        label {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        input, select {
-            background-color: #0f172a;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 10px;
-            color: var(--text-main);
-            font-family: var(--font-main);
-            font-size: 0.95rem;
-            width: 100%;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--accent-primary);
-        }
-
-        .btn {
-            background-color: var(--accent-primary);
-            color: var(--text-main);
-            border: none;
-            border-radius: 8px;
-            padding: 12px;
-            font-family: var(--font-main);
-            font-weight: 600;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: background-color 0.2s, transform 0.1s;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn:hover {
-            background-color: #2563eb;
-        }
-
-        .btn:active {
-            transform: scale(0.98);
-        }
-
-        .btn-secondary {
-            background-color: transparent;
-            border: 1px solid var(--accent-primary);
-            color: var(--accent-primary);
-        }
-
-        .btn-secondary:hover {
-            background-color: rgba(59, 130, 246, 0.1);
-        }
-
-        /* Fila de Itens */
-        .queue-item {
-            background: rgba(15, 23, 42, 0.3);
-            border-left: 4px solid var(--accent-warning);
-            border-radius: 8px;
-            padding: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .queue-item.syncing {
-            border-left-color: var(--accent-primary);
-            animation: pulse-border 1.5s infinite;
-        }
-
-        @keyframes pulse-border {
-            0% { border-left-color: var(--accent-primary); }
-            50% { border-left-color: #60a5fa; }
-            100% { border-left-color: var(--accent-primary); }
-        }
-
-        .queue-item-info h4 {
-            font-size: 0.95rem;
-            font-weight: 600;
-        }
-
-        .queue-item-info p {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin-top: 2px;
-        }
-
-        .status-badge {
-            font-size: 0.75rem;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .status-pending {
-            background: rgba(245, 158, 11, 0.15);
-            color: var(--accent-warning);
-            border: 1px solid rgba(245, 158, 11, 0.25);
-        }
-
-        .status-syncing {
-            background: rgba(59, 130, 246, 0.15);
-            color: #60a5fa;
-            border: 1px solid rgba(59, 130, 246, 0.25);
-        }
-
-        /* Logs e depuração */
-        .logs-box {
-            background-color: #020617;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 12px;
-            font-family: monospace;
-            font-size: 0.8rem;
-            max-height: 180px;
-            overflow-y: auto;
-            color: #38bdf8;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .log-entry {
-            display: flex;
-            gap: 8px;
-            line-height: 1.3;
-        }
-
-        .log-time {
-            color: var(--text-secondary);
-            flex-shrink: 0;
-        }
-
-        .log-msg-success { color: var(--accent-success); }
-        .log-msg-warning { color: var(--accent-warning); }
-
-        /* Indicador de Status Geral */
-        .status-header-card {
-            background: linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.8));
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .status-hud {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .status-pulse {
-            width: 12px;
-            height: 12px;
-            background-color: var(--accent-success);
-            border-radius: 50%;
-            box-shadow: 0 0 10px var(--accent-success);
-        }
-
-        .status-pulse.offline {
-            background-color: #ef4444;
-            box-shadow: 0 0 10px #ef4444;
-        }
-
-        .status-pulse.checking {
-            background-color: var(--accent-warning);
-            box-shadow: 0 0 10px var(--accent-warning);
-            animation: pulse 1s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.2); opacity: 0.6; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-    </style>
+    @media (max-width: 560px) {
+      .header { padding: 22px 18px; }
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
-
-    <!-- Barra de Versão Obrigatória no Topo -->
-    <div class="version-bar">
-        <span>testes/sincronizacao/index.html</span>
-        <span class="version-tag">Versão 1.0 (Protótipo)</span>
+  <main class="page">
+    <div class="topbar">
+      <a class="back-button" href="../index.html">Voltar</a>
     </div>
 
-    <div class="container">
-        <header>
-            <h1>Sincronização Inteligente</h1>
-            <p>Geolocalização Local e Fila Offline (Simulação)</p>
-        </header>
+    <header class="header">
+      <p class="eyebrow">SSVP / Testes</p>
+      <h1>sincronizacao</h1>
+      <p class="subtitle">Navegação estática em HTML e CSS, compatível com uso local e com GitHub.</p>
+    </header>
 
-        <!-- Status HUD -->
-        <div class="status-header-card">
-            <div class="status-hud">
-                <div id="statusPulse" class="status-pulse"></div>
-                <div>
-                    <div style="font-weight: 600; font-size: 0.95rem;" id="netStatusText">Rede: Online (Wi-Fi)</div>
-                    <div style="font-size: 0.8rem; color: var(--text-secondary);" id="geoStatusText">Localização: Não verificada</div>
-                </div>
-            </div>
-            <div style="text-align: right;">
-                <div style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">Fila Pendente</div>
-                <div style="font-size: 1.6rem; font-weight: 700; color: var(--accent-warning);" id="queueCount">3</div>
-            </div>
-        </div>
-
-        <!-- 1. Simulador de Localização e Conexão -->
-        <div class="card">
-            <div class="card-title">
-                <span>Simulador de Ambiente</span>
-                <span style="font-size: 0.8rem; font-weight: normal; color: var(--text-secondary);">Controle o teste</span>
-            </div>
-            
-            <div class="controls-grid">
-                <label>
-                    Tipo de Conexão
-                    <select id="connSelect">
-                        <option value="wifi">Wi-Fi (Confiável)</option>
-                        <option value="mobile">Rede Móvel (3G/4G)</option>
-                        <option value="offline">Sem Internet (Offline)</option>
-                    </select>
-                </label>
-                
-                <label>
-                    Ponto Simulado
-                    <select id="posSelect">
-                        <option value="casa">Na Casa do Vicentino (Salvo)</option>
-                        <option value="trabalho">No Trabalho do Vicentino (Salvo)</option>
-                        <option value="campo">Em Campo (Distante)</option>
-                        <option value="gps">Usar GPS Real do Navegador</option>
-                    </select>
-                </label>
-            </div>
-
-            <div class="controls-grid">
-                <label>
-                    Latitude Simulada
-                    <input type="number" id="latInput" value="-23.5505" step="0.0001">
-                </label>
-                <label>
-                    Longitude Simulada
-                    <input type="number" id="lonInput" value="-46.6333" step="0.0001">
-                </label>
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <button class="btn btn-secondary" id="btnCheckGeo">Checar Proximidade</button>
-                <button class="btn" id="btnSyncNow">Forçar Sincronismo</button>
-            </div>
-        </div>
-
-        <!-- 2. Cadastro de Locais Seguros (Salvo localmente) -->
-        <div class="card">
-            <div class="card-title">
-                <span>Locais de Sincronização Segura</span>
-                <span style="font-size: 0.8rem; font-weight: normal; color: var(--text-secondary);">IndexedDB Local</span>
-            </div>
-
-            <div style="display: flex; flex-direction: column; gap: 10px;" id="savedLocalsList">
-                <!-- Inserido via JS -->
-            </div>
-
-            <div style="border-top: 1px solid var(--border-color); padding-top: 14px; display: flex; flex-direction: column; gap: 10px;">
-                <div style="font-size: 0.85rem; font-weight: 500;">Salvar Ponto Atual como Seguro:</div>
-                <div style="display: flex; gap: 8px;">
-                    <input type="text" id="newLocalName" placeholder="Ex: Minha Casa" style="flex: 2;">
-                    <button class="btn" id="btnAddCurrentLocal" style="padding: 10px 16px; flex: 1;">Salvar</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- 3. Fila de Uploads (IndexedDB Simulada) -->
-        <div class="card">
-            <div class="card-title">
-                <span>Fila de Uploads Pendentes</span>
-                <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.75rem; font-weight: normal;" id="btnResetQueue">Reiniciar Fila</button>
-            </div>
-            
-            <div style="display: flex; flex-direction: column; gap: 10px;" id="queueList">
-                <!-- Inserido dinamicamente -->
-            </div>
-        </div>
-
-        <!-- 4. Console de Logs do Dispositivo -->
-        <div class="card">
-            <div class="card-title">
-                <span>Logs do Console Local</span>
-            </div>
-            <div class="logs-box" id="logsBox">
-                <!-- Logs via JS -->
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Coordenadas Fixas de Teste
-        const COORDS = {
-            casa: { lat: -23.5615, lon: -46.6620, nome: "Minha Casa" },
-            trabalho: { lat: -23.5732, lon: -46.6415, nome: "Trabalho" },
-            campo: { lat: -23.6000, lon: -46.7000, nome: "Em Campo" }
-        };
-
-        // Estado inicial da Fila Local de Consentimentos
-        let filaLocal = [
-            { id: 1, nome: "João da Silva", assunto: "menores", status: "pendente" },
-            { id: 2, nome: "Maria Oliveira", assunto: "saude", status: "pendente" },
-            { id: 3, nome: "Pedro Santos", assunto: "geral", status: "pendente" }
-        ];
-
-        // Locais Confiáveis Iniciais (Salvos no cliente)
-        let locaisSalvos = [
-            { id: 1, nome: "Minha Casa", lat: -23.5615, lon: -46.6620, raio: 100 },
-            { id: 2, nome: "Trabalho", lat: -23.5732, lon: -46.6415, raio: 100 }
-        ];
-
-        // Referências DOM
-        const statusPulse = document.getElementById('statusPulse');
-        const netStatusText = document.getElementById('netStatusText');
-        const geoStatusText = document.getElementById('geoStatusText');
-        const queueCount = document.getElementById('queueCount');
-        const connSelect = document.getElementById('connSelect');
-        const posSelect = document.getElementById('posSelect');
-        const latInput = document.getElementById('latInput');
-        const lonInput = document.getElementById('lonInput');
-        const savedLocalsList = document.getElementById('savedLocalsList');
-        const queueList = document.getElementById('queueList');
-        const logsBox = document.getElementById('logsBox');
-        const btnCheckGeo = document.getElementById('btnCheckGeo');
-        const btnSyncNow = document.getElementById('btnSyncNow');
-        const btnAddCurrentLocal = document.getElementById('btnAddCurrentLocal');
-        const newLocalName = document.getElementById('newLocalName');
-        const btnResetQueue = document.getElementById('btnResetQueue');
-
-        // Adiciona registro no console da tela
-        function addLog(message, type = '') {
-            const time = new Date().toLocaleTimeString();
-            const entry = document.createElement('div');
-            entry.className = 'log-entry';
-            
-            let classMsg = '';
-            if (type === 'success') classMsg = 'log-msg-success';
-            if (type === 'warning') classMsg = 'log-msg-warning';
-
-            entry.innerHTML = `<span class="log-time">[${time}]</span><span class="${classMsg}">${message}</span>`;
-            logsBox.appendChild(entry);
-            logsBox.scrollTop = logsBox.scrollHeight;
-        }
-
-        // Fórmula de Haversine para calcular distância em metros entre duas coordenadas
-        function calcularDistancia(lat1, lon1, lat2, lon2) {
-            const R = 6371e3; // Raio da terra em metros
-            const phi1 = lat1 * Math.PI/180;
-            const phi2 = lat2 * Math.PI/180;
-            const deltaPhi = (lat2-lat1) * Math.PI/180;
-            const deltaLambda = (lon2-lon1) * Math.PI/180;
-
-            const a = Math.sin(deltaPhi/2) * Math.sin(deltaPhi/2) +
-                      Math.cos(phi1) * Math.cos(phi2) *
-                      Math.sin(deltaLambda/2) * Math.sin(deltaLambda/2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-
-            return R * c; // Distância em metros
-        }
-
-        // Renderizar locais seguros
-        function renderLocais() {
-            savedLocalsList.innerHTML = '';
-            if (locaisSalvos.length === 0) {
-                savedLocalsList.innerHTML = `<div style="text-align: center; color: var(--text-secondary); font-size: 0.85rem;">Nenhum local cadastrado.</div>`;
-                return;
-            }
-            locaisSalvos.forEach(local => {
-                const item = document.createElement('div');
-                item.className = 'local-item';
-                item.innerHTML = `
-                    <div class="local-info">
-                        <strong>${local.nome}</strong>
-                        <span class="local-coords">Lat: ${local.lat.toFixed(5)}, Lon: ${local.lon.toFixed(5)} (Raio: ${local.raio}m)</span>
-                    </div>
-                    <button class="btn-delete" onclick="removerLocal(${local.id})">Excluir</button>
-                `;
-                savedLocalsList.appendChild(item);
-            });
-        }
-
-        // Renderizar Fila de uploads
-        function renderFila() {
-            queueList.innerHTML = '';
-            const pendentes = filaLocal.filter(item => item.status !== 'concluido');
-            queueCount.textContent = pendentes.length;
-
-            if (pendentes.length === 0) {
-                queueList.innerHTML = `<div style="text-align: center; color: var(--accent-success); font-size: 0.9rem; padding: 20px; font-weight: 500;">✓ Fila vazia! Todos os dados sincronizados.</div>`;
-                return;
-            }
-
-            pendentes.forEach(item => {
-                const el = document.createElement('div');
-                el.className = `queue-item ${item.status === 'sincronizando' ? 'syncing' : ''}`;
-                
-                const nomeArquivo = `consent_${item.assunto}_${item.nome.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '_')}.jpg`;
-                
-                el.innerHTML = `
-                    <div class="queue-item-info">
-                        <h4>${item.nome}</h4>
-                        <p style="font-family: monospace; font-size: 0.75rem;">${nomeArquivo}</p>
-                    </div>
-                    <span class="status-badge ${item.status === 'sincronizando' ? 'status-syncing' : 'status-pending'}">
-                        ${item.status === 'sincronizando' ? 'Sincronizando...' : 'Pendente'}
-                    </span>
-                `;
-                queueList.appendChild(el);
-            });
-        }
-
-        // Remover local
-        window.removerLocal = function(id) {
-            locaisSalvos = locaisSalvos.filter(local => local.id !== id);
-            addLog(`Local de sincronização excluído da memória local.`);
-            renderLocais();
-            checarRegrasDeSincronismo();
-        };
-
-        // Adicionar local atual
-        btnAddCurrentLocal.addEventListener('click', () => {
-            const nome = newLocalName.value.trim();
-            if (!nome) {
-                alert("Por favor, digite um nome para a localização.");
-                return;
-            }
-            const lat = parseFloat(latInput.value);
-            const lon = parseFloat(lonInput.value);
-            
-            const novo = {
-                id: Date.now(),
-                nome: nome,
-                lat: lat,
-                lon: lon,
-                raio: 100
-            };
-            
-            locaisSalvos.push(novo);
-            newLocalName.value = '';
-            addLog(`Local "${nome}" salvo como ponto confiável no dispositivo.`, 'success');
-            renderLocais();
-            checarRegrasDeSincronismo();
-        });
-
-        // Simular mudança de conexão
-        connSelect.addEventListener('change', () => {
-            const conn = connSelect.value;
-            if (conn === 'offline') {
-                statusPulse.className = 'status-pulse offline';
-                netStatusText.textContent = 'Rede: Offline';
-                addLog('O dispositivo desconectou da internet.', 'warning');
-            } else if (conn === 'mobile') {
-                statusPulse.className = 'status-pulse';
-                netStatusText.textContent = 'Rede: Conectado (Dados Móveis)';
-                addLog('Conectado à rede celular 3G/4G.', 'warning');
-            } else {
-                statusPulse.className = 'status-pulse';
-                netStatusText.textContent = 'Rede: Online (Wi-Fi)';
-                addLog('Conectado à rede Wi-Fi residencial.', 'success');
-            }
-            checarRegrasDeSincronismo();
-        });
-
-        // Simular mudança de posição geográfica
-        posSelect.addEventListener('change', () => {
-            const local = posSelect.value;
-            if (local === 'gps') {
-                addLog('Solicitando geolocalização real do navegador...');
-                geoStatusText.textContent = 'Buscando GPS real...';
-                
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(position => {
-                        const lat = position.coords.latitude;
-                        const lon = position.coords.longitude;
-                        latInput.value = lat.toFixed(5);
-                        lonInput.value = lon.toFixed(5);
-                        geoStatusText.textContent = `GPS real ativo: ${lat.toFixed(4)}, ${lon.toFixed(4)}`;
-                        addLog(`GPS obtido com sucesso: ${lat.toFixed(5)}, ${lon.toFixed(5)}`);
-                        checarRegrasDeSincronismo();
-                    }, error => {
-                        addLog(`Erro ao obter GPS: ${error.message}`, 'warning');
-                        geoStatusText.textContent = 'Falha ao ler GPS real';
-                        posSelect.value = 'campo';
-                    });
-                } else {
-                    addLog('Geolocalização não suportada neste navegador.', 'warning');
-                    posSelect.value = 'campo';
-                }
-            } else {
-                const dados = COORDS[local];
-                latInput.value = dados.lat;
-                lonInput.value = dados.lon;
-                geoStatusText.textContent = `Local Simulado: ${dados.nome}`;
-                addLog(`Localização simulada alterada para: ${dados.nome}`);
-                checarRegrasDeSincronismo();
-            }
-        });
-
-        // Executar a checagem manual
-        btnCheckGeo.addEventListener('click', () => {
-            checarRegrasDeSincronismo(true);
-        });
-
-        // Sincronizar Fila manual (Forçar)
-        btnSyncNow.addEventListener('click', () => {
-            const conexao = connSelect.value;
-            if (conexao === 'offline') {
-                addLog('Impossível sincronizar. Sem conexão de internet!', 'warning');
-                alert('Erro: Conecte-se à internet primeiro.');
-                return;
-            }
-            iniciarSincronizacao("Forçado pelo usuário");
-        });
-
-        // Reiniciar Fila de Teste
-        btnResetQueue.addEventListener('click', () => {
-            filaLocal = [
-                { id: 1, nome: "João da Silva", assunto: "menores", status: "pendente" },
-                { id: 2, nome: "Maria Oliveira", assunto: "saude", status: "pendente" },
-                { id: 3, nome: "Pedro Santos", assunto: "geral", status: "pendente" }
-            ];
-            addLog('Fila de testes reiniciada.', 'warning');
-            renderFila();
-            checarRegrasDeSincronismo();
-        });
-
-        // Core da Lógica: Checar Regras de Sincronismo Inteligente
-        let executandoSync = false;
-        function checarRegrasDeSincronismo(forcarLog = false) {
-            if (executandoSync) return;
-
-            const lat = parseFloat(latInput.value);
-            const lon = parseFloat(lonInput.value);
-            const conexao = connSelect.value;
-
-            const pendentes = filaLocal.filter(item => item.status === 'pendente');
-            if (pendentes.length === 0) {
-                if (forcarLog) addLog('Nenhum dado pendente na fila.');
-                return;
-            }
-
-            // 1. Validação de Conexão
-            if (conexao === 'offline') {
-                if (forcarLog) addLog('Fila suspensa: Dispositivo offline.');
-                return;
-            }
-
-            // 2. Procurar se o vicentino está perto de algum local seguro cadastrado
-            let localSeguroPerto = null;
-            let menorDistancia = Infinity;
-
-            locaisSalvos.forEach(local => {
-                const dist = calcularDistancia(lat, lon, local.lat, local.lon);
-                if (dist <= local.raio && dist < menorDistancia) {
-                    menorDistancia = dist;
-                    localSeguroPerto = local;
-                }
-            });
-
-            if (localSeguroPerto) {
-                geoStatusText.textContent = `Próximo a: ${localSeguroPerto.nome} (${menorDistancia.toFixed(1)}m)`;
-                
-                // Se estiver no Wi-Fi OU se estiver no mobile mas detectamos que está em um local seguro
-                if (conexao === 'wifi') {
-                    addLog(`GATILHO: Dispositivo está em local seguro (${localSeguroPerto.nome}) e conectado ao Wi-Fi. Iniciando upload automático.`, 'success');
-                    iniciarSincronizacao(`Gatilho de proximidade (${localSeguroPerto.nome}) + Wi-Fi`);
-                } else if (conexao === 'mobile') {
-                    // Se estiver no mobile e em local seguro, notifica o usuário ou pergunta (Mitiga uso de dados móveis)
-                    addLog(`ALERTA: Próximo a ${localSeguroPerto.nome}, mas utilizando dados móveis. Upload retido para economizar dados ou aguardando confirmação.`, 'warning');
-                }
-            } else {
-                geoStatusText.textContent = 'Localização: Distante de locais seguros';
-                if (forcarLog) {
-                    addLog('Verificação de proximidade concluída: Você está longe de redes conhecidas/locais seguros de sincronização.');
-                }
-            }
-        }
-
-        // Simula o processo de upload assíncrono para o Drive
-        function iniciarSincronizacao(motivo) {
-            if (executandoSync) return;
-            executandoSync = true;
-            statusPulse.className = 'status-pulse checking';
-
-            addLog(`Iniciando envio de ${filaLocal.filter(item => item.status === 'pendente').length} arquivos de consentimento [Motivo: ${motivo}]...`);
-
-            // Coloca os itens da fila em estado de sincronismo na UI
-            filaLocal.forEach(item => {
-                if (item.status === 'pendente') item.status = 'sincronizando';
-            });
-            renderFila();
-
-            // Simula o tempo de envio de cada arquivo
-            let index = 0;
-            function enviarProximo() {
-                const item = filaLocal.find(it => it.status === 'sincronizando');
-                if (!item) {
-                    // Fim do envio
-                    executandoSync = false;
-                    const conn = connSelect.value;
-                    statusPulse.className = conn === 'offline' ? 'status-pulse offline' : 'status-pulse';
-                    addLog('✓ Sincronização concluída com sucesso! Armazenamento IndexedDB temporário limpo.', 'success');
-                    renderFila();
-                    return;
-                }
-
-                setTimeout(() => {
-                    const nomeArquivo = `consent_${item.assunto}_${item.nome.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '_')}.jpg`;
-                    addLog(`Arquivo enviado ao Drive: ${nomeArquivo} (Status: 200 OK)`);
-                    item.status = 'concluido';
-                    renderFila();
-                    enviarProximo();
-                }, 1200); // 1.2 segundos por arquivo
-            }
-
-            enviarProximo();
-        }
-
-        // Inicialização
-        addLog('Aplicativo inicializado. Carregando registros offline da fila local...');
-        renderLocais();
-        renderFila();
-        // Disparar checagem automática inicial
-        setTimeout(() => {
-            posSelect.dispatchEvent(new Event('change'));
-        }, 500);
-
-    </script>
+    <nav class="grid" aria-label="Itens desta pasta">
+      <a class="card" href="./t1_fotos.html">
+        <span class="card-title">t1_fotos.html</span>
+        <span class="card-meta">Arquivo HTML</span>
+      </a>
+      <a class="card" href="./t2.1_problemas.html">
+        <span class="card-title">t2.1_problemas.html</span>
+        <span class="card-meta">Arquivo HTML</span>
+      </a>
+      <a class="card" href="./t2_problemas.html">
+        <span class="card-title">t2_problemas.html</span>
+        <span class="card-meta">Arquivo HTML</span>
+      </a>
+    </nav>
+  </main>
 </body>
 </html>

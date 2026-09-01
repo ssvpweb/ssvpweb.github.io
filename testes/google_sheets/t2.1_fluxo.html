@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>t2.1</title>
+  <style>
+    :root {
+      --ssvp-red: #cf1d27;
+      --ssvp-red-dark: #9f121a;
+      --ssvp-blue: #0b5bc8;
+      --ssvp-blue-dark: #083f8f;
+      --ssvp-blue-soft: #eaf3ff;
+      --white: #ffffff;
+      --text: #163251;
+      --muted: #4b5d78;
+      --line: #dfeeff;
+      --shadow: rgba(13, 60, 120, 0.12);
+      --status: #dfe9f8;
+      --status-text: #234a87;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: linear-gradient(180deg, #edf5ff 0%, #f8fbff 100%);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      padding-top: 58px;
+      padding-bottom: 58px;
+    }
+
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 58px;
+      background: linear-gradient(90deg, var(--ssvp-red-dark), var(--ssvp-red));
+      box-shadow: 0 6px 18px rgba(149, 15, 26, 0.2);
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 12px;
+      cursor: pointer;
+    }
+
+    .topbar-title {
+      color: var(--white);
+      font-size: 1.62rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: lowercase;
+      animation: pulse 1.4s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.9; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.06); }
+    }
+
+    .corner-buttons {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 50;
+    }
+
+    .corner-button {
+      position: absolute;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 2px solid var(--white);
+      background: rgba(255,255,255,0.02);
+      color: var(--white);
+      font-weight: 700;
+      font-size: 0.65rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: auto;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.15);
+      text-transform: lowercase;
+    }
+
+    .top-left { top: 8px; left: 8px; }
+    .top-right { top: 8px; right: 8px; }
+    .bottom-left { bottom: 8px; left: 8px; }
+    .bottom-right { bottom: 8px; right: 8px; }
+
+    .content {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 18px 14px 18px;
+    }
+
+    .status-box {
+      margin: 0 auto 14px auto;
+      width: min(100%, 360px);
+      background: var(--status);
+      color: var(--status-text);
+      border: 1px solid #d1def4;
+      border-radius: 999px;
+      padding: 10px 14px;
+      text-align: center;
+      font-weight: 700;
+      text-transform: lowercase;
+      letter-spacing: 0.04em;
+    }
+
+    .card {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: 0 10px 24px var(--shadow);
+      padding: 16px 14px;
+      margin-bottom: 12px;
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .step-number {
+      width: 28px;
+      height: 28px;
+      border-radius: 10px;
+      background: var(--ssvp-blue-soft);
+      color: var(--ssvp-blue-dark);
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+    }
+
+    .step-title {
+      font-weight: 700;
+      font-size: 1.02rem;
+    }
+
+    .step-text {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .bottombar {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 58px;
+      background: linear-gradient(90deg, var(--ssvp-red-dark), var(--ssvp-red));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--white);
+      letter-spacing: 0.04em;
+      font-size: 0.78rem;
+      text-transform: lowercase;
+      z-index: 40;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(12, 18, 30, 0.42);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 60;
+      padding: 18px;
+    }
+
+    .overlay.open {
+      display: flex;
+    }
+
+    .select-panel {
+      width: min(100%, 360px);
+      background: var(--white);
+      border-radius: 18px;
+      box-shadow: 0 18px 40px rgba(19, 31, 52, 0.22);
+      border: 1px solid var(--line);
+      padding: 18px 16px 14px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.94rem;
+      text-transform: lowercase;
+    }
+
+    select {
+      width: 100%;
+      padding: 12px 10px;
+      border-radius: 10px;
+      border: 1px solid #d7e1f5;
+      background: #f9fbff;
+      color: var(--text);
+      font-size: 0.98rem;
+    }
+
+    @media (max-width: 360px) {
+      .topbar-title {
+        font-size: 1.4rem;
+      }
+
+      .corner-button {
+        width: 38px;
+        height: 38px;
+        font-size: 0.6rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar" id="topBar" aria-label="abrir seleção do conselho metropolitano" role="button" tabindex="0">
+    <div class="topbar-title">não conectado</div>
+  </header>
+
+  <div class="overlay" id="selectorOverlay" aria-hidden="true">
+    <div class="select-panel">
+      <label for="metropolitanSelect">conselho metropolitano</label>
+      <select id="metropolitanSelect" aria-label="conselho metropolitano">
+        <option value="">selecione</option>
+        <option value="cc_001">cc_001 · conselho central 01</option>
+        <option value="cc_002">cc_002 · conselho central 02</option>
+        <option value="cc_003">cc_003 · conselho central 03</option>
+        <option value="cc_004">cc_004 · conselho central 04</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="corner-buttons" aria-hidden="true">
+    <button class="corner-button top-left" type="button">t2.1</button>
+    <button class="corner-button top-right" type="button" aria-label="configuração"></button>
+    <button class="corner-button bottom-left" type="button" aria-label="voltar"></button>
+    <button class="corner-button bottom-right" type="button" aria-label="avançar"></button>
+  </div>
+
+  <main class="content">
+    <div class="status-box">não conectado</div>
+
+    <section class="card">
+      <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-title">indice_ccs</div>
+      </div>
+      <p class="step-text">O WebApp lê o índice central para descobrir os conselhos disponíveis.</p>
+    </section>
+
+    <section class="card">
+      <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-title">drive do cc</div>
+      </div>
+      <p class="step-text">Com o link do conselho, o sistema entra na pasta do CC e acessa o índice local.</p>
+    </section>
+
+    <section class="card">
+      <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-title">indice_cfs</div>
+      </div>
+      <p class="step-text">A partir do drive do conselho, o WebApp encontra as conferências e seus links.</p>
+    </section>
+
+    <section class="card">
+      <div class="step">
+        <div class="step-number">4</div>
+        <div class="step-title">pessoas</div>
+      </div>
+      <p class="step-text">No fim, a tela mostra as pessoas da conferência selecionada.</p>
+    </section>
+  </main>
+
+  <footer class="bottombar">
+    webapp &nbsp;•&nbsp; google sheets
+  </footer>
+
+  <script>
+    const topBar = document.getElementById('topBar');
+    const overlay = document.getElementById('selectorOverlay');
+    const select = document.getElementById('metropolitanSelect');
+
+    function toggleOverlay() {
+      const isOpen = overlay.classList.contains('open');
+      overlay.classList.toggle('open', !isOpen);
+      overlay.setAttribute('aria-hidden', String(isOpen));
+    }
+
+    topBar.addEventListener('click', toggleOverlay);
+    topBar.addEventListener('keydown', function (event) {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        toggleOverlay();
+      }
+    });
+
+    overlay.addEventListener('click', function (event) {
+      if (event.target === overlay) {
+        overlay.classList.remove('open');
+        overlay.setAttribute('aria-hidden', 'true');
+      }
+    });
+
+    select.addEventListener('change', function () {
+      const selected = select.value;
+      if (!selected) {
+        return;
+      }
+
+      const statusBox = document.querySelector('.status-box');
+      statusBox.textContent = selected + ' · conectado';
+      overlay.classList.remove('open');
+      overlay.setAttribute('aria-hidden', 'true');
+    });
+  </script>
+</body>
+</html>

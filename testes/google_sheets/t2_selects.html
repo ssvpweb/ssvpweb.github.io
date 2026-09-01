@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>T2 - Selects em Cascata (CC → CP → CFA)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .status {
+            font-size: 14px;
+            color: #888;
+            font-style: italic;
+        }
+
+        .top-bar {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+
+        .top-bar:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+
+        .top-bar-status {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .top-bar.loading {
+            border-color: #667eea;
+            background-color: #f8f9ff;
+        }
+
+        .top-bar.connected {
+            border-color: #388e3c;
+        }
+
+        .top-bar.connected .status-indicator {
+            color: #388e3c;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #d32f2f;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            text-transform: capitalize;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            background-color: white;
+            color: #333;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+            font-family: inherit;
+        }
+
+        select:hover:not(:disabled) {
+            border-color: #667eea;
+        }
+
+        select:focus:not(:disabled) {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        select:disabled {
+            background-color: #f5f5f5;
+            cursor: not-allowed;
+            color: #999;
+            border-color: #ddd;
+        }
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #667eea;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .debug-info {
+            background: #f5f5f5;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-top: 30px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-family: 'Courier New', monospace;
+            color: #666;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .debug-info h3 {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .debug-line {
+            margin: 4px 0;
+            word-break: break-all;
+        }
+
+        .error {
+            color: #d32f2f;
+        }
+
+        .success {
+            color: #388e3c;
+        }
+
+        .info {
+            color: #1976d2;
+        }
+
+        .spinner-inline {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid #ddd;
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏛️ Seleção de Conselho</h1>
+            <p class="status">T2 - Seleção de Conselho Metropolitano e Central</p>
+        </header>
+
+        <!-- Barra Superior - Status de Conexão -->
+        <div class="top-bar" id="topBar">
+            <span class="top-bar-status">
+                <span class="status-indicator"></span>
+                <span id="statusText">não conectado</span>
+            </span>
+            <span id="statusIcon">👉</span>
+        </div>
+
+        <form id="selectForm">
+
+            <!-- Select Conselho Metropolitano (desativado) -->
+            <div class="form-group">
+                <label for="selectMetropolitano">Conselho Metropolitano</label>
+                <select id="selectMetropolitano" disabled>
+                    <option value="sp">São Paulo</option>
+                </select>
+            </div>
+
+            <!-- Select Conselho Central (a ser populado) -->
+            <div class="form-group">
+                <label for="selectCentral">
+                    Conselho Central
+                    <span id="loadingSpinner" class="loading" style="display: none;"></span>
+                </label>
+                <select id="selectCentral" disabled>
+                    <option value="">Selecione uma opção acima</option>
+                </select>
+            </div>
+        </form>
+
+        <!-- Debug Info -->
+        <div class="debug-info">
+            <h3>📊 Debug Info</h3>
+            <div id="debugOutput">
+                <div class="debug-line info">Aguardando inicialização...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuração
+        const SHEETS_API_KEY = 'AIzaSyAdXSo_zT5U2gDYZKcCxczBXBG04TkAyHI'; // Chave pública (pode ser exposta em testes)
+        const SHEET_ID = '1gdkV3ijExQZb9PVQIM-RIn5m5bd4_dWnadE_w8cy1To'; // ID da planilha de CCs
+        const SHEET_TAB = 'ccs'; // Aba contendo a lista de Conselhos Centrais
+        const COLUMN_NAMES = {
+            id: 'id_cc',
+            name: 'nome_cc',
+            status: 'status',
+            link: 'link_indice_cfs'
+        };
+
+        // Elementos do DOM
+        const topBar = document.getElementById('topBar');
+        const statusText = document.getElementById('statusText');
+        const statusIcon = document.getElementById('statusIcon');
+        const selectCentral = document.getElementById('selectCentral');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const debugOutput = document.getElementById('debugOutput');
+
+        // Estado
+        let isConnected = false;
+        const debugLogs = [];
+
+        /**
+         * Registra mensagem de debug
+         */
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}`;
+            debugLogs.push({ message: logEntry, type });
+            updateDebugDisplay();
+            console.log(logEntry);
+        }
+
+        /**
+         * Atualiza a exibição do debug
+         */
+        function updateDebugDisplay() {
+            debugOutput.innerHTML = debugLogs
+                .map(entry => `<div class="debug-line ${entry.type}">${entry.message}</div>`)
+                .join('');
+            debugOutput.scrollTop = debugOutput.scrollHeight;
+        }
+
+        /**
+         * Constrói o range de forma robusta usando nomes de colunas
+         */
+        function buildSheetRange(sheetTab, numColumns = 4) {
+            const lastColumn = String.fromCharCode(64 + numColumns);
+            const range = `${sheetTab}!A1:${lastColumn}1000`;
+            log(`Range definido: ${range}`, 'info');
+            return range;
+        }
+
+        /**
+         * Busca os dados da planilha Google Sheets via API
+         */
+        async function fetchConselhosCentralis() {
+            log('Iniciando busca de Conselhos Centrais...', 'info');
+            loadingSpinner.style.display = 'inline-block';
+            topBar.classList.add('loading');
+            topBar.style.cursor = 'default';
+
+            try {
+                const range = buildSheetRange(SHEET_TAB, 4);
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(range)}?key=${SHEETS_API_KEY}`;
+                
+                log(`Requisição para Sheet: ${SHEET_ID}`, 'info');
+                log(`Aba: ${SHEET_TAB}`, 'info');
+
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                log(`Resposta recebida com ${data.values?.length || 0} linhas`, 'success');
+
+                if (!data.values || data.values.length < 2) {
+                    throw new Error('Nenhum dado encontrado na planilha.');
+                }
+
+                const conselhos = data.values.slice(1);
+                log(`${conselhos.length} Conselhos Centrais encontrados`, 'success');
+
+                populateSelectCentral(conselhos);
+                setConnected();
+                
+            } catch (error) {
+                log(`❌ Erro ao buscar dados: ${error.message}`, 'error');
+                selectCentral.innerHTML = '<option value="">Erro ao carregar dados</option>';
+                selectCentral.disabled = true;
+                topBar.classList.remove('loading');
+                topBar.style.cursor = 'pointer';
+            } finally {
+                loadingSpinner.style.display = 'none';
+            }
+        }
+
+        /**
+         * Popula o select de Conselho Central
+         */
+        function populateSelectCentral(conselhos) {
+            selectCentral.innerHTML = '<option value="">Selecione um Conselho Central</option>';
+            
+            let validCount = 0;
+
+            conselhos.forEach((row, index) => {
+                const [id_cc, nome_cc, status, link_indice_cfs] = row;
+
+                if (nome_cc && id_cc) {
+                    const option = document.createElement('option');
+                    option.value = id_cc;
+                    option.textContent = nome_cc;
+                    option.dataset.link = link_indice_cfs || '';
+                    option.dataset.status = status || '';
+                    selectCentral.appendChild(option);
+                    validCount++;
+
+                    if (validCount <= 3) {
+                        log(`✓ Adicionado: "${nome_cc}" (ID: ${id_cc})`, 'info');
+                    }
+                }
+            });
+
+            if (validCount > 3) {
+                log(`... e mais ${validCount - 3} conselhos`, 'info');
+            }
+
+            selectCentral.disabled = false;
+            selectCentral.style.borderColor = '#667eea';
+            log(`✅ Select populado com ${validCount} opções`, 'success');
+        }
+
+        /**
+         * Define o status como conectado
+         */
+        function setConnected() {
+            isConnected = true;
+            topBar.classList.add('connected');
+            topBar.classList.remove('loading');
+            statusText.textContent = 'conectado';
+            statusIcon.textContent = '✓';
+            topBar.style.cursor = 'default';
+            log('✅ Conectado com sucesso', 'success');
+        }
+
+        /**
+         * Event Listener para quando o usuário seleciona um Conselho Central
+         */
+        selectCentral.addEventListener('change', function() {
+            if (this.value) {
+                const selectedOption = this.options[this.selectedIndex];
+                const nome = selectedOption.textContent;
+                const link = selectedOption.dataset.link;
+                const status = selectedOption.dataset.status;
+                
+                log(`🔗 Selecionado: ${nome}`, 'success');
+                if (link) log(`Link indice_cfs: ${link.substring(0, 50)}...`, 'info');
+                if (status) log(`Status: ${status}`, 'info');
+            }
+        });
+
+        /**
+         * Event Listener para a barra superior
+         */
+        topBar.addEventListener('click', async function() {
+            if (!isConnected && !topBar.classList.contains('loading')) {
+                debugLogs.length = 0;
+                updateDebugDisplay();
+                await fetchConselhosCentralis();
+            }
+        });
+
+        /**
+         * Inicialização
+         */
+        function init() {
+            log('Página carregada - T2', 'info');
+            log('Clique na barra superior para conectar', 'info');
+        }
+
+        // Inicia quando a página carregar
+        window.addEventListener('load', init);
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>
