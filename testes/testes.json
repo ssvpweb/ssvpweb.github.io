@@ -8,6 +8,14 @@
     ]
   },
   {
+    "folder": "compartilhar",
+    "files": [
+      {
+        "name": "t1_compartilhar.html"
+      }
+    ]
+  },
+  {
     "folder": "construtor_de_comandos",
     "files": [
       {
@@ -95,6 +103,21 @@
     "files": [
       {
         "name": "t1_sheets_crud_pessoas.html"
+      },
+      {
+        "name": "t2_selects_conferencia.html"
+      },
+      {
+        "name": "t2_selects.html"
+      },
+      {
+        "name": "t2.1_fluxo.html"
+      },
+      {
+        "name": "t2.2_fluxo.html"
+      },
+      {
+        "name": "t2.2.1_select_ccs.html"
       }
     ]
   },
@@ -227,6 +250,9 @@
       },
       {
         "name": "t7_matriz_cards.html"
+      },
+      {
+        "name": "t8_navegacao_por_voz.html"
       }
     ]
   },
@@ -340,16 +366,7 @@
     "folder": "voz",
     "files": [
       {
-        "name": "LEIA_ME.html"
-      },
-      {
-        "name": "t1_gravacao_audio_simples.html"
-      },
-      {
-        "name": "t1_reconhecimento.html"
-      },
-      {
-        "name": "t2_comandos_de_voz.html"
+        "name": "t1_android_e_ios.html"
       }
     ]
   }
