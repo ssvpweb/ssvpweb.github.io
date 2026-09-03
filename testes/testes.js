@@ -55,3 +55,75 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+/**
+ * Inicialização de compatibilidade de Sandbox para testes existentes.
+ * Renderiza a barra superior de versão e o Card Principal de instruções
+ * usando as classes padrão do testes.css (topo-acoes-teste e card-principal).
+ */
+function inicializarSandbox(config) {
+  if (!config) return;
+
+  const versao = config.versao || 'teste v1.0';
+  const titulo = config.titulo || 'Instruções do Teste';
+  const instrucoes = config.instrucoes || [];
+
+  // 1. Barra de Ações do Topo (se ainda não existir)
+  let topoAcoes = document.querySelector('.topo-acoes-teste');
+  if (!topoAcoes) {
+    topoAcoes = document.createElement('div');
+    topoAcoes.className = 'topo-acoes-teste';
+
+    const pathname = window.location.pathname;
+    const filenameWithExt = pathname.substring(pathname.lastIndexOf('/') + 1) || "teste.html";
+
+    topoAcoes.innerHTML = `
+      <div class="teste-nome-arquivo" id="topoNomeArquivo">${filenameWithExt}</div>
+      <div class="teste-versao-topo">${versao}</div>
+    `;
+    document.body.insertBefore(topoAcoes, document.body.firstChild);
+  }
+
+  // 2. Card Principal de Instruções (se ainda não existir)
+  let cardPrincipal = document.getElementById('cardPrincipal');
+  if (!cardPrincipal) {
+    cardPrincipal = document.createElement('div');
+    cardPrincipal.className = 'card-principal';
+    cardPrincipal.id = 'cardPrincipal';
+
+    const itensInstrucoes = instrucoes.map((ins) => `<li>${ins}</li>`).join('');
+
+    cardPrincipal.innerHTML = `
+      <div class="cabecalho-principal" onclick="toggleCardPrincipal()">
+        <span class="titulo-principal">📊 ${titulo}</span>
+        <span class="seta-principal" id="setaPrincipal">+</span>
+      </div>
+      <div class="conteudo-principal-wrapper">
+        <div class="conteudo-principal">
+          <div class="corpo-principal">
+            <div class="sub-card ativo" id="subCardInstrucoes">
+              <div class="sub-card-header" onclick="toggleSubCard('subCardInstrucoes')">
+                <span>📋 Instruções e Critérios</span>
+                <span class="sub-card-seta">−</span>
+              </div>
+              <div class="sub-card-content-wrapper">
+                <div class="sub-card-content">
+                  <ol style="padding-left: 1.2rem; margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.4rem;">
+                    ${itensInstrucoes}
+                  </ol>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.insertBefore(cardPrincipal, topoAcoes.nextSibling);
+  }
+
+  // Se houver barra inferior, adiciona a classe no body
+  if (document.querySelector('.barra-inferior')) {
+    document.body.classList.add('has-barra-inferior');
+  }
+}
+
+
