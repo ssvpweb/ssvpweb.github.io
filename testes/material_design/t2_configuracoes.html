@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Material Design SSVP - Teste 2: Configurações</title>
+
+  <!-- Google Fonts Montserrat -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       1. Tokens do Sistema de Cores e Elevação M3 (Adaptado à SSVP)
+       ========================================================================== */
+    :root {
+      /* Cores Institucionais SSVP */
+      --md-primary: #002d62;
+      /* Azul Marinho SSVP */
+      --md-on-primary: #ffffff;
+      --md-secondary: #007fff;
+      /* Azul Royal Ação */
+      --md-on-secondary: #ffffff;
+      --md-error: #d32f2f;
+      /* Vermelho Alerta SSVP */
+      --md-on-error: #ffffff;
+      --md-success: #15803d;
+      /* Verde Confirmação */
+
+      /* MODO ESCURO (Padrão de Campo) */
+      --md-surface-0: #0b0f19;
+      /* Nível 0: Canvas de Fundo */
+      --md-surface-1: #151d2f;
+      /* Nível 1: Cards e Itens de Lista */
+      --md-surface-2: #1b263d;
+      /* Nível 2: Barras Fixas e Elementos Flutuantes */
+      --md-surface-3: #22304d;
+      /* Nível 3: Modais, Dialogs e Sheets */
+
+      --md-on-surface: #f1f5f9;
+      /* Texto Principal */
+      --md-on-surface-variant: #94a3b8;
+      /* Texto Secundário / Muted */
+      --md-border-subtle: rgba(255, 255, 255, 0.08);
+      --md-border-strong: rgba(255, 255, 255, 0.18);
+
+      /* Tokens do Switch M3 (Modo Escuro) */
+      --md-switch-track-off: rgba(255, 255, 255, 0.14);
+      --md-switch-border-off: rgba(255, 255, 255, 0.35);
+      --md-switch-thumb-off: #cbd5e1;
+
+      /* Sombras de Elevação M3 */
+      --md-elevation-0: none;
+      --md-elevation-1: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px -1px rgba(0, 0, 0, 0.2);
+      --md-elevation-2: 0 4px 8px -1px rgba(0, 0, 0, 0.35), 0 2px 4px -2px rgba(0, 0, 0, 0.25);
+      --md-elevation-3: 0 16px 36px -4px rgba(0, 0, 0, 0.6), 0 6px 14px -2px rgba(0, 0, 0, 0.4);
+
+      /* Dimensões e Ergonomia */
+      --touch-target-min: 3rem;
+      /* 48px mínimo para dedos de idosos */
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --font-family: 'Montserrat', Arial, sans-serif;
+      --header-height: 4rem;
+
+      /* Duração Padrão Homologada (800ms) */
+      --sheet-duracao: 800ms;
+    }
+
+    /* MODO CLARO (Para Uso sob Sol Forte) */
+    body.tema-claro {
+      --md-surface-0: #f8fafc;
+      --md-surface-1: #ffffff;
+      --md-surface-2: #f1f5f9;
+      --md-surface-3: #ffffff;
+
+      --md-on-surface: #0f172a;
+      --md-on-surface-variant: #475569;
+      --md-border-subtle: rgba(0, 0, 0, 0.08);
+      --md-border-strong: rgba(0, 0, 0, 0.15);
+
+      --md-switch-track-off: #e2e8f0;
+      --md-switch-border-off: #94a3b8;
+      --md-switch-thumb-off: #64748b;
+
+      --md-elevation-1: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.06);
+      --md-elevation-2: 0 4px 6px -1px rgba(0, 0, 0, 0.12), 0 2px 4px -2px rgba(0, 0, 0, 0.08);
+      --md-elevation-3: 0 16px 32px -4px rgba(0, 0, 0, 0.22), 0 6px 12px -2px rgba(0, 0, 0, 0.08);
+    }
+
+    /* CONFIGURAÇÃO GLOBAL: FONTE GRANDE (Acessibilidade Idosos) */
+    body.fonte-grande {
+      font-size: 1.15rem;
+    }
+
+    body.fonte-grande .card-titulo {
+      font-size: 1.2rem;
+    }
+
+    body.fonte-grande .card-descricao {
+      font-size: 0.98rem;
+    }
+
+    body.fonte-grande .switch-title {
+      font-size: 1.05rem;
+    }
+
+    /* CONFIGURAÇÃO GLOBAL: REDUZIR ANIMAÇÕES */
+    body.sem-animacoes {
+      --sheet-duracao: 0.01s !important;
+    }
+
+    /* ==========================================================================
+       2. Reset e Estrutura Principal
+       ========================================================================== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-family);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--md-surface-0);
+      color: var(--md-on-surface);
+      height: 100vh;
+      height: 100dvh;
+      width: 100vw;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    /* ==========================================================================
+       3. Barra Superior (Nível 2 de Elevação - z-index: 60)
+       ========================================================================== */
+    .app-header {
+      position: relative;
+      background-color: var(--md-primary);
+      color: var(--md-on-primary);
+      padding-top: calc(0.6rem + var(--safe-top));
+      padding-bottom: 0.6rem;
+      padding-left: 1rem;
+      padding-right: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: var(--md-elevation-2);
+      z-index: 60;
+      /* Fica na frente da Top Sheet que emerge de trás dela */
+      flex-shrink: 0;
+      min-height: var(--header-height);
+      transition: flex-direction 0.3s ease;
+    }
+
+    /* Botão de Configurações (Área de Toque 48px) */
+    .btn-header-config {
+      width: var(--touch-target-min);
+      height: var(--touch-target-min);
+      border-radius: 50%;
+      border: none;
+      background: rgba(255, 255, 255, 0.12);
+      color: var(--md-on-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+      box-shadow: var(--md-elevation-1);
+      transition: background-color 0.2s ease, transform 0.1s ease;
+      margin: 0;
+    }
+
+    .btn-header-config:hover {
+      background: rgba(255, 255, 255, 0.22);
+    }
+
+    .btn-header-config:active {
+      transform: scale(0.92);
+    }
+
+    .header-title-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      user-select: none;
+    }
+
+    .header-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    .header-version-pill {
+      font-size: 0.68rem;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.15);
+      padding: 2px 8px;
+      border-radius: 12px;
+      margin-top: 2px;
+      letter-spacing: 0.04em;
+    }
+
+    /* Logo SSVP no Topo */
+    .header-logo {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 50%;
+      background-color: var(--md-on-primary);
+      color: var(--md-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.95rem;
+      user-select: none;
+      margin: 0;
+    }
+
+    /* ==========================================================================
+       4. Gaveta Superior Flutuante M3 (Top Sheet - Nível 3 de Elevação)
+          Estrutura Arquitetural Escalável:
+          - Cabeçalho Fixo (Título ⚙️)
+          - Corpo com Rolagem Independente (Suporta 7, 9 ou mais switches)
+          - Rodapé Fixo na Base da Gaveta (Botão "Fechar" SEMPRE visível)
+       ========================================================================== */
+    .scrim-overlay-top {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(4px);
+      z-index: 50;
+      /* Abaixo das barras superior e inferior (z-index: 60) */
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+
+    .scrim-overlay-top.aberto {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Gaveta Superior Flutuante:
+       - 1rem de folga abaixo da barra superior
+       - Para 1.4rem acima da barra inferior (NUNCA entra debaixo do rodapé)
+       - 4 cantos arredondados (1.5rem)
+       - Container flexbox com overflow oculto para fixar cabeçalho e rodapé */
+    .top-sheet {
+      width: calc(100% - 2rem);
+      max-width: 480px;
+      background-color: var(--md-surface-3);
+      border-radius: 1.5rem;
+      /* 4 cantos arredondados */
+      border: 1px solid var(--md-border-strong);
+      box-shadow: var(--md-elevation-3);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      /* Mantém os cantos arredondados nos limites do cabeçalho e rodapé */
+
+      /* Folga de 1rem abaixo da borda inferior da barra superior */
+      margin-top: calc(3.8rem + var(--safe-top) + 1rem);
+
+      /* Altura Máxima Calculada para parar antes da barra inferior (Folga de ~1.4rem acima dela) */
+      max-height: calc(100dvh - 11.5rem - var(--safe-top) - var(--safe-bottom));
+
+      /* Inicia recolhida atrás da barra superior */
+      transform: translateY(calc(-100% - 10rem));
+
+      /* Animação com duração homologada (800ms M3 Emphasized Decelerate) */
+      transition: transform var(--sheet-duracao) cubic-bezier(0.05, 0.7, 0.1, 1.0);
+    }
+
+    .scrim-overlay-top.aberto .top-sheet {
+      transform: translateY(0);
+    }
+
+    /* Cabeçalho da Gaveta (Fixo no topo interno da gaveta) */
+    .sheet-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--md-border-subtle);
+      padding: 1.15rem 1.5rem 0.85rem 1.5rem;
+      flex-shrink: 0;
+      background-color: var(--md-surface-3);
+    }
+
+    .sheet-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--md-on-surface);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Corpo Rolável da Gaveta (Recebe a lista de switches com rolagem suave) */
+    .sheet-body {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 1rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .sheet-secao-titulo {
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--md-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 0.35rem;
+      display: block;
+    }
+
+    .sheet-lista-config {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    /* Rodapé da Gaveta (Fixo na base interna da gaveta - Botão Fechar sempre visível) */
+    .sheet-footer {
+      padding: 0.75rem 1.5rem 1.15rem 1.5rem;
+      border-top: 1px solid var(--md-border-subtle);
+      background-color: var(--md-surface-3);
+      flex-shrink: 0;
+    }
+
+    /* ==========================================================================
+       5. Componente Switch Material Design 3 (Toggle Button)
+       ========================================================================== */
+    .m3-switch-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 3.2rem;
+      padding: 0.5rem 0.25rem;
+      cursor: pointer;
+      border-bottom: 1px solid var(--md-border-subtle);
+      user-select: none;
+      transition: background-color 0.15s ease;
+    }
+
+    .m3-switch-row:last-child {
+      border-bottom: none;
+    }
+
+    .m3-switch-row:active {
+      background-color: rgba(255, 255, 255, 0.04);
+      border-radius: 8px;
+    }
+
+    .switch-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      padding-right: 1rem;
+    }
+
+    .switch-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--md-on-surface);
+    }
+
+    .switch-desc {
+      font-size: 0.78rem;
+      color: var(--md-on-surface-variant);
+      line-height: 1.35;
+    }
+
+    /* O Switch Físico M3 */
+    .m3-switch {
+      position: relative;
+      width: 3.25rem;
+      /* 52px */
+      height: 2rem;
+      /* 32px */
+      flex-shrink: 0;
+    }
+
+    .m3-switch input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    /* Trilho (Track) */
+    .m3-switch-track {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--md-switch-track-off);
+      border: 2px solid var(--md-switch-border-off);
+      border-radius: 1rem;
+      transition: background-color 0.2s cubic-bezier(0.2, 0, 0, 1), border-color 0.2s cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    /* Êmbolo (Thumb) */
+    .m3-switch-thumb {
+      position: absolute;
+      top: 50%;
+      left: 0.25rem;
+      transform: translateY(-50%);
+      width: 1rem;
+      height: 1rem;
+      border-radius: 50%;
+      background-color: var(--md-switch-thumb-off);
+      transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1), width 0.2s ease, height 0.2s ease, background-color 0.2s ease, left 0.25s cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    /* Estado Ativo (Checked) */
+    .m3-switch input:checked+.m3-switch-track {
+      background-color: var(--md-secondary);
+      border-color: var(--md-secondary);
+    }
+
+    .m3-switch input:checked+.m3-switch-track .m3-switch-thumb {
+      left: calc(100% - 1.65rem);
+      width: 1.4rem;
+      height: 1.4rem;
+      background-color: #ffffff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+    }
+
+    /* ==========================================================================
+       6. Área de Conteúdo Central (Nível 0 com Cards em Nível 1)
+       ========================================================================== */
+    .app-viewport {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 1.25rem 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.25rem;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .container-largura {
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* Banner Informativo */
+    .banner-introducao {
+      background: linear-gradient(135deg, rgba(0, 45, 98, 0.25) 0%, rgba(0, 127, 255, 0.15) 100%);
+      border: 1px solid var(--md-secondary);
+      border-radius: 1rem;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .banner-titulo {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--md-secondary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .banner-texto {
+      font-size: 0.85rem;
+      line-height: 1.45;
+      color: var(--md-on-surface);
+    }
+
+    /* Cards Material Design (Nível 1) */
+    .md-card {
+      background-color: var(--md-surface-1);
+      border: 1px solid var(--md-border-subtle);
+      border-radius: 1.15rem;
+      padding: 1.25rem;
+      box-shadow: var(--md-elevation-1);
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      position: relative;
+      transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.2s cubic-bezier(0.2, 0, 0, 1), border-color 0.2s ease;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .badge-nivel {
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 0.2rem 0.6rem;
+      border-radius: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .badge-nivel-1 {
+      background-color: rgba(0, 127, 255, 0.15);
+      color: var(--md-secondary);
+      border: 1px solid rgba(0, 127, 255, 0.3);
+    }
+
+    .card-titulo {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--md-on-surface);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card-descricao {
+      font-size: 0.86rem;
+      color: var(--md-on-surface-variant);
+      line-height: 1.5;
+    }
+
+    /* Botão M3 Filled */
+    .btn-m3-filled {
+      width: 100%;
+      min-height: var(--touch-target-min);
+      background-color: var(--md-secondary);
+      color: var(--md-on-secondary);
+      border: none;
+      border-radius: 1rem;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      box-shadow: var(--md-elevation-1);
+      transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+    }
+
+    .btn-m3-filled:hover {
+      background-color: #006cd9;
+      box-shadow: var(--md-elevation-2);
+    }
+
+    .btn-m3-filled:active {
+      transform: scale(0.98);
+    }
+
+    /* ==========================================================================
+       7. Barra Inferior (Nível 2 de Elevação)
+       ========================================================================== */
+    .app-footer {
+      position: relative;
+      background-color: var(--md-primary);
+      color: var(--md-on-primary);
+      padding-top: 0.75rem;
+      padding-bottom: calc(0.75rem + var(--safe-bottom));
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.35);
+      z-index: 60;
+      flex-shrink: 0;
+      transition: flex-direction 0.3s ease;
+    }
+
+    /* ==========================================================================
+       8. CONTROLE ERGONÔMICO DESTRO / CANHOTO (Barras Superior e Inferior)
+          - Modo Destro (Padrão): Configurações ⚙️ à Direita; Menu 📋 à Esquerda e 🔄 à Direita.
+          - Modo Canhoto (Invertido): Inverte as posições das duas barras para favorecer a mão esquerda.
+       ========================================================================== */
+    body.layout-canhoto .app-header {
+      flex-direction: row-reverse;
+    }
+
+    body.layout-canhoto .app-footer {
+      flex-direction: row-reverse;
+    }
+
+    .footer-circle-btn {
+      width: 3.2rem;
+      height: 3.2rem;
+      border-radius: 50%;
+      background-color: var(--md-on-primary);
+      color: var(--md-primary);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      cursor: pointer;
+      box-shadow: var(--md-elevation-2);
+      transition: transform 0.1s ease;
+      margin: 0;
+    }
+
+    .footer-circle-btn:active {
+      transform: scale(0.92);
+    }
+
+    .footer-fab {
+      width: 3.8rem;
+      height: 3.8rem;
+      border-radius: 1.15rem;
+      background: linear-gradient(135deg, #007fff 0%, #0056b3 100%);
+      color: #ffffff;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--md-elevation-3);
+      cursor: pointer;
+      transition: transform 0.15s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.15s ease;
+      margin: 0;
+    }
+
+    .footer-fab:hover {
+      transform: translateY(-2px) scale(1.03);
+    }
+
+    .footer-fab:active {
+      transform: scale(0.95);
+    }
+
+    .footer-fab svg {
+      width: 2rem;
+      height: 2rem;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ========================================================================
+       Barra Superior Fixa (Nível 2 de Elevação - z-index: 60)
+       No Modo Destro: Logo SSVP à Esquerda, Configurações ⚙️ à Direita.
+       ======================================================================== -->
+  <header class="app-header" id="appHeader">
+    <!-- Logo SSVP (Canto Esquerdo no Modo Destro) -->
+    <div class="header-logo" title="Sociedade de São Vicente de Paulo">
+      SS
+    </div>
+
+    <div class="header-title-area">
+      <h1 class="header-title">Configurações</h1>
+      <span class="header-version-pill">t2_configuracoes.html • v1.5</span>
+    </div>
+
+    <!-- Botão de Configurações (Canto Direito no Modo Destro - fácil alcance do polegar) -->
+    <button type="button" class="btn-header-config" id="btnConfig" onclick="toggleTopSheet()"
+      title="Abrir Configurações">
+      ⚙️
+    </button>
+  </header>
+
+  <!-- ========================================================================
+       Gaveta Superior Flutuante M3 (Top Sheet - Nível 3 de Elevação)
+       Estrutura em 3 zonas: Cabeçalho Fixo, Lista Rolável e Botão Fechar Fixo
+       ======================================================================== -->
+  <div class="scrim-overlay-top" id="scrimTop" onclick="fecharTopSheetPorOverlay(event)">
+    <div class="top-sheet" id="topSheet" onclick="event.stopPropagation()">
+
+      <!-- 1. Cabeçalho Fixo da Gaveta -->
+      <div class="sheet-header">
+        <h3 class="sheet-title">⚙️ Configurações</h3>
+      </div>
+
+      <!-- 2. Corpo com Rolagem Independente (Escalável para quantas opções desejar) -->
+      <div class="sheet-body">
+
+        <!-- SEÇÃO 1: Aparência e Ergonomia -->
+        <span class="sheet-secao-titulo">Aparência &amp; Ergonomia</span>
+        <div class="sheet-lista-config">
+
+          <!-- Switch 1: Modo Escuro -->
+          <label class="m3-switch-row" for="switchModoEscuro">
+            <div class="switch-info">
+              <span class="switch-title">Modo Escuro</span>
+              <span class="switch-desc">Fundo noturno (OLED) / Desligue para sol forte</span>
+            </div>
+            <div class="m3-switch">
+              <input type="checkbox" id="switchModoEscuro" onchange="alterarConfig('modoEscuro', this.checked)">
+              <span class="m3-switch-track">
+                <span class="m3-switch-thumb"></span>
+              </span>
+            </div>
+          </label>
+
+          <!-- Switch 2: Fonte Grande -->
+          <label class="m3-switch-row" for="switchFonteGrande">
+            <div class="switch-info">
+              <span class="switch-title">Fonte Grande</span>
+              <span class="switch-desc">Amplia letras para leitura confortável de idosos</span>
+            </div>
+            <div class="m3-switch">
+              <input type="checkbox" id="switchFonteGrande" onchange="alterarConfig('fonteGrande', this.checked)">
+              <span class="m3-switch-track">
+                <span class="m3-switch-thumb"></span>
+              </span>
+            </div>
+          </label>
+
+          <!-- Switch 3: Destro (Configurações e ações à direita) -->
+          <label class="m3-switch-row" for="switchDestro">
+            <div class="switch-info">
+              <span class="switch-title">Modo Destro</span>
+              <span class="switch-desc">Configurações à direita; desative para canhoto</span>
+            </div>
+            <div class="m3-switch">
+              <input type="checkbox" id="switchDestro" onchange="alterarConfig('destro', this.checked)">
+              <span class="m3-switch-track">
+                <span class="m3-switch-thumb"></span>
+              </span>
+            </div>
+          </label>
+
+          <!-- Switch 4: Reduzir Animações -->
+          <label class="m3-switch-row" for="switchReduzirAnim">
+            <div class="switch-info">
+              <span class="switch-title">Reduzir Animações</span>
+              <span class="switch-desc">Abertura instantânea (desempenho em celulares lentos)</span>
+            </div>
+            <div class="m3-switch">
+              <input type="checkbox" id="switchReduzirAnim" onchange="alterarConfig('reduzirAnimacoes', this.checked)">
+              <span class="m3-switch-track">
+                <span class="m3-switch-thumb"></span>
+              </span>
+            </div>
+          </label>
+
+        </div>
+
+        <!-- SEÇÃO 2: Operação em Campo e Retorno -->
+        <span class="sheet-secao-titulo">Operação em Campo</span>
+        <div class="sheet-lista-config">
+
+          <!-- Switch 5: Vibração ao Tocar -->
+          <label class="m3-switch-row" for="switchVibracao">
+            <div class="switch-info">
+              <span class="switch-title">Vibração ao Tocar</span>
+              <span class="switch-desc">Confirmação física imediata de clique no celular</span>
+            </div>
+            <div class="m3-switch">
+              <input type="checkbox" id="switchVibracao" onchange="alterarConfig('vibracaoAtiva', this.checked)">
+              <span class="m3-switch-track">
+                <span class="m3-switch-thumb"></span>
+              </span>
+            </div>
+          </label>
+
+          <!-- Switch 6: Som ao Tocar -->
+          <label class="m3-switch-row" for="switchSom">
+            <div class="switch-info">
+              <span class="switch-title">Som ao Tocar</span>
+              <span class="switch-desc">Confirmação sonora ao tocar nos botões</span>
+            </div>
+            <div class="m3-switch">
+              <input type="checkbox" id="switchSom" onchange="alterarConfig('somAtivo', this.checked)">
+              <span class="m3-switch-track">
+                <span class="m3-switch-thumb"></span>
+              </span>
+            </div>
+          </label>
+
+          <!-- Switch 7: Sincronizar em Wi-Fi -->
+          <label class="m3-switch-row" for="switchWifi">
+            <div class="switch-info">
+              <span class="switch-title">Sincronizar em Wi-Fi</span>
+              <span class="switch-desc">Economiza dados móveis (3G/4G) durante visitas</span>
+            </div>
+            <div class="m3-switch">
+              <input type="checkbox" id="switchWifi" onchange="alterarConfig('somenteWifi', this.checked)">
+              <span class="m3-switch-track">
+                <span class="m3-switch-thumb"></span>
+              </span>
+            </div>
+          </label>
+
+        </div>
+
+      </div>
+
+      <!-- 3. Rodapé Fixo da Gaveta (Botão "Fechar" SEMPRE visível na mão do voluntário) -->
+      <div class="sheet-footer">
+        <button type="button" class="btn-m3-filled" style="background-color: var(--md-primary);"
+          onclick="fecharTopSheet()">
+          Fechar
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       Área de Conteúdo Central (Nível 0 com Cards em Nível 1)
+       ======================================================================== -->
+  <main class="app-viewport">
+    <div class="container-largura">
+
+      <!-- Banner de Instrução -->
+      <section class="banner-introducao">
+        <h2 class="banner-titulo">⚙️ Configurações</h2>
+        <p class="banner-texto">
+          Toque no botão <strong>⚙️ na barra superior</strong> (ou no botão azul abaixo) para abrir a <strong>Gaveta
+            Superior Flutuante</strong> com cabeçalho fixo, opções com rolagem livre e botão Fechar sempre acessível na
+          base.
+        </p>
+      </section>
+
+      <!-- Botão de Ação para Abrir a Top Sheet -->
+      <section style="display: flex; flex-direction: column; gap: 0.5rem;">
+        <button type="button" class="btn-m3-filled" onclick="abrirTopSheet()">
+          <span>⚙️ Abrir Configurações</span>
+        </button>
+      </section>
+
+      <!-- Card Exemplo: Demonstração de Escala de Fonte e Modo Destro -->
+      <article class="md-card">
+        <div class="card-header">
+          <span class="badge-nivel badge-nivel-1">Ergonomia de Toque</span>
+          <span id="badgeLayoutDestro" style="font-size: 0.75rem; color: var(--md-secondary); font-weight: 700;">Modo
+            Destro: Ativo</span>
+        </div>
+
+        <h3 class="card-titulo">📱 Validação de Mão Dominante</h3>
+        <p class="card-descricao">
+          No <strong>Modo Destro</strong>, o botão <strong>⚙️ Configurações fica à direita</strong>, ao alcance fácil do
+          polegar direito. Ao desativar para modo canhoto, o botão ⚙️ inverte para a esquerda e os botões da barra
+          inferior também se adaptam para a mão esquerda.
+        </p>
+      </article>
+
+      <!-- Card Exemplo: Confirmação de Salvamento Local Silencioso -->
+      <article class="md-card">
+        <div class="card-header">
+          <h3 class="card-titulo" style="font-size: 0.95rem;">💾 Armazenamento no Dispositivo</h3>
+          <span style="font-size: 0.7rem; color: var(--md-success); font-weight: 700;">● Salvo Automaticamente</span>
+        </div>
+        <p class="card-descricao" style="font-size: 0.85rem;">
+          Todas as suas preferências são gravadas com segurança no próprio celular e são restauradas sempre que o
+          aplicativo for aberto, mesmo sem conexão com a internet.
+        </p>
+      </article>
+
+    </div>
+  </main>
+
+  <!-- ========================================================================
+       Barra Inferior Fixa (Nível 2 de Elevação - z-index: 60)
+       ======================================================================== -->
+  <footer class="app-footer" id="appFooter">
+    <!-- Botão Lateral A (Menu / Prancheta) -->
+    <button type="button" class="footer-circle-btn" id="btnFooterA" onclick="executarAcaoBotao('Menu Vicentino')"
+      title="Menu / Prancheta">
+      📋
+    </button>
+
+    <!-- Botão Central FAB (Microfone de Voz) -->
+    <button type="button" class="footer-fab" id="btnFooterMic" onclick="executarAcaoBotao('Comando de Voz')"
+      title="Ação Rápida de Voz">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path
+          d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z" />
+      </svg>
+    </button>
+
+    <!-- Botão Lateral B (Sincronização / Nuvem) -->
+    <button type="button" class="footer-circle-btn" id="btnFooterB" onclick="executarAcaoBotao('Sincronização Nuvem')"
+      title="Sincronização">
+      🔄
+    </button>
+  </footer>
+
+  <!-- ========================================================================
+       Scripts de Controle, Armazenamento Local e Feedback M3
+       ======================================================================== -->
+  <script>
+    // 1. CONFIGURAÇÃO PADRÃO DO APLICATIVO
+    const CONFIG_PADRAO = {
+      id: "config_geral",
+      modoEscuro: true,
+      fonteGrande: false,
+      destro: true,
+      reduzirAnimacoes: false,
+      vibracaoAtiva: true,
+      somAtivo: true,
+      somenteWifi: false,
+      atualizadoEm: new Date().toISOString()
+    };
+
+    let configAtual = { ...CONFIG_PADRAO };
+
+    // Elementos do DOM
+    const scrimTop = document.getElementById("scrimTop");
+    const topSheet = document.getElementById("topSheet");
+    const appHeader = document.getElementById("appHeader");
+    const appFooter = document.getElementById("appFooter");
+    const badgeLayoutDestro = document.getElementById("badgeLayoutDestro");
+
+    // Switches
+    const switchModoEscuro = document.getElementById("switchModoEscuro");
+    const switchFonteGrande = document.getElementById("switchFonteGrande");
+    const switchDestro = document.getElementById("switchDestro");
+    const switchReduzirAnim = document.getElementById("switchReduzirAnim");
+    const switchVibracao = document.getElementById("switchVibracao");
+    const switchSom = document.getElementById("switchSom");
+    const switchWifi = document.getElementById("switchWifi");
+
+    // ==========================================================================
+    // 2. ARMAZENAMENTO LOCAL (IndexedDB Silencioso)
+    // ==========================================================================
+    const DB_NOME = "SSVP_ConfigDB";
+    const DB_VERSAO = 1;
+    const DB_STORE = "preferencias";
+
+    function abrirDB() {
+      return new Promise((resolve, reject) => {
+        const req = indexedDB.open(DB_NOME, DB_VERSAO);
+        req.onupgradeneeded = (e) => {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains(DB_STORE)) {
+            db.createObjectStore(DB_STORE, { keyPath: "id" });
+          }
+        };
+        req.onsuccess = (e) => resolve(e.target.result);
+        req.onerror = (e) => reject(e.target.error);
+      });
+    }
+
+    async function salvarNoArmazenamento(dados) {
+      try {
+        const db = await abrirDB();
+        const tx = db.transaction(DB_STORE, "readwrite");
+        const store = tx.objectStore(DB_STORE);
+        dados.atualizadoEm = new Date().toISOString();
+        store.put(dados);
+      } catch (err) {
+        console.error("Erro ao salvar preferências:", err);
+      }
+    }
+
+    async function carregarDoArmazenamento() {
+      try {
+        const db = await abrirDB();
+        const tx = db.transaction(DB_STORE, "readonly");
+        const store = tx.objectStore(DB_STORE);
+        const req = store.get("config_geral");
+
+        req.onsuccess = () => {
+          if (req.result) {
+            configAtual = { ...CONFIG_PADRAO, ...req.result };
+          } else {
+            configAtual = { ...CONFIG_PADRAO };
+            salvarNoArmazenamento(configAtual);
+          }
+          aplicarConfiguracoesNaInterface(configAtual);
+        };
+      } catch (err) {
+        console.error("Erro ao carregar preferências:", err);
+        aplicarConfiguracoesNaInterface(configAtual);
+      }
+    }
+
+    // ==========================================================================
+    // 3. APLICAÇÃO DINÂMICA DAS CONFIGURAÇÕES NO DOM
+    // ==========================================================================
+    function aplicarConfiguracoesNaInterface(cfg) {
+      // 1. Modo Escuro
+      if (cfg.modoEscuro) {
+        document.body.classList.remove("tema-claro");
+      } else {
+        document.body.classList.add("tema-claro");
+      }
+      switchModoEscuro.checked = cfg.modoEscuro;
+
+      // 2. Fonte Grande
+      if (cfg.fonteGrande) {
+        document.body.classList.add("fonte-grande");
+      } else {
+        document.body.classList.remove("fonte-grande");
+      }
+      switchFonteGrande.checked = cfg.fonteGrande;
+
+      // 3. Destro (No modo destro, ⚙️ fica à direita. No canhoto, inverte para a esquerda)
+      if (cfg.destro) {
+        document.body.classList.remove("layout-canhoto");
+        badgeLayoutDestro.textContent = "Modo Destro: ⚙️ à Direita";
+      } else {
+        document.body.classList.add("layout-canhoto");
+        badgeLayoutDestro.textContent = "Modo Canhoto: ⚙️ à Esquerda";
+      }
+      switchDestro.checked = cfg.destro;
+
+      // 4. Reduzir Animações
+      if (cfg.reduzirAnimacoes) {
+        document.body.classList.add("sem-animacoes");
+      } else {
+        document.body.classList.remove("sem-animacoes");
+      }
+      switchReduzirAnim.checked = cfg.reduzirAnimacoes;
+
+      // 5. Vibração, Som e Wi-Fi
+      switchVibracao.checked = cfg.vibracaoAtiva;
+      switchSom.checked = cfg.somAtivo;
+      switchWifi.checked = cfg.somenteWifi;
+    }
+
+    function alterarConfig(chave, valor) {
+      configAtual[chave] = valor;
+      dispararFeedbackTabil();
+      dispararFeedbackSonoro();
+      aplicarConfiguracoesNaInterface(configAtual);
+      salvarNoArmazenamento(configAtual);
+    }
+
+    // ==========================================================================
+    // 4. FEEDBACK TÁTIL (HAPTIC) E SONORO (AUDIO)
+    // ==========================================================================
+    function dispararFeedbackTabil() {
+      if (configAtual.vibracaoAtiva && navigator.vibrate) {
+        try {
+          navigator.vibrate(35);
+        } catch (e) { }
+      }
+    }
+
+    function dispararFeedbackSonoro() {
+      if (!configAtual.somAtivo) return;
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        const ctx = new AudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(659.25, ctx.currentTime); // Mi (E5)
+        gain.gain.setValueAtTime(0.06, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+
+        osc.start();
+        osc.stop(ctx.currentTime + 0.12);
+      } catch (e) { }
+    }
+
+    function executarAcaoBotao(nome) {
+      dispararFeedbackTabil();
+      dispararFeedbackSonoro();
+      alert(`Botão acionado: ${nome}`);
+    }
+
+    // ==========================================================================
+    // 5. CONTROLE DA GAVETA SUPERIOR FLUTUANTE (TOP SHEET)
+    // ==========================================================================
+    function abrirTopSheet() {
+      dispararFeedbackTabil();
+      dispararFeedbackSonoro();
+      scrimTop.classList.add("aberto");
+    }
+
+    function fecharTopSheet() {
+      dispararFeedbackTabil();
+      scrimTop.classList.remove("aberto");
+    }
+
+    function toggleTopSheet() {
+      if (scrimTop.classList.contains("aberto")) {
+        fecharTopSheet();
+      } else {
+        abrirTopSheet();
+      }
+    }
+
+    function fecharTopSheetPorOverlay(event) {
+      if (event.target === scrimTop) {
+        fecharTopSheet();
+      }
+    }
+
+    // ==========================================================================
+    // 6. INICIALIZAÇÃO AO CARREGAR A PÁGINA
+    // ==========================================================================
+    window.addEventListener("DOMContentLoaded", () => {
+      carregarDoArmazenamento();
+    });
+  </script>
+</body>
+
+</html>

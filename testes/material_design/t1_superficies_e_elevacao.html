@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Material Design SSVP - Teste 1: Superfícies e Elevação</title>
+
+  <!-- Google Fonts Montserrat -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       1. Tokens do Sistema de Cores e Elevação M3 (Adaptado à SSVP)
+       ========================================================================== */
+    :root {
+      /* Cores Institucionais SSVP */
+      --md-primary: #002d62;          /* Azul Marinho SSVP */
+      --md-on-primary: #ffffff;
+      --md-secondary: #007fff;        /* Azul Royal Ação */
+      --md-on-secondary: #ffffff;
+      --md-error: #d32f2f;            /* Vermelho Alerta SSVP */
+      --md-on-error: #ffffff;
+      --md-success: #15803d;          /* Verde Confirmação */
+
+      /* MODO ESCURO (Padrão de Campo) */
+      --md-surface-0: #0b0f19;        /* Nível 0: Canvas de Fundo */
+      --md-surface-1: #151d2f;        /* Nível 1: Cards e Itens de Lista */
+      --md-surface-2: #1b263d;        /* Nível 2: Barras Fixas e Elementos Flutuantes */
+      --md-surface-3: #22304d;        /* Nível 3: Modais, Dialogs e Bottom Sheets */
+      
+      --md-on-surface: #f1f5f9;       /* Texto Principal */
+      --md-on-surface-variant: #94a3b8; /* Texto Secundário / Muted */
+      --md-border-subtle: rgba(255, 255, 255, 0.08);
+      --md-border-strong: rgba(255, 255, 255, 0.18);
+
+      /* Sombras de Elevação M3 (Sombras duplas suaves para profundidade natural) */
+      --md-elevation-0: none;
+      --md-elevation-1: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px -1px rgba(0, 0, 0, 0.2);
+      --md-elevation-2: 0 4px 8px -1px rgba(0, 0, 0, 0.35), 0 2px 4px -2px rgba(0, 0, 0, 0.25);
+      --md-elevation-3: 0 16px 36px -4px rgba(0, 0, 0, 0.6), 0 6px 14px -2px rgba(0, 0, 0, 0.4);
+
+      /* Dimensões e Ergonomia */
+      --touch-target-min: 3rem;       /* 48px mínimo para dedos de idosos */
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --font-family: 'Montserrat', Arial, sans-serif;
+
+      /* Duração Padrão Homologada da Gaveta Flutuante M3 (800ms) */
+      --sheet-duracao: 800ms;
+    }
+
+    /* MODO CLARO (Para Uso sob Sol Forte) */
+    body.tema-claro {
+      --md-surface-0: #f8fafc;
+      --md-surface-1: #ffffff;
+      --md-surface-2: #f1f5f9;
+      --md-surface-3: #ffffff;
+
+      --md-on-surface: #0f172a;
+      --md-on-surface-variant: #475569;
+      --md-border-subtle: rgba(0, 0, 0, 0.08);
+      --md-border-strong: rgba(0, 0, 0, 0.15);
+
+      --md-elevation-1: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.06);
+      --md-elevation-2: 0 4px 6px -1px rgba(0, 0, 0, 0.12), 0 2px 4px -2px rgba(0, 0, 0, 0.08);
+      --md-elevation-3: 0 16px 32px -4px rgba(0, 0, 0, 0.22), 0 6px 12px -2px rgba(0, 0, 0, 0.08);
+    }
+
+    /* ==========================================================================
+       2. Reset e Estrutura Principal
+       ========================================================================== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-family);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--md-surface-0);
+      color: var(--md-on-surface);
+      height: 100vh;
+      height: 100dvh; /* Altura de viewport dinâmica para Android e iOS */
+      width: 100vw;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    /* ==========================================================================
+       3. Barra Superior (Nível de Elevação 2)
+       ========================================================================== */
+    .app-header {
+      position: relative;
+      background-color: var(--md-primary);
+      color: var(--md-on-primary);
+      padding-top: calc(0.6rem + var(--safe-top));
+      padding-bottom: 0.6rem;
+      padding-left: 1rem;
+      padding-right: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: var(--md-elevation-2);
+      z-index: 60;
+      flex-shrink: 0;
+    }
+
+    .header-logo {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 50%;
+      background-color: var(--md-on-primary);
+      color: var(--md-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.95rem;
+      user-select: none;
+    }
+
+    .header-title-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .header-title {
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    .header-version-pill {
+      font-size: 0.68rem;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.15);
+      padding: 2px 8px;
+      border-radius: 12px;
+      margin-top: 2px;
+      letter-spacing: 0.04em;
+    }
+
+    .btn-toggle-tema {
+      width: var(--touch-target-min);
+      height: var(--touch-target-min);
+      border-radius: 50%;
+      border: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--md-on-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+    }
+
+    .btn-toggle-tema:active {
+      transform: scale(0.92);
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* ==========================================================================
+       4. Área de Conteúdo Central (Nível 0 com Elementos em Nível 1)
+       ========================================================================== */
+    .app-viewport {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 1.25rem 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.25rem;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .container-largura {
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* Banner Informativo */
+    .banner-introducao {
+      background: linear-gradient(135deg, rgba(0, 45, 98, 0.25) 0%, rgba(0, 127, 255, 0.15) 100%);
+      border: 1px solid var(--md-secondary);
+      border-radius: 1rem;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .banner-titulo {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--md-secondary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .banner-texto {
+      font-size: 0.85rem;
+      line-height: 1.45;
+      color: var(--md-on-surface);
+    }
+
+    /* ==========================================================================
+       5. Cards Material Design (Nível 1 de Elevação)
+       ========================================================================== */
+    .md-card {
+      background-color: var(--md-surface-1);
+      border: 1px solid var(--md-border-subtle);
+      border-radius: 1.15rem;
+      padding: 1.25rem;
+      box-shadow: var(--md-elevation-1);
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      position: relative;
+      transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.2s cubic-bezier(0.2, 0, 0, 1), border-color 0.2s ease;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    /* Efeito de Elevação Dinâmica ao Toque/Pressionar (State Layer M3) */
+    .md-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--md-elevation-2);
+      border-color: var(--md-border-strong);
+    }
+
+    .md-card:active {
+      transform: scale(0.985);
+      background-color: color-mix(in srgb, var(--md-surface-1) 92%, white 8%);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .badge-nivel {
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 0.2rem 0.6rem;
+      border-radius: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .badge-nivel-1 {
+      background-color: rgba(0, 127, 255, 0.15);
+      color: var(--md-secondary);
+      border: 1px solid rgba(0, 127, 255, 0.3);
+    }
+
+    .card-titulo {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--md-on-surface);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card-descricao {
+      font-size: 0.86rem;
+      color: var(--md-on-surface-variant);
+      line-height: 1.5;
+    }
+
+    .card-dados-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+      background: rgba(0, 0, 0, 0.12);
+      padding: 0.75rem;
+      border-radius: 10px;
+    }
+
+    .card-dado-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .dado-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--md-on-surface-variant);
+      text-transform: uppercase;
+    }
+
+    .dado-valor {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--md-on-surface);
+    }
+
+    /* ==========================================================================
+       6. Botões Ergonômicos M3 (Alvo de Toque >= 48px)
+       ========================================================================== */
+    .btn-m3-filled {
+      width: 100%;
+      min-height: var(--touch-target-min);
+      background-color: var(--md-secondary);
+      color: var(--md-on-secondary);
+      border: none;
+      border-radius: 1rem;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      box-shadow: var(--md-elevation-1);
+      transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+    }
+
+    .btn-m3-filled:hover {
+      background-color: #006cd9;
+      box-shadow: var(--md-elevation-2);
+    }
+
+    .btn-m3-filled:active {
+      transform: scale(0.98);
+    }
+
+    /* Botões de Controle de Calibração (+ / -) */
+    .btn-controle-duracao {
+      width: 3.2rem;
+      height: 3.2rem;
+      border-radius: 50%;
+      background-color: var(--md-surface-2);
+      border: 1.5px solid var(--md-border-strong);
+      color: var(--md-on-surface);
+      font-size: 1.6rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: var(--md-elevation-1);
+      transition: background-color 0.15s ease, transform 0.1s ease, border-color 0.15s ease, color 0.15s ease;
+      user-select: none;
+    }
+
+    .btn-controle-duracao:hover {
+      background-color: var(--md-secondary);
+      color: #ffffff;
+      border-color: var(--md-secondary);
+      box-shadow: var(--md-elevation-2);
+    }
+
+    .btn-controle-duracao:active {
+      transform: scale(0.92);
+    }
+
+    /* ==========================================================================
+       7. Barra Inferior com Botões Centralizados Verticalmente (Nível 2)
+       ========================================================================== */
+    .app-footer {
+      position: relative;
+      background-color: var(--md-primary);
+      color: var(--md-on-primary);
+      padding-top: 0.75rem;
+      padding-bottom: calc(0.75rem + var(--safe-bottom));
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.35);
+      z-index: 60; /* Fica na frente da gaveta que emerge de trás dela */
+      flex-shrink: 0;
+    }
+
+    .footer-circle-btn {
+      width: 3.2rem;
+      height: 3.2rem;
+      border-radius: 50%;
+      background-color: var(--md-on-primary);
+      color: var(--md-primary);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      cursor: pointer;
+      box-shadow: var(--md-elevation-2);
+      transition: transform 0.1s ease;
+      margin: 0;
+    }
+
+    .footer-circle-btn:active {
+      transform: scale(0.92);
+    }
+
+    /* Botão Central de Voz / Ação (FAB M3 Centralizado) */
+    .footer-fab {
+      width: 3.8rem;
+      height: 3.8rem;
+      border-radius: 1.15rem; /* Formato M3 squircle ergonômico */
+      background: linear-gradient(135deg, #007fff 0%, #0056b3 100%);
+      color: #ffffff;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--md-elevation-3);
+      cursor: pointer;
+      transition: transform 0.15s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.15s ease;
+      margin: 0;
+    }
+
+    .footer-fab:hover {
+      transform: translateY(-2px) scale(1.03);
+    }
+
+    .footer-fab:active {
+      transform: scale(0.95);
+    }
+
+    .footer-fab svg {
+      width: 2rem;
+      height: 2rem;
+    }
+
+    /* ==========================================================================
+       8. Gaveta Flutuante M3 com 4 Cantos Arredondados (Nível 3 de Elevação)
+       ========================================================================== */
+    .scrim-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(4px);
+      z-index: 50; /* Abaixo da barra inferior (z-index: 60) */
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+
+    .scrim-overlay.aberto {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Gaveta Flutuante Suspensa: 1rem das laterais e 1rem acima da barra inferior */
+    .bottom-sheet {
+      width: calc(100% - 2rem);
+      max-width: 480px;
+      background-color: var(--md-surface-3);
+      border-radius: 1.5rem; /* 4 cantos arredondados */
+      border: 1px solid var(--md-border-strong);
+      padding: 1.5rem;
+      box-shadow: var(--md-elevation-3);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      max-height: calc(100dvh - 8rem);
+      overflow-y: auto;
+      
+      /* Margem inferior calculada:
+         Altura da barra inferior = 0.75rem + 3.8rem + 0.75rem + var(--safe-bottom) = 5.3rem + var(--safe-bottom)
+         + 1rem de folga em relação à borda superior da barra = calc(6.3rem + var(--safe-bottom)) */
+      margin-bottom: calc(6.3rem + var(--safe-bottom));
+      
+      /* Inicia recolhida atrás da barra inferior */
+      transform: translateY(calc(100% + 7rem));
+      
+      /* Animação com duração dinâmica calibrável (padrão homologado 800ms) */
+      transition: transform var(--sheet-duracao) cubic-bezier(0.05, 0.7, 0.1, 1.0);
+    }
+
+    .scrim-overlay.aberto .bottom-sheet {
+      transform: translateY(0);
+    }
+
+    .sheet-header {
+      display: flex;
+      align-items: center;
+    }
+
+    .sheet-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--md-on-surface);
+    }
+
+    .sheet-corpo {
+      font-size: 0.9rem;
+      line-height: 1.55;
+      color: var(--md-on-surface);
+    }
+
+    /* Painel Inspecionador de Código CSS */
+    .codigo-box {
+      background-color: rgba(0, 0, 0, 0.35);
+      border: 1px solid var(--md-border-subtle);
+      border-radius: 10px;
+      padding: 0.85rem;
+      font-family: Consolas, Monaco, monospace;
+      font-size: 0.78rem;
+      color: #93c5fd;
+      line-height: 1.45;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ========================================================================
+       Barra Superior Fixa (Nível 2 de Elevação)
+       ======================================================================== -->
+  <header class="app-header">
+    <div class="header-logo">SS</div>
+
+    <div class="header-title-area">
+      <h1 class="header-title">Superfícies e Elevação</h1>
+      <span class="header-version-pill">t1_superficies_e_elevacao.html • v1.6</span>
+    </div>
+
+    <!-- Botão de Alternar Modo Claro / Modo Escuro -->
+    <button type="button" class="btn-toggle-tema" id="btnTema" onclick="alternarTema()" title="Alternar Modo Claro/Escuro">
+      ☀️
+    </button>
+  </header>
+
+  <!-- ========================================================================
+       Área de Conteúdo Central (Nível 0 com Cards em Nível 1)
+       ======================================================================== -->
+  <main class="app-viewport">
+    <div class="container-largura">
+
+      <!-- Banner Explicativo -->
+      <section class="banner-introducao">
+        <h2 class="banner-titulo">✨ O que este protótipo valida?</h2>
+        <p class="banner-texto">
+          Demonstração dos <strong>4 níveis de elevação</strong> do Material Design 3 (M3) em <strong>Vanilla CSS</strong>, com gaveta flutuante de <strong>4 cantos arredondados</strong> e animação padrão de <strong>800ms</strong>.
+        </p>
+      </section>
+
+      <!-- Painel de Calibração da Velocidade da Animação -->
+      <section class="md-card" style="cursor: default;" onclick="event.stopPropagation()">
+        <div class="card-header">
+          <span class="badge-nivel badge-nivel-1">Padrão Homologado</span>
+          <span id="badgeDuracao" style="font-size: 0.85rem; font-weight: 800; color: var(--md-secondary);">800 ms</span>
+        </div>
+
+        <h3 class="card-titulo" style="font-size: 1rem;">⏱️ Velocidade da Gaveta (800ms Padrão)</h3>
+        <p class="card-descricao">
+          Velocidade padrão ajustada para <strong>800ms</strong>, transmitindo estabilidade física e ritmo calmo para voluntários:
+        </p>
+
+        <div style="display: flex; align-items: center; justify-content: center; gap: 1.25rem; margin: 0.5rem 0 0.25rem 0;">
+          <button type="button" class="btn-controle-duracao" onclick="ajustarDuracao(-50)" title="Diminuir 50ms">−</button>
+          
+          <div style="display: flex; flex-direction: column; align-items: center;">
+            <span style="font-size: 1.4rem; font-weight: 800; color: var(--md-on-surface); min-width: 6.5rem; text-align: center;" id="displayDuracaoGrande">
+              800 ms
+            </span>
+            <span style="font-size: 0.7rem; color: var(--md-on-surface-variant); font-weight: 600; text-transform: uppercase;">
+              Passo: ±50ms
+            </span>
+          </div>
+
+          <button type="button" class="btn-controle-duracao" onclick="ajustarDuracao(50)" title="Aumentar 50ms">+</button>
+        </div>
+      </section>
+
+      <!-- Botão de Ação para Disparar Nível 3 (Bottom Sheet) -->
+      <section style="display: flex; flex-direction: column; gap: 0.5rem;">
+        <span style="font-size: 0.8rem; font-weight: 700; color: var(--md-on-surface-variant); text-transform: uppercase;">
+          Teste o Movimento Padrão (800ms):
+        </span>
+        <button type="button" class="btn-m3-filled" onclick="abrirBottomSheet()">
+          <span>📱 Abrir Gaveta Inferior (<span id="labelBtnDuracao">800ms</span>)</span>
+        </button>
+      </section>
+
+      <!-- Card Exemplo 1: Família Assistida (Nível 1 de Elevação) -->
+      <article class="md-card" onclick="destacarCard(this)">
+        <div class="card-header">
+          <span class="badge-nivel badge-nivel-1">Nível 1 • Superfície</span>
+          <span style="font-size: 0.75rem; color: #ef4444; font-weight: 700;">● Urgência Alta</span>
+        </div>
+
+        <h3 class="card-titulo">🏠 Família Santos Silva</h3>
+        <p class="card-descricao">
+          Rua das Rosas, 120 — Vila Esperança<br>
+          Família de 4 pessoas, assistida pela Conferência São Francisco.
+        </p>
+
+        <div class="card-dados-grid">
+          <div class="card-dado-item">
+            <span class="dado-label">Última Visita</span>
+            <span class="dado-valor">28/08/2026</span>
+          </div>
+          <div class="card-dado-item">
+            <span class="dado-label">Meta Ativa</span>
+            <span class="dado-valor">Cesta Básica</span>
+          </div>
+        </div>
+
+        <p style="font-size: 0.75rem; color: var(--md-secondary); font-weight: 600; text-align: right;">
+          Toque para ver efeito de elevação dinâmica ↗
+        </p>
+      </article>
+
+      <!-- Card Exemplo 2: Conferência Vicentina (Nível 1 de Elevação) -->
+      <article class="md-card" onclick="destacarCard(this)">
+        <div class="card-header">
+          <span class="badge-nivel badge-nivel-1">Nível 1 • Superfície</span>
+          <span style="font-size: 0.75rem; color: var(--md-success); font-weight: 700;">● Conectada</span>
+        </div>
+
+        <h3 class="card-titulo">🤝 Conferência São Francisco de Assis</h3>
+        <p class="card-descricao">
+          Conselho Particular: <strong>CP Santana</strong><br>
+          Conselho Central: <strong>CC Teste A</strong>
+        </p>
+
+        <div class="card-dados-grid">
+          <div class="card-dado-item">
+            <span class="dado-label">Famílias Ativas</span>
+            <span class="dado-valor">14 famílias</span>
+          </div>
+          <div class="card-dado-item">
+            <span class="dado-label">Vicentinos</span>
+            <span class="dado-valor">6 membros</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Painel de Inspecionador dos Tokens CSS -->
+      <article class="md-card" style="cursor: default;" onclick="event.stopPropagation()">
+        <h3 class="card-titulo" style="font-size: 0.95rem;">🔍 Inspecionador de Variáveis CSS M3</h3>
+        <p class="card-descricao" style="font-size: 0.8rem;">
+          Valores aplicados nesta visualização em Vanilla CSS:
+        </p>
+        <div class="codigo-box" id="codigoBoxInspecao">
+--sheet-duracao: 800ms (padrão homologado)
+--md-surface-0: Fundo da tela repousado
+--md-elevation-1: 0 1px 3px rgba(0,0,0,0.3)
+--md-elevation-2: 0 4px 8px rgba(0,0,0,0.35)
+--md-elevation-3: 0 16px 36px rgba(0,0,0,0.6)
+--touch-target-min: 3rem (48px mínimo)
+        </div>
+      </article>
+
+    </div>
+  </main>
+
+  <!-- ========================================================================
+       Barra Inferior Fixa (Nível 2 de Elevação - z-index: 60)
+       ======================================================================== -->
+  <footer class="app-footer">
+    <button type="button" class="footer-circle-btn" onclick="alert('Menu / Navegação Vicentina')" title="Navegação">
+      📋
+    </button>
+
+    <!-- Floating Action Button (FAB M3 para Alternar Gaveta de Voz) -->
+    <button type="button" class="footer-fab" id="btnMic" onclick="toggleBottomSheet()" title="Ação Rápida de Voz">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
+      </svg>
+    </button>
+
+    <button type="button" class="footer-circle-btn" onclick="alternarTema()" title="Alternar Tema">
+      🎨
+    </button>
+  </footer>
+
+  <!-- ========================================================================
+       Gaveta Flutuante M3 (Nível 3 de Elevação - z-index: 50)
+       ======================================================================== -->
+  <div class="scrim-overlay" id="scrimOverlay" onclick="fecharBottomSheet(event)">
+    <div class="bottom-sheet" id="bottomSheet" onclick="event.stopPropagation()">
+      <div class="sheet-header">
+        <h3 class="sheet-title">Nível 3 • Gaveta Flutuante</h3>
+      </div>
+
+      <div class="sheet-corpo">
+        <p>
+          Esta é a superfície de <strong>Nível 3</strong> no formato <strong>Floating Bottom Sheet</strong>. Ela desliza de trás da barra inferior com animação suave desacelerada e repousa a <strong>1rem</strong> acima da barra.
+        </p>
+        <ul style="margin: 0.75rem 0 0.75rem 1.25rem; font-size: 0.85rem; color: var(--md-on-surface-variant);">
+          <li><strong>Duração padrão homologada:</strong> <strong style="color: var(--md-secondary);" id="sheetDuracaoAtual">800 ms</strong>.</li>
+          <li><strong>4 cantos arredondados</strong> em 24px (1.5rem).</li>
+          <li><strong>Margens laterais de 1rem</strong> simétricas aos cards.</li>
+          <li>Sombra profunda M3 com desfoque de fundo (scrim).</li>
+          <li>Toque no microfone, no botão Fechar ou no fundo para recolher.</li>
+        </ul>
+      </div>
+
+      <button type="button" class="btn-m3-filled" style="background-color: var(--md-primary);" onclick="fecharBottomSheetManual()">
+        Fechar
+      </button>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       Scripts de Interatividade e Ergonomia
+       ======================================================================== -->
+  <script>
+    const scrimOverlay = document.getElementById("scrimOverlay");
+    const btnTema = document.getElementById("btnTema");
+
+    // 1. Controle da Duração da Animação (Padrão Homologado: 800ms)
+    let duracaoMs = 800;
+    const badgeDuracao = document.getElementById("badgeDuracao");
+    const displayDuracaoGrande = document.getElementById("displayDuracaoGrande");
+    const labelBtnDuracao = document.getElementById("labelBtnDuracao");
+    const sheetDuracaoAtual = document.getElementById("sheetDuracaoAtual");
+    const codigoBoxInspecao = document.getElementById("codigoBoxInspecao");
+
+    function ajustarDuracao(delta) {
+      duracaoMs = Math.max(100, Math.min(3000, duracaoMs + delta));
+      const valorStr = `${duracaoMs}ms`;
+
+      // Atualiza a variável CSS global imediatamente
+      document.documentElement.style.setProperty("--sheet-duracao", valorStr);
+
+      // Atualiza os indicadores na interface
+      badgeDuracao.textContent = `${duracaoMs} ms`;
+      displayDuracaoGrande.textContent = `${duracaoMs} ms`;
+      labelBtnDuracao.textContent = valorStr;
+      if (sheetDuracaoAtual) {
+        sheetDuracaoAtual.textContent = `${duracaoMs} ms`;
+      }
+
+      // Atualiza o painel de código
+      if (codigoBoxInspecao) {
+        codigoBoxInspecao.innerHTML = 
+`--sheet-duracao: ${valorStr} (ajustável pelos botões + / -)
+--md-surface-0: Fundo da tela repousado
+--md-elevation-1: 0 1px 3px rgba(0,0,0,0.3)
+--md-elevation-2: 0 4px 8px rgba(0,0,0,0.35)
+--md-elevation-3: 0 16px 36px rgba(0,0,0,0.6)
+--touch-target-min: 3rem (48px mínimo)`;
+      }
+    }
+
+    // 2. Alternância de Tema Claro / Escuro (Alta Luminosidade para Sol Forte)
+    function alternarTema() {
+      document.body.classList.toggle("tema-claro");
+      const ehClaro = document.body.classList.contains("tema-claro");
+      btnTema.textContent = ehClaro ? "🌙" : "☀️";
+      btnTema.title = ehClaro ? "Mudar para Modo Noturno" : "Mudar para Modo Claro (Sol)";
+    }
+
+    // 3. Controle da Gaveta Flutuante (Nível 3)
+    function abrirBottomSheet() {
+      scrimOverlay.classList.add("aberto");
+    }
+
+    function fecharBottomSheetManual() {
+      scrimOverlay.classList.remove("aberto");
+    }
+
+    function toggleBottomSheet() {
+      if (scrimOverlay.classList.contains("aberto")) {
+        fecharBottomSheetManual();
+      } else {
+        abrirBottomSheet();
+      }
+    }
+
+    function fecharBottomSheet(event) {
+      if (event.target === scrimOverlay) {
+        fecharBottomSheetManual();
+      }
+    }
+
+    // 4. Efeito Visual de Toque nos Cards
+    function destacarCard(elemento) {
+      elemento.style.borderColor = "var(--md-secondary)";
+      setTimeout(() => {
+        elemento.style.borderColor = "";
+      }, 400);
+    }
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Material Design SSVP - Teste 3: Navegação e Configurações</title>
+
+  <!-- Google Fonts Montserrat -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       1. Tokens do Sistema de Cores e Elevação M3 (Adaptado à SSVP)
+       ========================================================================== */
+    :root {
+      /* Cores Institucionais SSVP */
+      --md-primary: #002d62;          /* Azul Marinho SSVP */
+      --md-on-primary: #ffffff;
+      --md-secondary: #007fff;        /* Azul Royal Ação */
+      --md-on-secondary: #ffffff;
+      --md-error: #d32f2f;            /* Vermelho Alerta SSVP */
+      --md-on-error: #ffffff;
+      --md-success: #15803d;          /* Verde Confirmação */
+
+      /* MODO ESCURO (Padrão de Campo) */
+      --md-surface-0: #0b0f19;        /* Nível 0: Canvas de Fundo */
+      --md-surface-1: #151d2f;        /* Nível 1: Cards e Itens de Lista */
+      --md-surface-2: #1b263d;        /* Nível 2: Barras Fixas e Elementos Flutuantes */
+      --md-surface-3: #22304d;        /* Nível 3: Modais, Dialogs e Sheets */
+      
+      --md-on-surface: #f1f5f9;       /* Texto Principal */
+      --md-on-surface-variant: #94a3b8; /* Texto Secundário / Muted */
+      --md-border-subtle: rgba(255, 255, 255, 0.08);
+      --md-border-strong: rgba(255, 255, 255, 0.18);
+
+      /* Tokens do Switch M3 */
+      --md-switch-track-off: rgba(255, 255, 255, 0.14);
+      --md-switch-border-off: rgba(255, 255, 255, 0.35);
+      --md-switch-thumb-off: #cbd5e1;
+
+      /* Sombras de Elevação M3 */
+      --md-elevation-0: none;
+      --md-elevation-1: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px -1px rgba(0, 0, 0, 0.2);
+      --md-elevation-2: 0 4px 8px -1px rgba(0, 0, 0, 0.35), 0 2px 4px -2px rgba(0, 0, 0, 0.25);
+      --md-elevation-3: 0 16px 36px -4px rgba(0, 0, 0, 0.6), 0 6px 14px -2px rgba(0, 0, 0, 0.4);
+
+      /* Dimensões e Ergonomia */
+      --touch-target-min: 3rem;       /* 48px mínimo para dedos de idosos */
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --font-family: 'Montserrat', Arial, sans-serif;
+      --header-height: 4rem;
+
+      /* Duração Padrão Homologada (800ms M3 Emphasized Decelerate) */
+      --sheet-duracao: 800ms;
+    }
+
+    /* MODO CLARO (Para Uso sob Sol Forte) */
+    body.tema-claro {
+      --md-surface-0: #f8fafc;
+      --md-surface-1: #ffffff;
+      --md-surface-2: #f1f5f9;
+      --md-surface-3: #ffffff;
+
+      --md-on-surface: #0f172a;
+      --md-on-surface-variant: #475569;
+      --md-border-subtle: rgba(0, 0, 0, 0.08);
+      --md-border-strong: rgba(0, 0, 0, 0.15);
+
+      --md-switch-track-off: #e2e8f0;
+      --md-switch-border-off: #94a3b8;
+      --md-switch-thumb-off: #64748b;
+
+      --md-elevation-1: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.06);
+      --md-elevation-2: 0 4px 6px -1px rgba(0, 0, 0, 0.12), 0 2px 4px -2px rgba(0, 0, 0, 0.08);
+      --md-elevation-3: 0 16px 32px -4px rgba(0, 0, 0, 0.22), 0 6px 12px -2px rgba(0, 0, 0, 0.08);
+    }
+
+    /* ==========================================================================
+       FONTE GRANDE (Acessibilidade Universal para Terceira Idade)
+       - Escala a raiz (html / :root), multiplicando proporcionalmente todos os tamanhos em rem do app
+       - Aumenta instantaneamente textos da gaveta (switches), cartões, banners, botões e navegação
+       ========================================================================== */
+    html {
+      transition: font-size 0.2s ease;
+    }
+
+    html.fonte-grande {
+      font-size: 118%;
+    }
+
+    /* REDUZIR ANIMAÇÕES */
+    body.sem-animacoes {
+      --sheet-duracao: 0.01s !important;
+    }
+
+    /* ==========================================================================
+       2. Reset e Estrutura Principal
+       ========================================================================== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-family);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--md-surface-0);
+      color: var(--md-on-surface);
+      height: 100vh;
+      height: 100dvh;
+      width: 100vw;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    /* ==========================================================================
+       3. Barra Superior (Nível 2 de Elevação - z-index: 60)
+          - NO MODO DESTRO: Logo SSVP à esquerda | Título no centro | ⚙️ Configurações à DIREITA.
+          - NO MODO CANHOTO: Invertido via body.layout-canhoto -> ⚙️ Configurações à ESQUERDA.
+       ========================================================================== */
+    .app-header {
+      position: relative;
+      background-color: var(--md-primary);
+      color: var(--md-on-primary);
+      padding-top: calc(0.6rem + var(--safe-top));
+      padding-bottom: 0.6rem;
+      padding-left: 1rem;
+      padding-right: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: var(--md-elevation-2);
+      z-index: 60;
+      flex-shrink: 0;
+      min-height: var(--header-height);
+      transition: flex-direction 0.3s ease;
+    }
+
+    .header-logo {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 50%;
+      background-color: var(--md-on-primary);
+      color: var(--md-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.95rem;
+      user-select: none;
+      margin: 0;
+    }
+
+    .header-title-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      user-select: none;
+    }
+
+    .header-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    .header-version-pill {
+      font-size: 0.68rem;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.15);
+      padding: 2px 8px;
+      border-radius: 12px;
+      margin-top: 2px;
+      letter-spacing: 0.04em;
+    }
+
+    /* Botão de Configurações (Área de Toque 48px) */
+    .btn-header-config {
+      width: var(--touch-target-min);
+      height: var(--touch-target-min);
+      border-radius: 50%;
+      border: none;
+      background: rgba(255, 255, 255, 0.12);
+      color: var(--md-on-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+      box-shadow: var(--md-elevation-1);
+      transition: background-color 0.2s ease, transform 0.1s ease;
+      margin: 0;
+    }
+
+    .btn-header-config:hover {
+      background: rgba(255, 255, 255, 0.22);
+    }
+
+    .btn-header-config:active {
+      transform: scale(0.92);
+    }
+
+    /* ==========================================================================
+       4. Gaveta Superior Flutuante M3: CONFIGURAÇÕES (Top Sheet - Nível 3)
+       ========================================================================== */
+    .scrim-overlay-top {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(4px);
+      z-index: 50; /* Atrás das barras fixas (z-index: 60) */
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+
+    .scrim-overlay-top.aberto {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .top-sheet {
+      width: calc(100% - 2rem);
+      max-width: 480px;
+      background-color: var(--md-surface-3);
+      border-radius: 1.5rem;
+      border: 1px solid var(--md-border-strong);
+      box-shadow: var(--md-elevation-3);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      margin-top: calc(3.8rem + var(--safe-top) + 1rem);
+      max-height: calc(100dvh - 11.5rem - var(--safe-top) - var(--safe-bottom));
+      transform: translateY(calc(-100% - 10rem));
+      transition: transform var(--sheet-duracao) cubic-bezier(0.05, 0.7, 0.1, 1.0);
+    }
+
+    .scrim-overlay-top.aberto .top-sheet {
+      transform: translateY(0);
+    }
+
+    .sheet-config-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--md-border-subtle);
+      padding: 1.15rem 1.5rem 0.85rem 1.5rem;
+      flex-shrink: 0;
+      background-color: var(--md-surface-3);
+    }
+
+    .sheet-config-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--md-on-surface);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .sheet-config-body {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 1rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .sheet-secao-titulo {
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--md-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 0.35rem;
+      display: block;
+    }
+
+    .sheet-lista-config {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .sheet-config-footer {
+      padding: 0.75rem 1.5rem 1.15rem 1.5rem;
+      border-top: 1px solid var(--md-border-subtle);
+      background-color: var(--md-surface-3);
+      flex-shrink: 0;
+    }
+
+    /* Switches Material Design 3 */
+    .m3-switch-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 3.2rem;
+      padding: 0.5rem 0.25rem;
+      cursor: pointer;
+      border-bottom: 1px solid var(--md-border-subtle);
+      user-select: none;
+      transition: background-color 0.15s ease;
+    }
+
+    .m3-switch-row:last-child {
+      border-bottom: none;
+    }
+
+    .m3-switch-row:active {
+      background-color: rgba(255, 255, 255, 0.04);
+      border-radius: 8px;
+    }
+
+    .switch-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      padding-right: 1rem;
+    }
+
+    .switch-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--md-on-surface);
+    }
+
+    .switch-desc {
+      font-size: 0.78rem;
+      color: var(--md-on-surface-variant);
+      line-height: 1.35;
+    }
+
+    .m3-switch {
+      position: relative;
+      width: 3.25rem;  /* 52px */
+      height: 2rem;     /* 32px */
+      flex-shrink: 0;
+    }
+
+    .m3-switch input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .m3-switch-track {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--md-switch-track-off);
+      border: 2px solid var(--md-switch-border-off);
+      border-radius: 1rem;
+      transition: background-color 0.2s cubic-bezier(0.2, 0, 0, 1), border-color 0.2s cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    .m3-switch-thumb {
+      position: absolute;
+      top: 50%;
+      left: 0.25rem;
+      transform: translateY(-50%);
+      width: 1rem;
+      height: 1rem;
+      border-radius: 50%;
+      background-color: var(--md-switch-thumb-off);
+      transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1), width 0.2s ease, height 0.2s ease, background-color 0.2s ease, left 0.25s cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    .m3-switch input:checked + .m3-switch-track {
+      background-color: var(--md-secondary);
+      border-color: var(--md-secondary);
+    }
+
+    .m3-switch input:checked + .m3-switch-track .m3-switch-thumb {
+      left: calc(100% - 1.65rem);
+      width: 1.4rem;
+      height: 1.4rem;
+      background-color: #ffffff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+    }
+
+    /* ==========================================================================
+       5. Área de Conteúdo Central (Páginas Simuladas: Visita, Pessoas, Regra)
+       ========================================================================== */
+    .app-viewport {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 1.25rem 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      -webkit-overflow-scrolling: touch;
+      position: relative;
+    }
+
+    .page-container {
+      width: 100%;
+      max-width: 480px;
+      display: none;
+      flex-direction: column;
+      gap: 1.25rem;
+      animation: fadeInPage 0.25s cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    .page-container.active {
+      display: flex;
+    }
+
+    @keyframes fadeInPage {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .banner-modulo {
+      background: linear-gradient(135deg, rgba(0, 45, 98, 0.25) 0%, rgba(0, 127, 255, 0.15) 100%);
+      border: 1px solid var(--md-secondary);
+      border-radius: 1rem;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .banner-badge-topo {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .badge-modulo {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--md-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .badge-status {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--md-success);
+    }
+
+    .banner-titulo {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--md-on-surface);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .banner-desc {
+      font-size: 0.85rem;
+      line-height: 1.45;
+      color: var(--md-on-surface-variant);
+    }
+
+    .md-card {
+      background-color: var(--md-surface-1);
+      border: 1px solid var(--md-border-subtle);
+      border-radius: 1.15rem;
+      padding: 1.25rem;
+      box-shadow: var(--md-elevation-1);
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      position: relative;
+    }
+
+    .card-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-chip {
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 0.25rem 0.65rem;
+      border-radius: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .chip-prioridade {
+      background-color: rgba(211, 47, 47, 0.15);
+      color: #ef5350;
+      border: 1px solid rgba(211, 47, 47, 0.35);
+    }
+
+    .chip-agendado {
+      background-color: rgba(0, 127, 255, 0.15);
+      color: var(--md-secondary);
+      border: 1px solid rgba(0, 127, 255, 0.35);
+    }
+
+    .chip-conferencia {
+      background-color: rgba(21, 128, 61, 0.15);
+      color: #4ade80;
+      border: 1px solid rgba(21, 128, 61, 0.35);
+    }
+
+    .card-titulo {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--md-on-surface);
+    }
+
+    .card-detalhes {
+      font-size: 0.86rem;
+      color: var(--md-on-surface-variant);
+      line-height: 1.5;
+    }
+
+    .btn-m3-filled {
+      width: 100%;
+      min-height: var(--touch-target-min);
+      background-color: var(--md-secondary);
+      color: var(--md-on-secondary);
+      border: none;
+      border-radius: 1rem;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      box-shadow: var(--md-elevation-1);
+      transition: background-color 0.2s ease, transform 0.1s ease;
+    }
+
+    .btn-m3-filled:hover {
+      background-color: #006cd9;
+    }
+
+    .btn-m3-filled:active {
+      transform: scale(0.98);
+    }
+
+    .card-oracao {
+      background: linear-gradient(180deg, var(--md-surface-1) 0%, rgba(0, 45, 98, 0.12) 100%);
+      border-left: 4px solid var(--md-secondary);
+    }
+
+    .texto-oracao {
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: var(--md-on-surface);
+      font-style: italic;
+    }
+
+    /* ==========================================================================
+       6. Barra Inferior (Nível 2 de Elevação - z-index: 60)
+          - NO MODO DESTRO: Sincronização 🔄 à esquerda | Microfone 🎤 no centro | Menu ☰ à DIREITA.
+          - NO MODO CANHOTO: Invertido via body.layout-canhoto -> Menu ☰ à ESQUERDA.
+       ========================================================================== */
+    .app-footer {
+      position: relative;
+      background-color: var(--md-primary);
+      color: var(--md-on-primary);
+      padding-top: 0.75rem;
+      padding-bottom: calc(0.75rem + var(--safe-bottom));
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.35);
+      z-index: 60;
+      flex-shrink: 0;
+      transition: flex-direction 0.3s ease;
+    }
+
+    /* ==========================================================================
+       7. ERGONOMIA DESTRO / CANHOTO (Regra Universal de Pareamento):
+          - NO MODO DESTRO (Padrão de Ergonomia):
+            * Topo: Configurações ⚙️ fica à DIREITA (alcance do polegar direito).
+            * Base: Menu de Telas ☰ fica à DIREITA (alcance do polegar direito).
+          - NO MODO CANHOTO (layout-canhoto):
+            * Inverte as duas barras simultaneamente!
+            * Topo: Configurações ⚙️ vai para a ESQUERDA (alcance do polegar esquerdo).
+            * Base: Menu de Telas ☰ vai para a ESQUERDA (alcance do polegar esquerdo).
+       ========================================================================== */
+    body.layout-canhoto .app-header {
+      flex-direction: row-reverse;
+    }
+
+    body.layout-canhoto .app-footer {
+      flex-direction: row-reverse;
+    }
+
+    .footer-circle-btn {
+      width: 3.2rem;
+      height: 3.2rem;
+      border-radius: 50%;
+      background-color: var(--md-on-primary);
+      color: var(--md-primary);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: var(--md-elevation-2);
+      transition: transform 0.1s ease, background-color 0.2s ease;
+      margin: 0;
+    }
+
+    .footer-circle-btn svg {
+      width: 1.6rem;
+      height: 1.6rem;
+      fill: var(--md-primary);
+    }
+
+    .footer-circle-btn:active {
+      transform: scale(0.92);
+      background-color: #e2e8f0;
+    }
+
+    .btn-footer-menu {
+      background-color: var(--md-on-primary);
+      border: 2px solid rgba(255, 255, 255, 0.5);
+    }
+
+    .footer-fab {
+      width: 3.8rem;
+      height: 3.8rem;
+      border-radius: 1.15rem;
+      background: linear-gradient(135deg, #007fff 0%, #0056b3 100%);
+      color: #ffffff;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--md-elevation-3);
+      cursor: pointer;
+      transition: transform 0.15s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.15s ease;
+      margin: 0;
+    }
+
+    .footer-fab:hover {
+      transform: translateY(-2px) scale(1.03);
+    }
+
+    .footer-fab:active {
+      transform: scale(0.95);
+    }
+
+    .footer-fab svg {
+      width: 2rem;
+      height: 2rem;
+      fill: #ffffff;
+    }
+
+    /* ==========================================================================
+       8. Gaveta Inferior Flutuante M3: NAVEGAÇÃO DE TELAS (Bottom Sheet - Nível 3)
+       ========================================================================== */
+    .scrim-overlay-bottom {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(4px);
+      z-index: 50;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+
+    .scrim-overlay-bottom.aberto {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .bottom-sheet {
+      width: calc(100% - 2rem);
+      max-width: 480px;
+      background-color: var(--md-surface-3);
+      border-radius: 1.5rem;
+      border: 1px solid var(--md-border-strong);
+      box-shadow: var(--md-elevation-3);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      margin-bottom: calc(5.3rem + var(--safe-bottom) + 1rem);
+      transform: translateY(calc(100% + 6rem));
+      transition: transform var(--sheet-duracao) cubic-bezier(0.05, 0.7, 0.1, 1.0);
+    }
+
+    .scrim-overlay-bottom.aberto .bottom-sheet {
+      transform: translateY(0);
+    }
+
+    .sheet-nav-header {
+      padding: 1.15rem 1.5rem 0.85rem 1.5rem;
+      border-bottom: 1px solid var(--md-border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      background-color: var(--md-surface-3);
+    }
+
+    .sheet-nav-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--md-on-surface);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .sheet-nav-body {
+      padding: 1rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .nav-item-btn {
+      width: 100%;
+      min-height: 3.8rem;
+      background-color: var(--md-surface-1);
+      border: 1.5px solid var(--md-border-subtle);
+      border-radius: 1.15rem;
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      cursor: pointer;
+      transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+      text-align: left;
+      user-select: none;
+    }
+
+    .nav-item-btn:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+      border-color: var(--md-secondary);
+    }
+
+    .nav-item-btn:active {
+      transform: scale(0.98);
+    }
+
+    .nav-item-btn.active {
+      background: linear-gradient(135deg, rgba(0, 45, 98, 0.4) 0%, rgba(0, 127, 255, 0.25) 100%);
+      border-color: var(--md-secondary);
+      box-shadow: 0 0 0 1px var(--md-secondary);
+    }
+
+    .nav-item-icon-box {
+      width: 2.8rem;
+      height: 2.8rem;
+      border-radius: 0.85rem;
+      background-color: rgba(0, 127, 255, 0.15);
+      color: var(--md-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .nav-item-btn.active .nav-item-icon-box {
+      background-color: var(--md-secondary);
+      color: #ffffff;
+    }
+
+    .nav-item-icon-box svg {
+      width: 1.6rem;
+      height: 1.6rem;
+      fill: currentColor;
+    }
+
+    .nav-item-text {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    .nav-item-nome {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--md-on-surface);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .nav-item-desc {
+      font-size: 0.78rem;
+      color: var(--md-on-surface-variant);
+      line-height: 1.35;
+    }
+
+    .nav-item-badge {
+      font-size: 0.68rem;
+      font-weight: 800;
+      padding: 0.2rem 0.5rem;
+      border-radius: 6px;
+      background-color: var(--md-secondary);
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .sheet-nav-footer {
+      padding: 0.75rem 1.25rem 1.15rem 1.25rem;
+      border-top: 1px solid var(--md-border-subtle);
+      background-color: var(--md-surface-3);
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ========================================================================
+       Barra Superior Fixa (Nível 2 de Elevação - z-index: 60)
+       No Modo Destro: Logo SSVP à esquerda | Título | ⚙️ Configurações à DIREITA!
+       No Modo Canhoto: Invertido via body.layout-canhoto -> ⚙️ à ESQUERDA!
+       ======================================================================== -->
+  <header class="app-header" id="appHeader">
+    <!-- Logo SSVP -->
+    <div class="header-logo" title="Sociedade de São Vicente de Paulo">
+      SS
+    </div>
+
+    <div class="header-title-area">
+      <h1 class="header-title" id="headerTitle">
+        <span>Visitas</span>
+      </h1>
+      <span class="header-version-pill">t3_navegacao.html • v1.4</span>
+    </div>
+
+    <!-- Botão de Configurações ⚙️ (À DIREITA no Modo Destro) -->
+    <button type="button" class="btn-header-config" id="btnConfig" onclick="toggleTopSheet()" title="Abrir Configurações">
+      ⚙️
+    </button>
+  </header>
+
+  <!-- ========================================================================
+       GAVETA SUPERIOR FLUTUANTE: CONFIGURAÇÕES GLOBAIS (Top Sheet M3)
+       ======================================================================== -->
+  <div class="scrim-overlay-top" id="scrimTop" onclick="fecharTopSheetPorOverlay(event)">
+    <div class="top-sheet" id="topSheet" onclick="event.stopPropagation()">
+      
+      <!-- 1. Cabeçalho Fixo da Gaveta de Configurações -->
+      <div class="sheet-config-header">
+        <h3 class="sheet-config-title">⚙️ Configurações</h3>
+      </div>
+
+      <!-- 2. Corpo com Rolagem Independente (7 Switches M3) -->
+      <div class="sheet-config-body">
+
+        <!-- SEÇÃO 1: Aparência e Ergonomia -->
+        <span class="sheet-secao-titulo">Aparência &amp; Ergonomia</span>
+        <div class="sheet-lista-config">
+
+          <!-- Switch 1: Modo Escuro -->
+          <label class="m3-switch-row" for="switchModoEscuro">
+            <div class="switch-info">
+              <span class="switch-title">Modo Escuro</span>
+              <span class="switch-desc">Fundo noturno (OLED) / Desligue para sol forte</span>
+            </div>
+            <div class="m3-switch">
+              <input type="checkbox" id="switchModoEscuro" onchange="alterarConfig('modoEscuro', this.checked)">
+              <span class="m3-switch-track">
+                <span class="m3-switch-thumb"></span>
+              </span>
+            </div>
+          </label>
+
+          <!-- Switch 2: Fonte Grande -->
+          <label class="m3-switch-row" for="switchFonteGrande">
+            <div class="switch-info">
+              <span class="switch-title">Fonte Grande</span>
+              <span class="switch-desc">Amplia letras para leitura confortável de idosos</span>
+            </div>
+            <div class="m3-switch">
+              <input type="checkbox" id="switchFonteGrande" onchange="alterarConfig('fonteGrande', this.checked)">
+              <span class="m3-switch-track">
+                <span class="m3-switch-thumb"></span>
+              </span>
+            </div>
+          </label>
+
+          <!-- Switch 3: Modo Destro (Ativo = botões ⚙️ e ☰ à direita) -->
+          <label class="m3-switch-row" for="switchDestro">
+            <div class="switch-info">
+              <span class="switch-title">Modo Destro</span>
+              <span class="switch-desc">⚙️ e ☰ à direita; desative para canhoto (à esquerda)</span>
+            </div>
+            <div class="m3-switch">
+              <input type="checkbox" id="switchDestro" onchange="alterarConfig('destro', this.checked)">
+              <span class="m3-switch-track">
+                <span class="m3-switch-thumb"></span>
+              </span>
+            </div>
+          </label>
+
+          <!-- Switch 4: Reduzir Animações -->
+          <label class="m3-switch-row" for="switchReduzirAnim">
+            <div class="switch-info">
+              <span class="switch-title">Reduzir Animações</span>
+              <span class="switch-desc">Abertura instantânea (desempenho em celulares lentos)</span>
+            </div>
+            <div class="m3-switch">
+              <input type="checkbox" id="switchReduzirAnim" onchange="alterarConfig('reduzirAnimacoes', this.checked)">
+              <span class="m3-switch-track">
+                <span class="m3-switch-thumb"></span>
+              </span>
+            </div>
+          </label>
+
+        </div>
+
+        <!-- SEÇÃO 2: Operação em Campo e Retorno -->
+        <span class="sheet-secao-titulo">Operação em Campo</span>
+        <div class="sheet-lista-config">
+
+          <!-- Switch 5: Vibração ao Tocar -->
+          <label class="m3-switch-row" for="switchVibracao">
+            <div class="switch-info">
+              <span class="switch-title">Vibração ao Tocar</span>
+              <span class="switch-desc">Confirmação física imediata de clique no celular</span>
+            </div>
+            <div class="m3-switch">
+              <input type="checkbox" id="switchVibracao" onchange="alterarConfig('vibracaoAtiva', this.checked)">
+              <span class="m3-switch-track">
+                <span class="m3-switch-thumb"></span>
+              </span>
+            </div>
+          </label>
+
+          <!-- Switch 6: Som ao Tocar -->
+          <label class="m3-switch-row" for="switchSom">
+            <div class="switch-info">
+              <span class="switch-title">Som ao Tocar</span>
+              <span class="switch-desc">Confirmação sonora harmônica ao tocar nos botões</span>
+            </div>
+            <div class="m3-switch">
+              <input type="checkbox" id="switchSom" onchange="alterarConfig('somAtivo', this.checked)">
+              <span class="m3-switch-track">
+                <span class="m3-switch-thumb"></span>
+              </span>
+            </div>
+          </label>
+
+          <!-- Switch 7: Sincronizar em Wi-Fi -->
+          <label class="m3-switch-row" for="switchWifi">
+            <div class="switch-info">
+              <span class="switch-title">Sincronizar em Wi-Fi</span>
+              <span class="switch-desc">Economiza dados móveis (3G/4G) durante visitas</span>
+            </div>
+            <div class="m3-switch">
+              <input type="checkbox" id="switchWifi" onchange="alterarConfig('somenteWifi', this.checked)">
+              <span class="m3-switch-track">
+                <span class="m3-switch-thumb"></span>
+              </span>
+            </div>
+          </label>
+
+        </div>
+
+      </div>
+
+      <!-- 3. Rodapé Fixo da Gaveta de Configurações -->
+      <div class="sheet-config-footer">
+        <button type="button" class="btn-m3-filled" style="background-color: var(--md-primary);" onclick="fecharTopSheet()">
+          Fechar
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       Área Central (Páginas Simuladas: Visita, Pessoas e Regra)
+       ======================================================================== -->
+  <main class="app-viewport">
+
+    <!-- ====================================================================
+         PÁGINA 1: VISITAS DOMICILIARES (home.svg)
+         ==================================================================== -->
+    <section class="page-container active" id="pageVisita">
+      <div class="banner-modulo">
+        <div class="banner-badge-topo">
+          <span class="badge-modulo">Módulo Principal</span>
+          <span class="badge-status">● 2 Visitas Pendentes</span>
+        </div>
+        <h2 class="banner-titulo">
+          <svg style="width: 1.4rem; height: 1.4rem; fill: var(--md-secondary);" viewBox="0 -960 960 960">
+            <path d="M240-200h120v-240h240v240h120v-360L480-740 240-560v360Zm-80 80v-480l320-240 320 240v480H520v-240h-80v240H160Zm320-350Z"/>
+          </svg>
+          Visitas Domiciliares
+        </h2>
+        <p class="banner-desc">
+          Acompanhamento das famílias atendidas pela Conferência Vicentina com registro de necessidades e distribuição solidária.
+        </p>
+      </div>
+
+      <!-- Card 1: Família Prioritária -->
+      <article class="md-card">
+        <div class="card-header-row">
+          <span class="card-chip chip-prioridade">Urgente • Prioridade Alta</span>
+          <span style="font-size: 0.72rem; color: var(--md-on-surface-variant);">Há 14 dias</span>
+        </div>
+        <h3 class="card-titulo">Família Silva (Dona Neuza)</h3>
+        <p class="card-detalhes">
+          <strong>Endereço:</strong> Rua São Vicente, 120 - Vila Esperança<br>
+          <strong>Composição:</strong> 5 pessoas (3 crianças e 1 idoso acamado)<br>
+          <strong>Demanda:</strong> Medicamentos de uso contínuo e cesta básica.
+        </p>
+        <button type="button" class="btn-m3-filled" onclick="executarAcao('Iniciar Relato de Visita: Família Silva')">
+          <span>📝 Iniciar Relato de Visita</span>
+        </button>
+      </article>
+
+      <!-- Card 2: Próxima Visita Agendada -->
+      <article class="md-card">
+        <div class="card-header-row">
+          <span class="card-chip chip-agendado">Agendada • Próximo Sábado</span>
+          <span style="font-size: 0.72rem; color: var(--md-secondary); font-weight: 700;">14:30h</span>
+        </div>
+        <h3 class="card-titulo">Família Oliveira (Seu Raimundo)</h3>
+        <p class="card-detalhes">
+          <strong>Endereço:</strong> Travessa das Flores, 45 - Jardim Progresso<br>
+          <strong>Objetivo:</strong> Entrega de botijão de gás e acompanhamento escolar das filhas.
+        </p>
+        <button type="button" class="btn-m3-filled" style="background-color: var(--md-primary);" onclick="executarAcao('Ver Rota no Mapa: Família Oliveira')">
+          <span>🗺️ Traçar Rota de Visita</span>
+        </button>
+      </article>
+    </section>
+
+    <!-- ====================================================================
+         PÁGINA 2: PESSOAS & CONFERÊNCIA (groups.svg)
+         ==================================================================== -->
+    <section class="page-container" id="pagePessoas">
+      <div class="banner-modulo">
+        <div class="banner-badge-topo">
+          <span class="badge-modulo">Módulo de Cadastros</span>
+          <span class="badge-status">● 18 Famílias Cadastradas</span>
+        </div>
+        <h2 class="banner-titulo">
+          <svg style="width: 1.4rem; height: 1.4rem; fill: var(--md-secondary);" viewBox="0 -960 960 960">
+            <path d="M0-240v-63q0-43 44-70t116-27q13 0 25 .5t23 2.5q-14 21-21 44t-7 48v65H0Zm240 0v-65q0-32 17.5-58.5T307-410q32-20 76.5-30t96.5-10q53 0 97.5 10t76.5 30q32 20 49 46.5t17 58.5v65H240Zm540 0v-65q0-26-6.5-49T754-397q11-2 22.5-2.5t23.5-.5q72 0 116 26.5t44 70.5v63H780Zm-455-80h311q-10-20-55.5-35T480-370q-55 0-100.5 15T325-320ZM160-440q-33 0-56.5-23.5T80-520q0-34 23.5-57t56.5-23q34 0 57 23t23 57q0 33-23 56.5T160-440Zm640 0q-33 0-56.5-23.5T720-520q0-34 23.5-57t56.5-23q34 0 57 23t23 57q0 33-23 56.5T800-440Zm-320-40q-50 0-85-35t-35-85q0-51 35-85.5t85-34.5q51 0 85.5 34.5T600-600q0 50-34.5 85T480-480Zm0-80q17 0 28.5-11.5T520-600q0-17-11.5-28.5T480-640q-17 0-28.5 11.5T440-600q0 17 11.5 28.5T480-560Zm1 240Zm-1-280Z"/>
+          </svg>
+          Pessoas &amp; Vicentinos
+        </h2>
+        <p class="banner-desc">
+          Gestão dos dados cadastrais dos assistidos, membros ativos da Conferência São José e contatos de apoio social.
+        </p>
+      </div>
+
+      <!-- Card 1: Assistido em Acompanhamento -->
+      <article class="md-card">
+        <div class="card-header-row">
+          <span class="card-chip chip-agendado">Assistida Titular</span>
+          <span style="font-size: 0.72rem; color: var(--md-on-surface-variant);">72 anos</span>
+        </div>
+        <h3 class="card-titulo">Dona Maria das Graças Ferreira</h3>
+        <p class="card-detalhes">
+          <strong>Situação:</strong> Aposentada, mora com dois netos menores de idade.<br>
+          <strong>Conferência Responsável:</strong> Conf. São José Operário<br>
+          <strong>Vicentinos de Referência:</strong> Confrade Antônio e Consócia Lúcia.
+        </p>
+        <button type="button" class="btn-m3-filled" onclick="executarAcao('Abrir Ficha: Dona Maria das Graças')">
+          <span>👤 Ver Ficha Socioeconômica</span>
+        </button>
+      </article>
+
+      <!-- Card 2: Membro da Conferência -->
+      <article class="md-card">
+        <div class="card-header-row">
+          <span class="card-chip chip-conferencia">Vicentino Ativo</span>
+          <span style="font-size: 0.72rem; color: var(--md-success); font-weight: 700;">Em Campo</span>
+        </div>
+        <h3 class="card-titulo">Confrade José Carlos Ribeiro</h3>
+        <p class="card-detalhes">
+          <strong>Função:</strong> 1º Tesoureiro e Visitador Titular<br>
+          <strong>Tempo de SSVP:</strong> 12 anos de caridade vicentina<br>
+          <strong>Telefone:</strong> (11) 98765-4321
+        </p>
+        <button type="button" class="btn-m3-filled" style="background-color: var(--md-primary);" onclick="executarAcao('Contatar Confrade José Carlos')">
+          <span>📞 Contatar Vicentino</span>
+        </button>
+      </article>
+    </section>
+
+    <!-- ====================================================================
+         PÁGINA 3: A REGRA DA SSVP (description.svg)
+         ==================================================================== -->
+    <section class="page-container" id="pageRegra">
+      <div class="banner-modulo">
+        <div class="banner-badge-topo">
+          <span class="badge-modulo">Espiritualidade e Estatuto</span>
+          <span class="badge-status">● A Regra da SSVP</span>
+        </div>
+        <h2 class="banner-titulo">
+          <svg style="width: 1.4rem; height: 1.4rem; fill: var(--md-secondary);" viewBox="0 -960 960 960">
+            <path d="M320-240h320v-80H320v80Zm0-160h320v-80H320v80ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H240Zm280-520v-200H240v640h480v-440H520ZM240-800v200-200 640-640Z"/>
+          </svg>
+          A Regra da SSVP
+        </h2>
+        <p class="banner-desc">
+          Fundamentos espirituais, orações oficiais da conferência e princípios de São Vicente de Paulo e Beato Frederico Ozanam.
+        </p>
+      </div>
+
+      <!-- Card 1: Oração Inicial da Reunião -->
+      <article class="md-card card-oracao">
+        <div class="card-header-row">
+          <span class="card-chip chip-conferencia">Oração Oficial</span>
+          <span style="font-size: 0.72rem; color: var(--md-secondary); font-weight: 700;">Reunião Vicentina</span>
+        </div>
+        <h3 class="card-titulo">Oração Inicial da Conferência</h3>
+        <p class="texto-oracao">
+          "Em nome do Pai, do Filho e do Espírito Santo. Amém.<br><br>
+          Vinde, Espírito Santo, enchei os corações dos vossos fiéis e acendei neles o fogo do vosso amor. Enviai o vosso Espírito e tudo será criado, e renovareis a face da terra.<br><br>
+          Senhor Jesus, que quisestes fazer-vos pobre entre os pobres, dai-nos a graça de reconhecer a vossa imagem em cada irmão que sofre."
+        </p>
+        <button type="button" class="btn-m3-filled" style="background-color: var(--md-primary);" onclick="executarAcao('Oração Inicial Concluída')">
+          <span>🙏 Amém</span>
+        </button>
+      </article>
+
+      <!-- Card 2: Princípio Fundamental (Artigo 1.2) -->
+      <article class="md-card">
+        <div class="card-header-row">
+          <span class="card-chip chip-agendado">Artigo 1.2 da Regra</span>
+          <span style="font-size: 0.72rem; color: var(--md-on-surface-variant);">Estatuto SSVP</span>
+        </div>
+        <h3 class="card-titulo">A Vocação Vicentina</h3>
+        <p class="card-detalhes">
+          <em>"Nenhuma obra de caridade é estranha à Sociedade de São Vicente de Paulo. Sua ação compreende qualquer forma de ajuda mediante contato pessoal, no sentido de aliviar o sofrimento e promover a dignidade integral da pessoa humana."</em>
+        </p>
+      </article>
+    </section>
+
+  </main>
+
+  <!-- ========================================================================
+       Barra Inferior Fixa (Console de Acessibilidade - z-index: 60)
+       No Modo Destro: Sincronização 🔄 à esquerda | Microfone 🎤 | Menu ☰ à DIREITA!
+       No Modo Canhoto: Invertido via body.layout-canhoto -> Menu ☰ à ESQUERDA!
+       ======================================================================== -->
+  <footer class="app-footer" id="appFooter">
+    <!-- Botão Lateral A: Sincronização em Nuvem (À Esquerda no Modo Destro) -->
+    <button type="button" class="footer-circle-btn" id="btnFooterSync" onclick="executarAcao('Sincronização com a Nuvem')" title="Sincronizar Dados">
+      <svg viewBox="0 -960 960 960">
+        <path d="M480-160q-134 0-227-93t-93-227q0-134 93-227t227-93q69 0 132 28.5T720-690v-110h80v280H520v-80h168q-32-56-87.5-88T480-720q-100 0-170 70t-70 170q0 100 70 170t170 70q77 0 139-44t87-116h84q-28 106-114 173t-196 67Z"/>
+      </svg>
+    </button>
+
+    <!-- Botão Central: Microfone de Voz (FAB de Alto Contraste) -->
+    <button type="button" class="footer-fab" id="btnFooterMic" onclick="executarAcao('Comando de Voz Ativado')" title="Comando de Voz">
+      <svg viewBox="0 -960 960 960">
+        <path d="M480-400q-50 0-85-35t-35-85v-240q0-50 35-85t85-35q50 0 85 35t35 85v240q0 50-35 85t-85 35Zm0-240Zm-40 520v-123q-104-14-172-93t-68-184h80q0 83 58.5 141.5T480-320q83 0 141.5-58.5T680-520h80q0 105-68 184t-172 93v123h-80Zm40-360q17 0 28.5-11.5T520-520v-240q0-17-11.5-28.5T480-800q-17 0-28.5 11.5T440-760v240q0 17 11.5 28.5T480-480Z"/>
+      </svg>
+    </button>
+
+    <!-- Botão Lateral B: 3 Linhas Horizontais (Menu Hambúrguer) para Selecionar Página (À DIREITA no Modo Destro!) -->
+    <button type="button" class="footer-circle-btn btn-footer-menu" id="btnFooterMenu" onclick="abrirSeletorPagina()" title="Selecionar Página (Menu)">
+      <svg viewBox="0 -960 960 960">
+        <path d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z"/>
+      </svg>
+    </button>
+  </footer>
+
+  <!-- ========================================================================
+       Gaveta Inferior Flutuante M3: NAVEGAÇÃO DE TELAS (Bottom Sheet)
+       ======================================================================== -->
+  <div class="scrim-overlay-bottom" id="scrimBottom" onclick="fecharSeletorPorOverlay(event)">
+    <div class="bottom-sheet" id="bottomSheet" onclick="event.stopPropagation()">
+      
+      <div class="sheet-nav-header">
+        <h3 class="sheet-nav-title">
+          <span>🧭 Selecionar Página</span>
+        </h3>
+        <span id="badgeMaoAtiva" style="font-size: 0.72rem; color: var(--md-secondary); font-weight: 700;">Modo Destro</span>
+      </div>
+
+      <div class="sheet-nav-body">
+
+        <!-- Opção 1: Visita (home.svg) -->
+        <button type="button" class="nav-item-btn active" id="navBtnVisita" onclick="navegarPara('visita')">
+          <div class="nav-item-icon-box">
+            <svg viewBox="0 -960 960 960">
+              <path d="M240-200h120v-240h240v240h120v-360L480-740 240-560v360Zm-80 80v-480l320-240 320 240v480H520v-240h-80v240H160Zm320-350Z"/>
+            </svg>
+          </div>
+          <div class="nav-item-text">
+            <span class="nav-item-nome">
+              Visitas Domiciliares
+              <span class="nav-item-badge" id="badgeAtivoVisita">Atual</span>
+            </span>
+            <span class="nav-item-desc">Acompanhamento e relatos de famílias assistidas</span>
+          </div>
+        </button>
+
+        <!-- Opção 2: Pessoas (groups.svg) -->
+        <button type="button" class="nav-item-btn" id="navBtnPessoas" onclick="navegarPara('pessoas')">
+          <div class="nav-item-icon-box">
+            <svg viewBox="0 -960 960 960">
+              <path d="M0-240v-63q0-43 44-70t116-27q13 0 25 .5t23 2.5q-14 21-21 44t-7 48v65H0Zm240 0v-65q0-32 17.5-58.5T307-410q32-20 76.5-30t96.5-10q53 0 97.5 10t76.5 30q32 20 49 46.5t17 58.5v65H240Zm540 0v-65q0-26-6.5-49T754-397q11-2 22.5-2.5t23.5-.5q72 0 116 26.5t44 70.5v63H780Zm-455-80h311q-10-20-55.5-35T480-370q-55 0-100.5 15T325-320ZM160-440q-33 0-56.5-23.5T80-520q0-34 23.5-57t56.5-23q34 0 57 23t23 57q0 33-23 56.5T160-440Zm640 0q-33 0-56.5-23.5T720-520q0-34 23.5-57t56.5-23q34 0 57 23t23 57q0 33-23 56.5T800-440Zm-320-40q-50 0-85-35t-35-85q0-51 35-85.5t85-34.5q51 0 85.5 34.5T600-600q0 50-34.5 85T480-480Zm0-80q17 0 28.5-11.5T520-600q0-17-11.5-28.5T480-640q-17 0-28.5 11.5T440-600q0 17 11.5 28.5T480-560Zm1 240Zm-1-280Z"/>
+            </svg>
+          </div>
+          <div class="nav-item-text">
+            <span class="nav-item-nome">
+              Pessoas &amp; Vicentinos
+              <span class="nav-item-badge" id="badgeAtivoPessoas" style="display: none;">Atual</span>
+            </span>
+            <span class="nav-item-desc">Cadastro de assistidos e membros da conferência</span>
+          </div>
+        </button>
+
+        <!-- Opção 3: Regra (description.svg) -->
+        <button type="button" class="nav-item-btn" id="navBtnRegra" onclick="navegarPara('regra')">
+          <div class="nav-item-icon-box">
+            <svg viewBox="0 -960 960 960">
+              <path d="M320-240h320v-80H320v80Zm0-160h320v-80H320v80ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H240Zm280-520v-200H240v640h480v-440H520ZM240-800v200-200 640-640Z"/>
+            </svg>
+          </div>
+          <div class="nav-item-text">
+            <span class="nav-item-nome">
+              A Regra da SSVP
+              <span class="nav-item-badge" id="badgeAtivoRegra" style="display: none;">Atual</span>
+            </span>
+            <span class="nav-item-desc">Orações, espiritualidade e artigos normativos</span>
+          </div>
+        </button>
+
+      </div>
+
+      <div class="sheet-nav-footer">
+        <button type="button" class="btn-m3-filled" style="background-color: var(--md-primary);" onclick="fecharSeletorPagina()">
+          Fechar
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       Scripts de Navegação, Configurações Globais e IndexedDB Silencioso
+       ======================================================================== -->
+  <script>
+    // 1. CONFIGURAÇÃO E ESTADO GLOBAL UNIFICADOS
+    const CONFIG_PADRAO = {
+      id: "app_estado_global",
+      paginaAtiva: "visita",
+      destro: true,             // No Modo Destro: ⚙️ e ☰ ficam à DIREITA!
+      modoEscuro: true,
+      fonteGrande: false,
+      reduzirAnimacoes: false,
+      vibracaoAtiva: true,
+      somAtivo: true,
+      somenteWifi: false,
+      atualizadoEm: new Date().toISOString()
+    };
+
+    let configAtual = { ...CONFIG_PADRAO };
+
+    // Elementos DOM
+    const scrimTop = document.getElementById("scrimTop");
+    const topSheet = document.getElementById("topSheet");
+    const scrimBottom = document.getElementById("scrimBottom");
+    const bottomSheet = document.getElementById("bottomSheet");
+    const headerTitle = document.getElementById("headerTitle");
+    const badgeMaoAtiva = document.getElementById("badgeMaoAtiva");
+
+    // Switches de Configurações
+    const switchModoEscuro = document.getElementById("switchModoEscuro");
+    const switchFonteGrande = document.getElementById("switchFonteGrande");
+    const switchDestro = document.getElementById("switchDestro");
+    const switchReduzirAnim = document.getElementById("switchReduzirAnim");
+    const switchVibracao = document.getElementById("switchVibracao");
+    const switchSom = document.getElementById("switchSom");
+    const switchWifi = document.getElementById("switchWifi");
+
+    // Containers de Páginas
+    const pageVisita = document.getElementById("pageVisita");
+    const pagePessoas = document.getElementById("pagePessoas");
+    const pageRegra = document.getElementById("pageRegra");
+
+    // Botões e Badges da Gaveta de Navegação
+    const navBtnVisita = document.getElementById("navBtnVisita");
+    const navBtnPessoas = document.getElementById("navBtnPessoas");
+    const navBtnRegra = document.getElementById("navBtnRegra");
+    const badgeAtivoVisita = document.getElementById("badgeAtivoVisita");
+    const badgeAtivoPessoas = document.getElementById("badgeAtivoPessoas");
+    const badgeAtivoRegra = document.getElementById("badgeAtivoRegra");
+
+    // ==========================================================================
+    // 2. ARMAZENAMENTO LOCAL (IndexedDB Silencioso)
+    // ==========================================================================
+    const DB_NOME = "SSVP_NavegacaoDB";
+    const DB_VERSAO = 2;
+    const DB_STORE = "estado_completo";
+
+    function abrirDB() {
+      return new Promise((resolve, reject) => {
+        const req = indexedDB.open(DB_NOME, DB_VERSAO);
+        req.onupgradeneeded = (e) => {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains(DB_STORE)) {
+            db.createObjectStore(DB_STORE, { keyPath: "id" });
+          }
+        };
+        req.onsuccess = (e) => resolve(e.target.result);
+        req.onerror = (e) => reject(e.target.error);
+      });
+    }
+
+    async function salvarNoArmazenamento(dados) {
+      try {
+        const db = await abrirDB();
+        const tx = db.transaction(DB_STORE, "readwrite");
+        const store = tx.objectStore(DB_STORE);
+        dados.atualizadoEm = new Date().toISOString();
+        store.put(dados);
+      } catch (err) {
+        console.error("Erro ao salvar estado:", err);
+      }
+    }
+
+    async function carregarDoArmazenamento() {
+      try {
+        const db = await abrirDB();
+        const tx = db.transaction(DB_STORE, "readonly");
+        const store = tx.objectStore(DB_STORE);
+        const req = store.get("app_estado_global");
+
+        req.onsuccess = () => {
+          if (req.result) {
+            configAtual = { ...CONFIG_PADRAO, ...req.result };
+          } else {
+            configAtual = { ...CONFIG_PADRAO };
+            salvarNoArmazenamento(configAtual);
+          }
+          aplicarTodasConfiguracoes(configAtual);
+        };
+      } catch (err) {
+        console.error("Erro ao carregar estado:", err);
+        aplicarTodasConfiguracoes(configAtual);
+      }
+    }
+
+    // ==========================================================================
+    // 3. APLICAÇÃO DINÂMICA DE CONFIGURAÇÕES E NAVEGAÇÃO
+    // ==========================================================================
+    function aplicarTodasConfiguracoes(cfg) {
+      // 1. Modo Escuro
+      if (cfg.modoEscuro) {
+        document.body.classList.remove("tema-claro");
+      } else {
+        document.body.classList.add("tema-claro");
+      }
+      switchModoEscuro.checked = cfg.modoEscuro;
+
+      // 2. Fonte Grande (Acessibilidade na Raiz HTML)
+      if (cfg.fonteGrande) {
+        document.documentElement.classList.add("fonte-grande");
+        document.body.classList.add("fonte-grande");
+      } else {
+        document.documentElement.classList.remove("fonte-grande");
+        document.body.classList.remove("fonte-grande");
+      }
+      switchFonteGrande.checked = cfg.fonteGrande;
+
+      // 3. Modo Destro / Canhoto
+      // - No Modo Destro (cfg.destro = true):
+      //   ⚙️ (topo) e ☰ (base) ficam AMBOS à DIREITA!
+      // - No Modo Canhoto (cfg.destro = false):
+      //   layout-canhoto inverte as barras, colocando ⚙️ e ☰ AMBOS à ESQUERDA!
+      if (cfg.destro) {
+        document.body.classList.remove("layout-canhoto");
+        badgeMaoAtiva.textContent = "Modo Destro (⚙️ e ☰ à Direita)";
+      } else {
+        document.body.classList.add("layout-canhoto");
+        badgeMaoAtiva.textContent = "Modo Canhoto (⚙️ e ☰ à Esquerda)";
+      }
+      switchDestro.checked = cfg.destro;
+
+      // 4. Reduzir Animações
+      if (cfg.reduzirAnimacoes) {
+        document.body.classList.add("sem-animacoes");
+      } else {
+        document.body.classList.remove("sem-animacoes");
+      }
+      switchReduzirAnim.checked = cfg.reduzirAnimacoes;
+
+      // 5. Switches Operacionais
+      switchVibracao.checked = cfg.vibracaoAtiva;
+      switchSom.checked = cfg.somAtivo;
+      switchWifi.checked = cfg.somenteWifi;
+
+      // 6. Ativa a Página Atual
+      ativarPagina(cfg.paginaAtiva, false);
+    }
+
+    function alterarConfig(chave, valor) {
+      configAtual[chave] = valor;
+      dispararFeedbackTabil();
+      dispararFeedbackSonoro();
+      aplicarTodasConfiguracoes(configAtual);
+      salvarNoArmazenamento(configAtual);
+    }
+
+    function navegarPara(idPagina) {
+      dispararFeedbackTabil();
+      dispararFeedbackSonoro();
+      ativarPagina(idPagina, true);
+      fecharSeletorPagina();
+    }
+
+    function ativarPagina(idPagina, salvar) {
+      pageVisita.classList.remove("active");
+      pagePessoas.classList.remove("active");
+      pageRegra.classList.remove("active");
+
+      navBtnVisita.classList.remove("active");
+      navBtnPessoas.classList.remove("active");
+      navBtnRegra.classList.remove("active");
+      badgeAtivoVisita.style.display = "none";
+      badgeAtivoPessoas.style.display = "none";
+      badgeAtivoRegra.style.display = "none";
+
+      if (idPagina === "pessoas") {
+        pagePessoas.classList.add("active");
+        navBtnPessoas.classList.add("active");
+        badgeAtivoPessoas.style.display = "inline-block";
+        headerTitle.innerHTML = "<span>Pessoas</span>";
+        configAtual.paginaAtiva = "pessoas";
+      } else if (idPagina === "regra") {
+        pageRegra.classList.add("active");
+        navBtnRegra.classList.add("active");
+        badgeAtivoRegra.style.display = "inline-block";
+        headerTitle.innerHTML = "<span>A Regra</span>";
+        configAtual.paginaAtiva = "regra";
+      } else {
+        pageVisita.classList.add("active");
+        navBtnVisita.classList.add("active");
+        badgeAtivoVisita.style.display = "inline-block";
+        headerTitle.innerHTML = "<span>Visitas</span>";
+        configAtual.paginaAtiva = "visita";
+      }
+
+      if (salvar) {
+        salvarNoArmazenamento(configAtual);
+      }
+    }
+
+    // ==========================================================================
+    // 4. CONTROLE DAS GAVETAS FLUTUANTES (TOP SHEET E BOTTOM SHEET)
+    // ==========================================================================
+    function abrirTopSheet() {
+      dispararFeedbackTabil();
+      dispararFeedbackSonoro();
+      fecharSeletorPagina();
+      scrimTop.classList.add("aberto");
+    }
+
+    function fecharTopSheet() {
+      dispararFeedbackTabil();
+      scrimTop.classList.remove("aberto");
+    }
+
+    function toggleTopSheet() {
+      if (scrimTop.classList.contains("aberto")) {
+        fecharTopSheet();
+      } else {
+        abrirTopSheet();
+      }
+    }
+
+    function fecharTopSheetPorOverlay(e) {
+      if (e.target === scrimTop) {
+        fecharTopSheet();
+      }
+    }
+
+    function abrirSeletorPagina() {
+      dispararFeedbackTabil();
+      dispararFeedbackSonoro();
+      fecharTopSheet();
+      scrimBottom.classList.add("aberto");
+    }
+
+    function fecharSeletorPagina() {
+      dispararFeedbackTabil();
+      scrimBottom.classList.remove("aberto");
+    }
+
+    function fecharSeletorPorOverlay(e) {
+      if (e.target === scrimBottom) {
+        fecharSeletorPagina();
+      }
+    }
+
+    // ==========================================================================
+    // 5. FEEDBACK TÁTIL (HAPTIC) E SONORO (WEB AUDIO)
+    // ==========================================================================
+    function dispararFeedbackTabil() {
+      if (configAtual.vibracaoAtiva && navigator.vibrate) {
+        try {
+          navigator.vibrate(35);
+        } catch (e) {}
+      }
+    }
+
+    function dispararFeedbackSonoro() {
+      if (!configAtual.somAtivo) return;
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        const ctx = new AudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(659.25, ctx.currentTime); // Mi (E5)
+        gain.gain.setValueAtTime(0.06, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+
+        osc.start();
+        osc.stop(ctx.currentTime + 0.12);
+      } catch (e) {}
+    }
+
+    function executarAcao(nome) {
+      dispararFeedbackTabil();
+      dispararFeedbackSonoro();
+      alert(`Ação acionada: ${nome}`);
+    }
+
+    // ==========================================================================
+    // 6. INICIALIZAÇÃO AO CARREGAR A PÁGINA
+    // ==========================================================================
+    window.addEventListener("DOMContentLoaded", () => {
+      carregarDoArmazenamento();
+    });
+  </script>
+</body>
+
+</html>
