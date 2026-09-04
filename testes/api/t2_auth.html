@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Porteiro SSVP - Teste 2: Autenticação e Hierarquia</title>
+
+  <!-- Google Fonts Montserrat -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       Variáveis Globais e Design System SSVP (baseado em ux/app/t1_layout_basico)
+       ========================================================================== */
+    :root {
+      --raio-cantos: 3.2rem;
+      --raio-audio: 3.8rem;
+      --padding-vertical-barras: 0.55rem;
+
+      /* Cores SSVP */
+      --ssvp-navy: #002d62;
+      --ssvp-blue: #007fff;
+      --ssvp-red: #d32f2f;
+      --ssvp-green: #15803d;
+      --ssvp-bg: #0b0f19;
+      --ssvp-card-bg: rgba(18, 25, 41, 0.96);
+      --ssvp-card-border: rgba(255, 255, 255, 0.1);
+      --ssvp-text: #f3f4f6;
+      --ssvp-text-muted: #94a3b8;
+      --ssvp-white: #ffffff;
+
+      --cor-barra-sup: var(--ssvp-red);
+      /* Inicia em vermelho (Não conectado) */
+      --cor-barra-inf: var(--ssvp-navy);
+      --font-family: 'Montserrat', Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-family);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--ssvp-bg);
+      color: var(--ssvp-text);
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* ==========================================================================
+       Barra Superior Fixa (Header)
+       ========================================================================== */
+    .bar-sup {
+      position: relative;
+      background-color: var(--cor-barra-sup);
+      padding-top: calc(var(--padding-vertical-barras) + env(safe-area-inset-top));
+      padding-bottom: var(--padding-vertical-barras);
+      padding-left: 1rem;
+      padding-right: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      z-index: 100;
+      transition: background-color 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .bar-circle {
+      width: var(--raio-cantos);
+      height: var(--raio-cantos);
+      border-radius: 50%;
+      background-color: var(--ssvp-white);
+      color: var(--ssvp-navy);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1rem;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+      user-select: none;
+    }
+
+    .status-header-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 0.25rem 0.5rem;
+      border-radius: 8px;
+      transition: background-color 0.2s ease;
+      max-width: calc(100% - 7rem);
+    }
+
+    .status-header-container:hover {
+      background-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .status-header-container:active {
+      transform: scale(0.98);
+    }
+
+    .status-texto-principal {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--ssvp-white);
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+      letter-spacing: 0.02em;
+    }
+
+    .status-subtexto {
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.85);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Animação de pulsar para o estado não conectado */
+    .pulsar {
+      animation: animarPulsar 1.8s infinite ease-in-out;
+    }
+
+    @keyframes animarPulsar {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.65;
+        transform: scale(0.96);
+      }
+    }
+
+    /* Identificador discreto de versão */
+    .versao-badge {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--ssvp-navy);
+      opacity: 0.9;
+    }
+
+    /* ==========================================================================
+       Área Central Scrollável
+       ========================================================================== */
+    .display-area {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 1.25rem 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      position: relative;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Cards Explicativos para Leigos */
+    .card-explicativo {
+      width: 100%;
+      max-width: 480px;
+      background-color: var(--ssvp-card-bg);
+      border: 1px solid var(--ssvp-card-border);
+      border-radius: 1rem;
+      padding: 1.15rem;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      backdrop-filter: blur(8px);
+    }
+
+    .card-explicativo-titulo {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #93c5fd;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card-explicativo-corpo {
+      font-size: 0.85rem;
+      line-height: 1.5;
+      color: #cbd5e1;
+    }
+
+    .card-explicativo-corpo strong {
+      color: var(--ssvp-white);
+    }
+
+    /* ==========================================================================
+       Card Flutuante / Modal de Seleção e Login
+       ========================================================================== */
+    .overlay-modal {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(6, 10, 18, 0.88);
+      backdrop-filter: blur(6px);
+      z-index: 90;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      overflow-y: auto;
+    }
+
+    .overlay-modal.ativo {
+      display: flex;
+    }
+
+    .card-login {
+      width: 100%;
+      max-width: 420px;
+      background: linear-gradient(180deg, #162035 0%, #0e1526 100%);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 1.25rem;
+      padding: 1.5rem;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
+      display: flex;
+      flex-direction: column;
+      gap: 1.15rem;
+      position: relative;
+    }
+
+    .card-login-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 0.75rem;
+    }
+
+    .card-login-titulo {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--ssvp-white);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-fechar {
+      background: rgba(255, 255, 255, 0.08);
+      border: none;
+      color: var(--ssvp-white);
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s ease;
+    }
+
+    .btn-fechar:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Formulários e Selects (Prevenção de Zoom no iPhone: font-size >= 16px) */
+    .form-grupo {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .form-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #94a3b8;
+    }
+
+    .form-select,
+    .form-input {
+      width: 100%;
+      min-height: 48px;
+      padding: 0.75rem 0.85rem;
+      font-size: 1rem;
+      /* 16px mínimo para Safari iOS */
+      color: var(--ssvp-white);
+      background-color: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      box-sizing: border-box;
+    }
+
+    .form-select option {
+      background-color: #111827;
+      color: #ffffff;
+      padding: 8px;
+    }
+
+    .form-select:focus,
+    .form-input:focus {
+      border-color: var(--ssvp-blue);
+      box-shadow: 0 0 0 3px rgba(0, 127, 255, 0.25);
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-submit {
+      width: 100%;
+      min-height: 50px;
+      background-color: var(--ssvp-blue);
+      color: var(--ssvp-white);
+      border: none;
+      border-radius: 10px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+      box-shadow: 0 4px 12px rgba(0, 127, 255, 0.35);
+      transition: background-color 0.2s ease, transform 0.1s ease;
+    }
+
+    .btn-submit:hover {
+      background-color: #006cd9;
+    }
+
+    .btn-submit:active {
+      transform: scale(0.98);
+    }
+
+    .btn-submit:disabled {
+      background-color: #475569;
+      cursor: not-allowed;
+      opacity: 0.6;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .feedback-msg {
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-align: center;
+      padding: 0.65rem;
+      border-radius: 8px;
+      display: none;
+    }
+
+    .feedback-erro {
+      display: block;
+      background-color: rgba(239, 68, 68, 0.2);
+      border: 1px solid #ef4444;
+      color: #fca5a5;
+    }
+
+    .feedback-sucesso {
+      display: block;
+      background-color: rgba(34, 197, 94, 0.2);
+      border: 1px solid #22c55e;
+      color: #86efac;
+    }
+
+    .badge-conferencia-ativa {
+      background-color: rgba(0, 127, 255, 0.15);
+      border: 1px solid var(--ssvp-blue);
+      color: #93c5fd;
+      padding: 0.5rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .btn-link-trocar {
+      background: none;
+      border: none;
+      color: #38bdf8;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-decoration: underline;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    /* ==========================================================================
+       Barra Inferior Fixa (Footer)
+       ========================================================================== */
+    .bar-inf {
+      position: relative;
+      background-color: var(--cor-barra-inf);
+      padding-top: var(--padding-vertical-barras);
+      padding-bottom: calc(var(--padding-vertical-barras) + env(safe-area-inset-bottom));
+      padding-left: 1rem;
+      padding-right: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.4);
+      z-index: 100;
+      flex-shrink: 0;
+    }
+
+    .audio-circle {
+      width: var(--raio-audio);
+      height: var(--raio-audio);
+      border-radius: 50%;
+      background-color: var(--ssvp-white);
+      color: var(--ssvp-navy);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+      transition: transform 0.1s ease;
+    }
+
+    .audio-circle:active {
+      transform: scale(0.95);
+    }
+
+    .audio-circle svg {
+      width: 1.8rem;
+      height: 1.8rem;
+    }
+
+    .canto-circle {
+      cursor: pointer;
+      transition: transform 0.1s ease;
+    }
+
+    .canto-circle:active {
+      transform: scale(0.95);
+    }
+
+    /* Spinner */
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: girar 0.8s linear infinite;
+      display: inline-block;
+    }
+
+    @keyframes girar {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Barra Superior (Header Reativo) -->
+  <header class="bar-sup" id="barraSuperior">
+    <div class="bar-circle canto-circle" id="btnLogoTop">SS</div>
+
+    <!-- Status Clicável Central -->
+    <div class="status-header-container" id="statusHeaderBtn" onclick="abrirModalConexao()">
+      <span class="status-texto-principal pulsar" id="txtStatusPrincipal">Não conectado</span>
+      <span class="status-subtexto" id="txtStatusSub">Toque para conectar</span>
+    </div>
+
+    <div class="bar-circle canto-circle" style="background-color: transparent; box-shadow: none;">
+      <span class="versao-badge" id="lblVersaoTopo">v2.0</span>
+    </div>
+  </header>
+
+  <!-- Área de Conteúdo Central (Scrollável com Cards Educativos) -->
+  <main class="display-area" id="areaConteudo">
+
+    <!-- Card 1: O que é o Porteiro SSVP -->
+    <article class="card-explicativo">
+      <h2 class="card-explicativo-titulo">🛡️ O que é o Porteiro SSVP?</h2>
+      <p class="card-explicativo-corpo">
+        O <strong>Porteiro SSVP</strong> é o assistente de segurança digital do nosso aplicativo. Ele protege os dados
+        das famílias que visitamos, garantindo que <strong>nenhuma informação sensível</strong> fique desprotegida na
+        internet ou exposta em links públicos.
+      </p>
+    </article>
+
+    <!-- Card 2: Como funciona a Conexão Vicentina -->
+    <article class="card-explicativo">
+      <h2 class="card-explicativo-titulo">🗺️ Como funciona a Conexão?</h2>
+      <p class="card-explicativo-corpo">
+        Seguindo a hierarquia da nossa Sociedade, você seleciona seu <strong>Conselho Central</strong>, depois seu
+        <strong>Conselho Particular</strong> e finalmente a sua <strong>Conferência</strong>. O Porteiro localiza a
+        planilha da sua conferência automaticamente nos bastidores.
+      </p>
+    </article>
+
+    <!-- Card 3: Offline-First e Conforto nas Visitas -->
+    <article class="card-explicativo">
+      <h2 class="card-explicativo-titulo">📱 Pronto para Visitas no Domingo</h2>
+      <p class="card-explicativo-corpo">
+        Após fazer login uma única vez, o aplicativo grava a sua conferência na <strong>memória segura do
+          celular</strong>. Assim, nas visitas semanais, você pode trabalhar com tranquilidade mesmo em locais onde o
+        sinal de celular for fraco ou ausente.
+      </p>
+    </article>
+
+    <!-- Card 4: Configuração da API (Avançado) -->
+    <article class="card-explicativo" style="opacity: 0.85;">
+      <h2 class="card-explicativo-titulo" style="font-size: 0.9rem;">⚙️ Endpoint do Google Apps Script</h2>
+      <p class="card-explicativo-corpo" style="font-size: 0.78rem;">
+        URL do Porteiro: <span id="lblUrlAtiva"
+          style="color: #60a5fa; word-break: break-all;">AKfycbym44Qw...</span><br>
+        <button type="button" onclick="configurarUrlManual()"
+          style="background: none; border: none; color: #38bdf8; font-weight: bold; cursor: pointer; text-decoration: underline; padding-top: 4px;">
+          Alterar ou Testar Outra URL
+        </button>
+      </p>
+    </article>
+
+  </main>
+
+  <!-- Modal Flutuante de Seleção Hierárquica e Login -->
+  <div class="overlay-modal" id="overlayModal">
+    <div class="card-login" id="cardLogin">
+
+      <div class="card-login-header">
+        <h3 class="card-login-titulo" id="tituloCardLogin">Conectar Conferência</h3>
+        <button type="button" class="btn-fechar" onclick="fecharModalConexao()">✕</button>
+      </div>
+
+      <!-- Feedback de Erro ou Sucesso -->
+      <div class="feedback-msg" id="msgFeedback"></div>
+
+      <!-- ETAPA 1: Cascata de Seleção (CM ➔ CC ➔ CP ➔ CF) -->
+      <div id="secaoSelects" style="display: flex; flex-direction: column; gap: 0.9rem;">
+
+        <!-- Select 0: Conselho Metropolitano (Fixo / Desativado por enquanto) -->
+        <div class="form-grupo">
+          <label for="selConselhoMetropolitano" class="form-label">Conselho Metropolitano:</label>
+          <select id="selConselhoMetropolitano" class="form-select" disabled style="opacity: 0.8; cursor: not-allowed; background-color: rgba(255, 255, 255, 0.03); border-style: dashed;">
+            <option value="SP" selected>São Paulo</option>
+          </select>
+        </div>
+
+        <!-- Select 1: Conselho Central -->
+        <div class="form-grupo">
+          <label for="selConselhoCentral" class="form-label">Conselho Central:</label>
+          <select id="selConselhoCentral" class="form-select" onchange="aoSelecionarCC()">
+            <option value="">Carregando conselhos...</option>
+          </select>
+        </div>
+
+        <!-- Select 2: Conselho Particular (surge após escolher CC) -->
+        <div class="form-grupo" id="grupoCP" style="display: none;">
+          <label for="selConselhoParticular" class="form-label">Conselho Particular:</label>
+          <select id="selConselhoParticular" class="form-select" onchange="aoSelecionarCP()">
+            <option value="">Selecione o Conselho Particular...</option>
+          </select>
+        </div>
+
+        <!-- Select 3: Conferência (surge após escolher CP) -->
+        <div class="form-grupo" id="grupoCF" style="display: none;">
+          <label for="selConferencia" class="form-label">Conferência:</label>
+          <select id="selConferencia" class="form-select" onchange="aoSelecionarConferencia()">
+            <option value="">Selecione a Conferência...</option>
+          </select>
+        </div>
+
+      </div>
+
+      <!-- ETAPA 2: Formulário de Login ( surge após selecionar a Conferência ) -->
+      <form id="secaoFormLogin" style="display: none; flex-direction: column; gap: 0.9rem;"
+        onsubmit="executarLogin(event)">
+
+        <!-- Indicador da Conferência Selecionada -->
+        <div class="badge-conferencia-ativa">
+          <div>
+            <span style="font-size: 0.72rem; text-transform: uppercase; color: #94a3b8; display: block;">Conferência
+              Selecionada:</span>
+            <span id="txtNomeCfaSelecionada" style="color: var(--ssvp-white); font-weight: 700;">--</span>
+          </div>
+          <button type="button" class="btn-link-trocar" onclick="voltarParaSelects()">Trocar</button>
+        </div>
+
+        <div class="form-grupo">
+          <label for="iptEmail" class="form-label">E-mail do Vicentino:</label>
+          <input type="email" id="iptEmail" class="form-input" placeholder="exemplo@gmail.com" required
+            autocomplete="username">
+        </div>
+
+        <div class="form-grupo">
+          <label for="iptSenha" class="form-label">Senha:</label>
+          <input type="password" id="iptSenha" class="form-input" placeholder="Digite sua senha" required
+            autocomplete="current-password">
+        </div>
+
+        <button type="submit" class="btn-submit" id="btnLogin">
+          <span>Entrar no WebApp</span>
+        </button>
+
+      </form>
+
+      <!-- ETAPA 3: Sessão Ativa / Vicentino Conectado -->
+      <div id="secaoSessaoAtiva" style="display: none; flex-direction: column; gap: 0.9rem; text-align: center;">
+        <div style="font-size: 2.5rem;">🎉</div>
+        <h4 style="color: #86efac; font-size: 1.1rem;" id="txtBoasVindas">Bem-vindo(a)!</h4>
+        <p style="font-size: 0.85rem; color: #cbd5e1;" id="txtDetalhesSessao">Conferência conectada com sucesso.</p>
+
+        <button type="button" class="btn-submit" style="background-color: #334155; margin-top: 0.5rem;"
+          onclick="encerrarSessao()">
+          Desconectar / Sair
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Barra Inferior (Footer de Navegação) -->
+  <footer class="bar-inf">
+    <div class="bar-circle canto-circle" id="btn_config" onclick="abrirModalConexao()" title="Configurações">⚙️</div>
+
+    <div class="bar-circle audio-circle" id="btn_voz" title="Comando de Voz">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path
+          d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z" />
+      </svg>
+    </div>
+
+    <div class="bar-circle canto-circle" id="btn_ajuda"
+      onclick="alert('Porteiro SSVP - Versão 2.0\nToque no topo para escolher seu Conselho Central e Conferência.')"
+      title="Ajuda">❓</div>
+  </footer>
+
+  <!-- ==========================================================================
+       Lógica Javascript: IndexedDB, Chamadas da API e Estados da Interface
+       ========================================================================== -->
+  <script>
+    // URL Padrão Oficial do Porteiro SSVP
+    const URL_PADRAO_PORTEIRO = "https://script.google.com/macros/s/AKfycbzP6CehGh2U_kLhVPMZNZKeoaWIWzpzd-fgNh03qnmwYVBJFoI3nMP6TZBGH1ZahT9t/exec";
+    const STORAGE_KEY_URL = "ssvp_porteiro_url";
+
+    // Cache em memória da estrutura do CC atual
+    let cacheEstruturaCC = {
+      id_cc: null,
+      conselhos_particulares: [],
+      conferencias: []
+    };
+
+    // Estado da sessão ativa
+    let sessaoAtiva = {
+      conectado: false,
+      id_cc: null,
+      nome_cc: null,
+      id_cp: null,
+      id_ssvp: null,
+      nome_cf: null,
+      nome_pessoa: null,
+      email_pessoa: null
+    };
+
+    // Elementos do DOM
+    const barraSuperior = document.getElementById("barraSuperior");
+    const txtStatusPrincipal = document.getElementById("txtStatusPrincipal");
+    const txtStatusSub = document.getElementById("txtStatusSub");
+    const overlayModal = document.getElementById("overlayModal");
+    const msgFeedback = document.getElementById("msgFeedback");
+
+    const secaoSelects = document.getElementById("secaoSelects");
+    const selConselhoCentral = document.getElementById("selConselhoCentral");
+    const grupoCP = document.getElementById("grupoCP");
+    const selConselhoParticular = document.getElementById("selConselhoParticular");
+    const grupoCF = document.getElementById("grupoCF");
+    const selConferencia = document.getElementById("selConferencia");
+
+    const secaoFormLogin = document.getElementById("secaoFormLogin");
+    const txtNomeCfaSelecionada = document.getElementById("txtNomeCfaSelecionada");
+    const iptEmail = document.getElementById("iptEmail");
+    const iptSenha = document.getElementById("iptSenha");
+    const btnLogin = document.getElementById("btnLogin");
+
+    const secaoSessaoAtiva = document.getElementById("secaoSessaoAtiva");
+    const txtBoasVindas = document.getElementById("txtBoasVindas");
+    const txtDetalhesSessao = document.getElementById("txtDetalhesSessao");
+    const lblUrlAtiva = document.getElementById("lblUrlAtiva");
+
+    // ==========================================================================
+    // Inicialização
+    // ==========================================================================
+    document.addEventListener("DOMContentLoaded", async () => {
+      atualizarLabelUrlAtiva();
+      await inicializarIndexedDB();
+      await recuperarSessaoDoIndexedDB();
+    });
+
+    function obterUrlPorteiro() {
+      const urlSalva = localStorage.getItem(STORAGE_KEY_URL);
+      if (urlSalva && urlSalva.includes("AKfycbym44Qw7BO")) {
+        // Migração automática da URL antiga do t1 para a nova do t2
+        localStorage.setItem(STORAGE_KEY_URL, URL_PADRAO_PORTEIRO);
+        return URL_PADRAO_PORTEIRO;
+      }
+      return (urlSalva && urlSalva.trim() !== "") ? urlSalva.trim() : URL_PADRAO_PORTEIRO;
+    }
+
+    function atualizarLabelUrlAtiva() {
+      const url = obterUrlPorteiro();
+      lblUrlAtiva.textContent = url.replace("https://script.google.com/macros/s/", "").substring(0, 20) + "...";
+    }
+
+    function configurarUrlManual() {
+      const atual = obterUrlPorteiro();
+      const nova = prompt("Cole a URL do Google Apps Script (/exec) ou deixe em branco para usar a padrão:", atual);
+      if (nova !== null) {
+        if (nova.trim() === "") {
+          localStorage.removeItem(STORAGE_KEY_URL);
+        } else {
+          localStorage.setItem(STORAGE_KEY_URL, nova.trim());
+        }
+        atualizarLabelUrlAtiva();
+        alert("URL configurada com sucesso!");
+      }
+    }
+
+    // ==========================================================================
+    // IndexedDB: Persistência local da Conferência Selecionada
+    // ==========================================================================
+    const DB_NAME = "webappssvp_db";
+    const DB_VERSION = 1;
+    const STORE_NAME = "config_conferencia";
+
+    function abrirBanco() {
+      return new Promise((resolve, reject) => {
+        const req = indexedDB.open(DB_NAME, DB_VERSION);
+        req.onupgradeneeded = (e) => {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains(STORE_NAME)) {
+            db.createObjectStore(STORE_NAME, { keyPath: "chave" });
+          }
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    async function salvarNoIndexedDB(dados) {
+      try {
+        const db = await abrirBanco();
+        const tx = db.transaction(STORE_NAME, "readwrite");
+        const store = tx.objectStore(STORE_NAME);
+        store.put({ chave: "conferencia_atual", ...dados });
+      } catch (err) {
+        console.warn("Aviso ao gravar no IndexedDB:", err);
+      }
+    }
+
+    async function lerDoIndexedDB() {
+      try {
+        const db = await abrirBanco();
+        return new Promise((resolve) => {
+          const tx = db.transaction(STORE_NAME, "readonly");
+          const store = tx.objectStore(STORE_NAME);
+          const req = store.get("conferencia_atual");
+          req.onsuccess = () => resolve(req.result || null);
+          req.onerror = () => resolve(null);
+        });
+      } catch (err) {
+        return null;
+      }
+    }
+
+    async function limparIndexedDB() {
+      try {
+        const db = await abrirBanco();
+        const tx = db.transaction(STORE_NAME, "readwrite");
+        tx.objectStore(STORE_NAME).delete("conferencia_atual");
+      } catch (err) { }
+    }
+
+    async function inicializarIndexedDB() {
+      try {
+        await abrirBanco();
+      } catch (e) {
+        console.warn("IndexedDB indisponível, operando em memória.");
+      }
+    }
+
+    // ==========================================================================
+    // Gestão de Estados da Barra Superior
+    // ==========================================================================
+    function aplicarEstadoVisual(estado, detalhes = {}) {
+      if (estado === "NAO_CONECTADO") {
+        barraSuperior.style.backgroundColor = "var(--ssvp-red)";
+        txtStatusPrincipal.textContent = "Não conectado";
+        txtStatusPrincipal.className = "status-texto-principal pulsar";
+        txtStatusSub.textContent = "Toque para conectar";
+      }
+      else if (estado === "NAO_LOGADO") {
+        barraSuperior.style.backgroundColor = "var(--ssvp-red)";
+        txtStatusPrincipal.textContent = "Não logado";
+        txtStatusPrincipal.className = "status-texto-principal";
+        txtStatusSub.textContent = detalhes.nome_cf || "Toque para entrar";
+      }
+      else if (estado === "LOGADO") {
+        barraSuperior.style.backgroundColor = "var(--ssvp-navy)";
+        txtStatusPrincipal.textContent = detalhes.nome_cf || "Conferência Ativa";
+        txtStatusPrincipal.className = "status-texto-principal";
+        txtStatusSub.textContent = detalhes.nome_pessoa ? `Olá, ${detalhes.nome_pessoa}` : "Conectado";
+      }
+    }
+
+    async function recuperarSessaoDoIndexedDB() {
+      const registro = await lerDoIndexedDB();
+      if (registro && registro.id_ssvp) {
+        sessaoAtiva = { ...sessaoAtiva, ...registro };
+        txtNomeCfaSelecionada.textContent = sessaoAtiva.nome_cf || sessaoAtiva.id_ssvp;
+
+        if (sessaoAtiva.conectado && sessaoAtiva.nome_pessoa) {
+          aplicarEstadoVisual("LOGADO", sessaoAtiva);
+        } else {
+          aplicarEstadoVisual("NAO_LOGADO", sessaoAtiva);
+        }
+      } else {
+        aplicarEstadoVisual("NAO_CONECTADO");
+      }
+    }
+
+    // ==========================================================================
+    // Controle do Modal
+    // ==========================================================================
+    function abrirModalConexao() {
+      overlayModal.classList.add("ativo");
+      msgFeedback.className = "feedback-msg";
+      msgFeedback.style.display = "none";
+
+      if (sessaoAtiva.conectado) {
+        // Usuário já autenticado
+        secaoSelects.style.display = "none";
+        secaoFormLogin.style.display = "none";
+        secaoSessaoAtiva.style.display = "flex";
+        txtBoasVindas.textContent = `Olá, ${sessaoAtiva.nome_pessoa}!`;
+        txtDetalhesSessao.textContent = `Conferência: ${sessaoAtiva.nome_cf} (ID: ${sessaoAtiva.id_ssvp})`;
+      } else if (sessaoAtiva.id_ssvp) {
+        // Já tem conferência escolhida no IndexedDB, exibe tela de login
+        secaoSelects.style.display = "none";
+        secaoFormLogin.style.display = "flex";
+        secaoSessaoAtiva.style.display = "none";
+        txtNomeCfaSelecionada.textContent = sessaoAtiva.nome_cf || sessaoAtiva.id_ssvp;
+      } else {
+        // Primeiro acesso: carregar Conselhos Centrais
+        secaoSelects.style.display = "flex";
+        secaoFormLogin.style.display = "none";
+        secaoSessaoAtiva.style.display = "none";
+        carregarConselhosCentrais();
+      }
+    }
+
+    function fecharModalConexao() {
+      overlayModal.classList.remove("ativo");
+    }
+
+    function voltarParaSelects() {
+      secaoFormLogin.style.display = "none";
+      secaoSelects.style.display = "flex";
+      carregarConselhosCentrais();
+    }
+
+    // ==========================================================================
+    // Chamadas à API do Porteiro SSVP
+    // ==========================================================================
+
+    // 1. Carregar Conselhos Centrais (action=get_ccs)
+    async function carregarConselhosCentrais() {
+      selConselhoCentral.innerHTML = `<option value="">Carregando conselhos...</option>`;
+      selConselhoCentral.disabled = true;
+      grupoCP.style.display = "none";
+      grupoCF.style.display = "none";
+
+      try {
+        const urlBase = obterUrlPorteiro();
+        const sep = urlBase.includes("?") ? "&" : "?";
+        
+        // Usa GET para leitura rápida e compatibilidade total em celulares
+        const res = await fetch(`${urlBase}${sep}action=get_ccs`);
+        
+        if (!res.ok) {
+          throw new Error(`Erro HTTP ${res.status}: ${res.statusText}`);
+        }
+
+        const dados = await res.json();
+
+        // Diagnóstico: Se o script ainda for o t1_ping (v1.0)
+        if (dados && dados.dados && dados.dados.versao_api === "1.0") {
+          throw new Error("O Google Apps Script ainda está rodando o t1_ping (v1.0). Atualize o código do Apps Script para o t2_auth e crie uma 'Nova versão' em 'Gerenciar implantações'.");
+        }
+
+        if (dados.sucesso && dados.dados && dados.dados.conselhos_centrais) {
+          const lista = dados.dados.conselhos_centrais;
+          if (lista.length === 0) {
+            selConselhoCentral.innerHTML = `<option value="">Nenhum conselho central encontrado</option>`;
+            exibirFeedback("A aba 'conselhos_centrais' está vazia na planilha do Porteiro.", "erro");
+            return;
+          }
+
+          selConselhoCentral.innerHTML = `<option value="">Selecione o Conselho Central...</option>`;
+          lista.forEach(cc => {
+            const opt = document.createElement("option");
+            opt.value = cc.id_cc;
+            opt.textContent = cc.nome_cc || cc.id_cc;
+            selConselhoCentral.appendChild(opt);
+          });
+          selConselhoCentral.disabled = false;
+        } else {
+          throw new Error(dados.erro ? dados.erro.mensagem : "Falha ao obter Conselhos Centrais.");
+        }
+      } catch (err) {
+        selConselhoCentral.innerHTML = `<option value="">Erro ao carregar</option>`;
+        exibirFeedback(`Erro de conexão com o Porteiro: ${err.message}`, "erro");
+      }
+    }
+
+    // 2. Ao selecionar Conselho Central ➔ Carregar CPs e Conferências (action=get_estrutura_cc)
+    async function aoSelecionarCC() {
+      const idCc = selConselhoCentral.value;
+      if (!idCc) {
+        grupoCP.style.display = "none";
+        grupoCF.style.display = "none";
+        return;
+      }
+
+      selConselhoParticular.innerHTML = `<option value="">Carregando CPs...</option>`;
+      grupoCP.style.display = "flex";
+      grupoCF.style.display = "none";
+
+      try {
+        const urlBase = obterUrlPorteiro();
+        const sep = urlBase.includes("?") ? "&" : "?";
+        
+        // Usa GET passando id_cc codificado na URL
+        const res = await fetch(`${urlBase}${sep}action=get_estrutura_cc&id_cc=${encodeURIComponent(idCc)}`);
+
+        if (!res.ok) {
+          throw new Error(`Erro HTTP ${res.status}: ${res.statusText}`);
+        }
+
+        const dados = await res.json();
+
+        if (dados.sucesso && dados.dados) {
+          cacheEstruturaCC = {
+            id_cc: idCc,
+            nome_cc: dados.dados.nome_cc,
+            conselhos_particulares: dados.dados.conselhos_particulares || [],
+            conferencias: dados.dados.conferencias || []
+          };
+
+          // Popula o Select de CPs
+          selConselhoParticular.innerHTML = `<option value="">Selecione o Conselho Particular...</option>`;
+          cacheEstruturaCC.conselhos_particulares.forEach(cp => {
+            const opt = document.createElement("option");
+            opt.value = cp.id_cp;
+            opt.textContent = cp.nome_cp || cp.id_cp;
+            selConselhoParticular.appendChild(opt);
+          });
+        } else {
+          throw new Error(dados.erro ? dados.erro.mensagem : "Erro ao carregar estrutura do CC.");
+        }
+      } catch (err) {
+        exibirFeedback(`Falha ao ler índice do Conselho: ${err.message}`, "erro");
+      }
+    }
+
+    // 3. Ao selecionar Conselho Particular ➔ Filtrar Conferências na Memória Local
+    function aoSelecionarCP() {
+      const idCp = selConselhoParticular.value;
+      if (!idCp) {
+        grupoCF.style.display = "none";
+        return;
+      }
+
+      // Filtra as conferências que pertencem a este id_cp
+      const cfsFiltradas = cacheEstruturaCC.conferencias.filter(cf => String(cf.id_cp).trim() === String(idCp).trim());
+
+      selConferencia.innerHTML = `<option value="">Selecione a Conferência...</option>`;
+      cfsFiltradas.forEach(cf => {
+        const opt = document.createElement("option");
+        opt.value = cf.id_ssvp;
+        opt.textContent = cf.nome_cf || cf.id_ssvp;
+        opt.dataset.nomeCf = cf.nome_cf || cf.id_ssvp;
+        selConferencia.appendChild(opt);
+      });
+
+      grupoCF.style.display = "flex";
+    }
+
+    // 4. Ao selecionar Conferência ➔ Salva no IndexedDB e avança para o Login
+    async function aoSelecionarConferencia() {
+      const idSsvp = selConferencia.value;
+      if (!idSsvp) return;
+
+      const optSelecionada = selConferencia.options[selConferencia.selectedIndex];
+      const nomeCf = optSelecionada.dataset.nomeCf || optSelecionada.textContent;
+
+      sessaoAtiva.conselho_metropolitano = "São Paulo";
+      sessaoAtiva.id_cc = cacheEstruturaCC.id_cc;
+      sessaoAtiva.nome_cc = cacheEstruturaCC.nome_cc;
+      sessaoAtiva.id_cp = selConselhoParticular.value;
+      sessaoAtiva.id_ssvp = idSsvp;
+      sessaoAtiva.nome_cf = nomeCf;
+      sessaoAtiva.conectado = false;
+
+      // Salva no IndexedDB
+      await salvarNoIndexedDB({
+        conselho_metropolitano: "São Paulo",
+        id_cc: sessaoAtiva.id_cc,
+        nome_cc: sessaoAtiva.nome_cc,
+        id_cp: sessaoAtiva.id_cp,
+        id_ssvp: sessaoAtiva.id_ssvp,
+        nome_cf: sessaoAtiva.nome_cf,
+        conectado: false
+      });
+
+      // Atualiza a barra superior para NÃO LOGADO
+      aplicarEstadoVisual("NAO_LOGADO", sessaoAtiva);
+
+      // Transiciona os formulários
+      txtNomeCfaSelecionada.textContent = nomeCf;
+      secaoSelects.style.display = "none";
+      secaoFormLogin.style.display = "flex";
+      iptEmail.focus();
+    }
+
+    // 5. Executar Login na Aba 'pessoas' da Conferência (action=login)
+    async function executarLogin(e) {
+      e.preventDefault();
+
+      const email = iptEmail.value.trim();
+      const senha = iptSenha.value.trim();
+
+      if (!email || !senha) {
+        exibirFeedback("Preencha seu e-mail e senha.", "erro");
+        return;
+      }
+
+      btnLogin.disabled = true;
+      btnLogin.innerHTML = `<span class="spinner"></span> Validando credenciais...`;
+      ocultarFeedback();
+
+      try {
+        const urlBase = obterUrlPorteiro();
+        const sep = urlBase.includes("?") ? "&" : "?";
+        
+        // Passa os parâmetros na URL e no corpo para contornar qualquer perda de payload em redirects 302 do Safari/Chrome
+        const urlLogin = `${urlBase}${sep}action=login&id_cc=${encodeURIComponent(sessaoAtiva.id_cc)}&id_ssvp=${encodeURIComponent(sessaoAtiva.id_ssvp)}&email=${encodeURIComponent(email)}&senha=${encodeURIComponent(senha)}`;
+        
+        const res = await fetch(urlLogin, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            id_cc: sessaoAtiva.id_cc,
+            id_ssvp: sessaoAtiva.id_ssvp,
+            email: email,
+            senha: senha
+          })
+        });
+
+        const dados = await res.json();
+
+        if (dados.sucesso && dados.dados) {
+          // Login com Sucesso!
+          sessaoAtiva.conectado = true;
+          sessaoAtiva.nome_pessoa = dados.dados.nome_pessoa || "Vicentino(a)";
+          sessaoAtiva.email_pessoa = dados.dados.email_pessoa || email;
+
+          // Atualiza o IndexedDB com o status conectado
+          await salvarNoIndexedDB({
+            ...sessaoAtiva,
+            conectado: true
+          });
+
+          // Barra Superior fica AZUL com o nome da Conferência!
+          aplicarEstadoVisual("LOGADO", sessaoAtiva);
+
+          exibirFeedback(`Olá, ${sessaoAtiva.nome_pessoa}! Login efetuado com sucesso.`, "sucesso");
+
+          setTimeout(() => {
+            fecharModalConexao();
+          }, 1200);
+
+        } else {
+          // Falha: Pessoa não encontrada
+          const msg = (dados.erro && dados.erro.mensagem) ? dados.erro.mensagem : "Pessoa não encontrada";
+
+          // Mantém/força a barra em vermelho informando o erro
+          barraSuperior.style.backgroundColor = "var(--ssvp-red)";
+          txtStatusPrincipal.textContent = "Pessoa não encontrada";
+          txtStatusSub.textContent = "Verifique e-mail e senha";
+
+          exibirFeedback(`❌ ${msg}. Confira suas credenciais.`, "erro");
+        }
+
+      } catch (err) {
+        barraSuperior.style.backgroundColor = "var(--ssvp-red)";
+        txtStatusPrincipal.textContent = "Erro na validação";
+        exibirFeedback(`Falha ao consultar Porteiro: ${err.message}`, "erro");
+      } finally {
+        btnLogin.disabled = false;
+        btnLogin.innerHTML = `<span>Entrar no WebApp</span>`;
+      }
+    }
+
+    // 6. Encerrar Sessão (Logout)
+    async function encerrarSessao() {
+      if (confirm("Deseja desconectar da conferência atual?")) {
+        await limparIndexedDB();
+        sessaoAtiva = {
+          conectado: false,
+          id_cc: null,
+          nome_cc: null,
+          id_cp: null,
+          id_ssvp: null,
+          nome_cf: null,
+          nome_pessoa: null,
+          email_pessoa: null
+        };
+        iptEmail.value = "";
+        iptSenha.value = "";
+        aplicarEstadoVisual("NAO_CONECTADO");
+        fecharModalConexao();
+        alert("Sessão desconectada com sucesso.");
+      }
+    }
+
+    // Utilitários de Interface
+    function exibirFeedback(texto, tipo) {
+      msgFeedback.textContent = texto;
+      msgFeedback.className = `feedback-msg feedback-${tipo}`;
+      msgFeedback.style.display = "block";
+    }
+
+    function ocultarFeedback() {
+      msgFeedback.style.display = "none";
+    }
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Porteiro SSVP - Teste 1: Ping e Latência</title>
+
+  <!-- CSS Compartilhado dos Testes -->
+  <link rel="stylesheet" href="../testes.css">
+
+  <style>
+    /* Estilos específicos para a ferramenta de teste de API */
+    .config-card {
+      background-color: var(--ssvp-white);
+      border: 1px solid var(--ssvp-gray-border);
+      border-radius: 1rem;
+      padding: 1.25rem;
+      box-shadow: 0 4px 6px -1px var(--ssvp-shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      width: 100%;
+    }
+
+    .config-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--ssvp-gray-border);
+      padding-bottom: 0.5rem;
+    }
+
+    .config-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--ssvp-navy);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .status-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.2rem 0.5rem;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .badge-desconectado {
+      background-color: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .badge-conectado {
+      background-color: #dcfce7;
+      color: #15803d;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .form-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--ssvp-text-muted);
+    }
+
+    /* Prevenção de Zoom no iPhone: font-size >= 16px (1rem) */
+    .input-url {
+      width: 100%;
+      padding: 0.75rem 0.85rem;
+      font-size: 1rem;
+      font-family: inherit;
+      color: var(--ssvp-text-main);
+      background-color: var(--ssvp-gray-light);
+      border: 1px solid var(--ssvp-gray-border);
+      border-radius: 8px;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      box-sizing: border-box;
+    }
+
+    .input-url:focus {
+      border-color: var(--ssvp-blue);
+      box-shadow: 0 0 0 3px rgba(0, 127, 255, 0.15);
+      background-color: var(--ssvp-white);
+    }
+
+    .btn-acao {
+      width: 100%;
+      min-height: 48px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .btn-salvar {
+      background-color: var(--ssvp-navy);
+      color: var(--ssvp-white);
+      box-shadow: 0 2px 4px rgba(0, 45, 98, 0.15);
+    }
+
+    .btn-salvar:active {
+      transform: scale(0.98);
+    }
+
+    .btn-ping {
+      background-color: var(--ssvp-blue);
+      color: var(--ssvp-white);
+      box-shadow: 0 4px 10px rgba(0, 127, 255, 0.25);
+      margin-top: 0.5rem;
+    }
+
+    .btn-ping:hover {
+      background-color: #006cd9;
+    }
+
+    .btn-ping:active {
+      transform: scale(0.98);
+    }
+
+    .btn-ping:disabled {
+      background-color: var(--ssvp-text-muted);
+      cursor: not-allowed;
+      opacity: 0.6;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* Painel de Métricas de Tempo */
+    .metricas-card {
+      background: linear-gradient(135deg, #ffffff 0%, var(--ssvp-light-blue) 100%);
+      border: 1px solid var(--ssvp-gray-border);
+      border-radius: 1rem;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      width: 100%;
+    }
+
+    .metricas-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    @media (max-width: 480px) {
+      .metricas-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .metrica-item {
+      background-color: var(--ssvp-white);
+      border: 1px solid var(--ssvp-gray-border);
+      border-radius: 8px;
+      padding: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .metrica-titulo {
+      font-size: 0.75rem;
+      color: var(--ssvp-text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .metrica-valor {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--ssvp-navy);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .metrica-classificacao {
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .classif-otima {
+      background-color: #dcfce7;
+      color: #15803d;
+    }
+
+    .classif-media {
+      background-color: #fef9c3;
+      color: #854d0e;
+    }
+
+    .classif-alta {
+      background-color: #ffedd5;
+      color: #9a3412;
+    }
+
+    /* Visualizador de JSON */
+    .json-card {
+      background-color: #091220;
+      color: #e2e8f0;
+      border-radius: 12px;
+      padding: 1rem;
+      overflow-x: auto;
+      font-family: Consolas, Monaco, "Courier New", Courier, monospace;
+      font-size: 0.85rem;
+      line-height: 1.45;
+      max-height: 280px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: girar 0.8s linear infinite;
+      display: inline-block;
+    }
+
+    @keyframes girar {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Barra de Ações do Topo -->
+  <div class="topo-acoes-teste">
+    <div class="teste-nome-arquivo" id="topoNomeArquivo">t1_ping.html</div>
+    <div class="teste-versao-topo">v1.0</div>
+  </div>
+
+  <!-- Card Principal de Instruções (Acordeão) -->
+  <div class="card-principal" id="cardPrincipal">
+    <div class="cabecalho-principal" onclick="toggleCardPrincipal()">
+      <span class="titulo-principal">📊 Instruções do Teste de Conexão (Ping)</span>
+      <span class="seta-principal" id="setaPrincipal">+</span>
+    </div>
+
+    <div class="conteudo-principal-wrapper">
+      <div class="conteudo-principal">
+        <div class="corpo-principal">
+
+          <!-- SUB-CARD 1: Objetivo -->
+          <div class="sub-card ativo" id="subCardObjetivo">
+            <div class="sub-card-header" onclick="toggleSubCard('subCardObjetivo')">
+              <span>❓ O que este teste valida?</span>
+              <span class="sub-card-seta">−</span>
+            </div>
+            <div class="sub-card-content-wrapper">
+              <div class="sub-card-content">
+                Este teste avalia o canal básico de comunicação entre a interface web do celular e o <strong>Porteiro SSVP</strong> no Google Apps Script:
+                <ul>
+                  <li><strong>Conectividade HTTP:</strong> Se o Google Apps Script responde sem erros de CORS.</li>
+                  <li><strong>Latência Real (Ida e Volta):</strong> Quanto tempo o celular do vicentino aguarda para receber um retorno da nuvem.</li>
+                  <li><strong>Tempo do Servidor:</strong> Quanto tempo o script gastou processando no Google.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUB-CARD 2: Passo a Passo -->
+          <div class="sub-card" id="subCardPasso">
+            <div class="sub-card-header" onclick="toggleSubCard('subCardPasso')">
+              <span>📋 Como executar o teste</span>
+              <span class="sub-card-seta">+</span>
+            </div>
+            <div class="sub-card-content-wrapper">
+              <div class="sub-card-content">
+                <ol style="padding-left: 1.2rem; display: flex; flex-direction: column; gap: 0.4rem;">
+                  <li>Copie o código de <code>testes/api/privado/t1_ping.gs</code> e cole em um novo projeto no <a href="https://script.google.com" target="_blank" style="color: var(--ssvp-blue); font-weight: bold;">script.google.com</a>.</li>
+                  <li>Implante como <strong>App da Web</strong> configurando <em>"Quem pode acessar: Qualquer pessoa"</em>.</li>
+                  <li>Cole a URL gerada no campo abaixo e clique em <strong>"Salvar URL"</strong>.</li>
+                  <li>Toque no botão <strong>"⚡ Disparar Ping"</strong> para realizar a medição de performance.</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Container de Configuração e Execução -->
+  <main class="container">
+
+    <!-- Card de Configuração da URL -->
+    <section class="config-card">
+      <div class="config-header">
+        <span class="config-title">⚙️ Configuração da URL do Porteiro</span>
+        <span class="status-badge badge-desconectado" id="badgeStatus">URL Não Configurada</span>
+      </div>
+
+      <div class="form-group">
+        <label for="urlWebapp" class="form-label">URL do Web App (Google Apps Script /exec):</label>
+        <input type="url" id="urlWebapp" class="input-url" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off" spellcheck="false">
+      </div>
+
+      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <button type="button" class="btn-acao btn-salvar" id="btnSalvarUrl" onclick="salvarUrl()" style="flex: 1; min-width: 180px;">
+          💾 Salvar URL Personalizada
+        </button>
+        <button type="button" class="btn-acao" id="btnRestaurarUrl" onclick="restaurarUrlPadrao()" style="flex: 1; min-width: 160px; background-color: var(--ssvp-gray-light); border: 1px solid var(--ssvp-gray-border); color: var(--ssvp-navy);">
+          🔄 Restaurar Padrão
+        </button>
+      </div>
+    </section>
+
+    <!-- Card de Ação e Disparo -->
+    <section class="config-card">
+      <div class="config-header">
+        <span class="config-title">🚀 Disparo de Health Check</span>
+      </div>
+
+      <p style="font-size: 0.85rem; color: var(--ssvp-text-muted);">
+        Envia uma requisição <code>POST /exec?action=ping</code> para o Porteiro SSVP e mede os tempos de resposta.
+      </p>
+
+      <button type="button" class="btn-acao btn-ping" id="btnPing" onclick="executarPing()">
+        ⚡ Disparar Ping (Health Check)
+      </button>
+    </section>
+
+    <!-- Painel de Performance e Métricas -->
+    <section class="metricas-card" id="painelMetricas">
+      <div style="font-weight: 700; color: var(--ssvp-navy); font-size: 0.95rem;">
+        ⏱️ Métricas de Tempo da Ação
+      </div>
+
+      <div class="metricas-grid">
+        <div class="metrica-item">
+          <span class="metrica-titulo">Tempo Total (Ida e Volta)</span>
+          <span class="metrica-valor">
+            <span id="txtTempoTotal">--</span>
+            <span id="badgeClassifTotal" class="metrica-classificacao" style="display: none;"></span>
+          </span>
+        </div>
+
+        <div class="metrica-item">
+          <span class="metrica-titulo">Processamento no Google (Servidor)</span>
+          <span class="metrica-valor" id="txtTempoServidor">--</span>
+        </div>
+
+        <div class="metrica-item">
+          <span class="metrica-titulo">Tempo de Tráfego de Rede (Estimado)</span>
+          <span class="metrica-valor" id="txtTempoRede">--</span>
+        </div>
+
+        <div class="metrica-item">
+          <span class="metrica-titulo">Status da Conexão</span>
+          <span class="metrica-valor" id="txtStatusConexao" style="font-size: 1.05rem;">--</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Resposta JSON da API -->
+    <section class="config-card">
+      <div class="config-header">
+        <span class="config-title">📄 Resposta Bruta do Porteiro (JSON)</span>
+        <button type="button" onclick="copiarJson()" style="background: none; border: 1px solid var(--ssvp-gray-border); padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; color: var(--ssvp-navy); font-weight: 600;">
+          📋 Copiar JSON
+        </button>
+      </div>
+
+      <div class="json-card" id="jsonOutput">// Aguardando disparo do teste...</div>
+    </section>
+
+  </main>
+
+  <!-- JS Compartilhado dos Testes -->
+  <script src="../testes.js"></script>
+
+  <script>
+    // Chave de armazenamento local
+    const STORAGE_KEY_URL = "ssvp_porteiro_url";
+
+    // URL Padrão Oficial do Porteiro SSVP (Carregada automaticamente em novos aparelhos)
+    const URL_PADRAO_PORTEIRO = "https://script.google.com/macros/s/AKfycbzP6CehGh2U_kLhVPMZNZKeoaWIWzpzd-fgNh03qnmwYVBJFoI3nMP6TZBGH1ZahT9t/exec";
+
+    // Elementos do DOM
+    const inputUrl = document.getElementById("urlWebapp");
+    const badgeStatus = document.getElementById("badgeStatus");
+    const btnPing = document.getElementById("btnPing");
+    const txtTempoTotal = document.getElementById("txtTempoTotal");
+    const badgeClassifTotal = document.getElementById("badgeClassifTotal");
+    const txtTempoServidor = document.getElementById("txtTempoServidor");
+    const txtTempoRede = document.getElementById("txtTempoRede");
+    const txtStatusConexao = document.getElementById("txtStatusConexao");
+    const jsonOutput = document.getElementById("jsonOutput");
+
+    // Inicialização ao carregar a página
+    document.addEventListener("DOMContentLoaded", () => {
+      carregarUrlSalva();
+    });
+
+    // Carregar URL memorizada ou padrão
+    function carregarUrlSalva() {
+      const urlSalva = localStorage.getItem(STORAGE_KEY_URL);
+      if (urlSalva && urlSalva.trim() !== "") {
+        inputUrl.value = urlSalva.trim();
+        badgeStatus.textContent = "URL Personalizada";
+        badgeStatus.className = "status-badge badge-conectado";
+      } else if (URL_PADRAO_PORTEIRO && URL_PADRAO_PORTEIRO.trim() !== "") {
+        inputUrl.value = URL_PADRAO_PORTEIRO.trim();
+        badgeStatus.textContent = "URL Padrão Ativa";
+        badgeStatus.className = "status-badge badge-conectado";
+      } else {
+        badgeStatus.textContent = "URL Não Configurada";
+        badgeStatus.className = "status-badge badge-desconectado";
+      }
+    }
+
+    // Salvar URL personalizada informada pelo usuário
+    function salvarUrl() {
+      const url = inputUrl.value.trim();
+      if (!url) {
+        alert("Por favor, cole a URL do seu Google Apps Script (terminada em /exec).");
+        return;
+      }
+
+      if (!url.startsWith("https://script.google.com/")) {
+        if (!confirm("Aviso: A URL fornecida não parece ser do Google Apps Script. Deseja salvar mesmo assim?")) {
+          return;
+        }
+      }
+
+      localStorage.setItem(STORAGE_KEY_URL, url);
+      badgeStatus.textContent = "URL Personalizada";
+      badgeStatus.className = "status-badge badge-conectado";
+      alert("URL salva no navegador com sucesso!");
+    }
+
+    // Restaurar URL padrão do projeto
+    function restaurarUrlPadrao() {
+      localStorage.removeItem(STORAGE_KEY_URL);
+      inputUrl.value = URL_PADRAO_PORTEIRO;
+      badgeStatus.textContent = "URL Padrão Ativa";
+      badgeStatus.className = "status-badge badge-conectado";
+      alert("URL padrão do Porteiro SSVP restaurada com sucesso!");
+    }
+
+    // Disparar o Ping com medição rigorosa de tempo
+    async function executarPing() {
+      const urlBase = inputUrl.value.trim();
+      if (!urlBase) {
+        alert("Antes de disparar, informe e salve a URL do Web App acima.");
+        inputUrl.focus();
+        return;
+      }
+
+      // Preparação de Estado na UI
+      btnPing.disabled = true;
+      btnPing.innerHTML = `<span class="spinner"></span> Medindo tempo de resposta...`;
+      txtStatusConexao.textContent = "Conectando...";
+      txtStatusConexao.style.color = "var(--ssvp-blue)";
+      jsonOutput.textContent = "// Enviando requisição para o Porteiro SSVP...";
+
+      // Monta a URL garantindo o parâmetro de ação ping
+      const separador = urlBase.includes("?") ? "&" : "?";
+      const urlRequisicao = `${urlBase}${separador}action=ping`;
+
+      // Marca o tempo inicial no navegador (T0)
+      const tInicio = performance.now();
+
+      try {
+        // Disparo da requisição POST
+        const response = await fetch(urlRequisicao, {
+          method: "POST",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
+          body: JSON.stringify({
+            cliente: "WebAppSSVP Testes",
+            versao_teste: "t1_ping v1.0",
+            timestamp_disparo: new Date().toISOString()
+          })
+        });
+
+        // Marca o tempo final assim que a resposta HTTP é recebida (T1)
+        const tFim = performance.now();
+        const tempoTotalMs = Math.round(tFim - tInicio);
+
+        if (!response.ok) {
+          throw new Error(`Erro HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const dadosRetorno = await response.json();
+
+        // Extrai o tempo de processamento informado pelo Google Apps Script
+        const tempoServidorMs = (dadosRetorno && typeof dadosRetorno.tempo_servidor_ms === "number") 
+          ? dadosRetorno.tempo_servidor_ms 
+          : null;
+
+        // Calcula tempo aproximado de tráfego de rede (ida + volta nos cabos/ondas)
+        const tempoRedeMs = tempoServidorMs !== null 
+          ? Math.max(0, tempoTotalMs - tempoServidorMs) 
+          : null;
+
+        // Atualização dos Indicadores de Performance
+        exibirMetricas(tempoTotalMs, tempoServidorMs, tempoRedeMs, true);
+
+        // Exibe JSON formatado
+        jsonOutput.textContent = JSON.stringify(dadosRetorno, null, 2);
+
+      } catch (erro) {
+        const tFimErro = performance.now();
+        const tempoTotalMs = Math.round(tFimErro - tInicio);
+
+        exibirMetricas(tempoTotalMs, null, null, false);
+
+        jsonOutput.textContent = JSON.stringify({
+          sucesso: false,
+          erro_cliente: erro.message,
+          orientacoes: [
+            "Verifique se a URL do Web App foi publicada com acesso para 'Qualquer pessoa'.",
+            "Certifique-se de que a implantação é do tipo 'App da Web' e termina com /exec.",
+            "Confira se você tem conexão ativa com a internet."
+          ]
+        }, null, 2);
+
+      } finally {
+        btnPing.disabled = false;
+        btnPing.innerHTML = `⚡ Disparar Ping (Health Check)`;
+      }
+    }
+
+    // Atualiza os valores visuais das métricas
+    function exibirMetricas(tempoTotalMs, tempoServidorMs, tempoRedeMs, sucesso) {
+      txtTempoTotal.textContent = `${tempoTotalMs} ms`;
+      badgeClassifTotal.style.display = "inline-block";
+
+      if (tempoTotalMs < 600) {
+        badgeClassifTotal.textContent = "🟢 Rápido";
+        badgeClassifTotal.className = "metrica-classificacao classif-otima";
+      } else if (tempoTotalMs < 1800) {
+        badgeClassifTotal.textContent = "🟡 Aceitável";
+        badgeClassifTotal.className = "metrica-classificacao classif-media";
+      } else {
+        badgeClassifTotal.textContent = "🟠 Cold Start / Lento";
+        badgeClassifTotal.className = "metrica-classificacao classif-alta";
+      }
+
+      if (tempoServidorMs !== null) {
+        txtTempoServidor.textContent = `${tempoServidorMs} ms`;
+      } else {
+        txtTempoServidor.textContent = "N/A";
+      }
+
+      if (tempoRedeMs !== null) {
+        txtTempoRede.textContent = `~${tempoRedeMs} ms`;
+      } else {
+        txtTempoRede.textContent = "N/A";
+      }
+
+      if (sucesso) {
+        txtStatusConexao.textContent = "✅ Online (200 OK)";
+        txtStatusConexao.style.color = "var(--ssvp-success)";
+      } else {
+        txtStatusConexao.textContent = "❌ Falha de Conexão";
+        txtStatusConexao.style.color = "var(--ssvp-red)";
+      }
+    }
+
+    // Copiar resposta JSON para a área de transferência
+    function copiarJson() {
+      const conteudo = jsonOutput.textContent;
+      navigator.clipboard.writeText(conteudo).then(() => {
+        alert("JSON copiado para a área de transferência!");
+      }).catch(() => {
+        alert("Não foi possível copiar automaticamente.");
+      });
+    }
+  </script>
+</body>
+
+</html>
