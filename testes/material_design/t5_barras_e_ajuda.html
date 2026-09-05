@@ -1,0 +1,1984 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Material Design SSVP - Teste 5: Barras e Central de Ajuda</title>
+
+  <!-- Google Fonts: Montserrat (Interface) e EB Garamond (Identidade Institucional SSVP) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       1. TOKENS DO SISTEMA DE CORES E ELEVAÇÃO M3 (SSVP)
+       ========================================================================== */
+    :root {
+      /* Cores Institucionais do Manual da Marca SSVP Brasil */
+      --ssvp-blue: #0064B6;           /* Azul Oficial SSVP */
+      --ssvp-red: #E00512;            /* Vermelho Oficial SSVP */
+      --md-secondary: #007fff;        /* Azul Ação M3 */
+      --md-error: #d32f2f;            /* Vermelho Alerta */
+      --md-success: #15803d;          /* Verde Confirmação */
+      --md-amber: #d97706;            /* Âmbar Ajuda / Dúvidas */
+      --md-amber-bg: rgba(217, 119, 6, 0.15);
+
+      /* Modo Escuro (Padrão de Campo) */
+      --md-surface-0: #0b0f19;        /* Nível 0: Fundo da Página */
+      --md-surface-1: #151d2f;        /* Nível 1: Cards e Seções */
+      --md-surface-2: #1b263d;        /* Nível 2: Barras Fixas e Realces */
+      --md-surface-3: #22304d;        /* Nível 3: Gavetas e Menus Flutuantes */
+
+      --md-on-surface: #f1f5f9;       /* Texto Principal */
+      --md-on-surface-variant: #94a3b8; /* Texto Secundário */
+      --md-border-subtle: rgba(255, 255, 255, 0.08);
+      --md-border-strong: rgba(255, 255, 255, 0.18);
+
+      /* Sombras e Elevação M3 */
+      --md-elevation-1: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px -1px rgba(0, 0, 0, 0.2);
+      --md-elevation-2: 0 4px 8px -1px rgba(0, 0, 0, 0.35), 0 2px 4px -2px rgba(0, 0, 0, 0.25);
+      --md-elevation-3: 0 12px 24px -4px rgba(0, 0, 0, 0.45), 0 4px 8px -2px rgba(0, 0, 0, 0.3);
+
+      /* Safe Areas */
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+
+      /* Tipografias */
+      --font-ui: 'Montserrat', Arial, sans-serif;
+      --font-brand: 'EB Garamond', Georgia, serif;
+    }
+
+    /* TEMA CLARO */
+    body.tema-claro {
+      --md-surface-0: #f8fafc;
+      --md-surface-1: #ffffff;
+      --md-surface-2: #f1f5f9;
+      --md-surface-3: #e2e8f0;
+      --md-on-surface: #0f172a;
+      --md-on-surface-variant: #475569;
+      --md-border-subtle: rgba(0, 0, 0, 0.08);
+      --md-border-strong: rgba(0, 0, 0, 0.2);
+      --md-amber-bg: #fef3c7;
+    }
+
+    /* FONTE GRANDE (Acessibilidade para Terceira Idade) */
+    html.fonte-grande {
+      font-size: 118%;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--md-surface-0);
+      color: var(--md-on-surface);
+      font-family: var(--font-ui);
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    /* Prevenção de Zoom no iOS/Safari */
+    input, textarea, select, button {
+      font-family: var(--font-ui);
+      font-size: 1rem;
+    }
+
+    /* ==========================================================================
+       2. BARRA SUPERIOR INSTITUCIONAL (SSVP + CONFERÊNCIA + OVERFLOW)
+       ========================================================================== */
+    .app-header {
+      position: relative;
+      background-color: var(--md-surface-2);
+      border-bottom: 1px solid var(--md-border-subtle);
+      padding-top: calc(0.55rem + var(--safe-top));
+      padding-bottom: 0.55rem;
+      padding-left: 0.9rem;
+      padding-right: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      box-shadow: var(--md-elevation-2);
+      z-index: 60;
+      flex-shrink: 0;
+    }
+
+    /* Logo Oficial SSVP */
+    .header-logo-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 2.6rem;
+      height: 2.6rem;
+    }
+
+    .header-logo-img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+    }
+
+    /* Nome da Conferência em Largura Total */
+    .header-title-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-width: 0;
+    }
+
+    .header-conf-name {
+      font-family: var(--font-brand);
+      font-size: 1.18rem;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.15;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      letter-spacing: 0.01em;
+    }
+
+    body.tema-claro .header-conf-name {
+      color: var(--ssvp-blue);
+    }
+
+    .header-sub-row {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      margin-top: 0.15rem;
+    }
+
+    .header-cp-name {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--md-on-surface-variant);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .header-version-pill {
+      font-size: 0.65rem;
+      font-weight: 700;
+      background-color: rgba(255, 255, 255, 0.08);
+      color: var(--md-secondary);
+      padding: 0.1rem 0.35rem;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    /* Botão de 3 Pontos Verticais (Overflow Menu M3 - Alvo 48x48px) */
+    .btn-header-overflow {
+      width: 3rem;
+      height: 3rem;
+      background: transparent;
+      border: none;
+      color: var(--md-on-surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background-color 0.15s ease, transform 0.1s ease;
+    }
+
+    .btn-header-overflow:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-header-overflow:active {
+      transform: scale(0.92);
+      background-color: rgba(255, 255, 255, 0.18);
+    }
+
+    .btn-header-overflow svg {
+      width: 1.6rem;
+      height: 1.6rem;
+      fill: currentColor;
+    }
+
+    /* ==========================================================================
+       3. MENU FLUTUANTE DE CONTEXTO M3 (POP-UP DOS 3 PONTOS)
+       ========================================================================== */
+    .popup-menu-overlay {
+      position: fixed;
+      inset: 0;
+      background-color: transparent;
+      z-index: 110;
+      display: none;
+    }
+
+    .popup-menu-overlay.visivel {
+      display: block;
+    }
+
+    .popup-menu-card {
+      position: absolute;
+      top: calc(3.4rem + var(--safe-top));
+      right: 0.9rem;
+      background-color: var(--md-surface-3);
+      border: 1px solid var(--md-border-strong);
+      border-radius: 1rem;
+      min-width: 14.5rem;
+      box-shadow: var(--md-elevation-3);
+      padding: 0.4rem 0;
+      animation: animarMenuM3 0.18s cubic-bezier(0, 0, 0.2, 1);
+      z-index: 120;
+    }
+
+    @keyframes animarMenuM3 {
+      from { opacity: 0; transform: scale(0.9) translateY(-8px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .menu-item-btn {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: transparent;
+      border: none;
+      color: var(--md-on-surface);
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      font-size: 0.92rem;
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+    }
+
+    .menu-item-btn:hover {
+      background-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .menu-item-btn:active {
+      background-color: rgba(0, 127, 255, 0.16);
+    }
+
+    .menu-item-btn svg {
+      width: 1.35rem;
+      height: 1.35rem;
+      fill: var(--md-secondary);
+      flex-shrink: 0;
+    }
+
+    .menu-divisor {
+      height: 1px;
+      background-color: var(--md-border-subtle);
+      margin: 0.35rem 0;
+    }
+
+    /* ==========================================================================
+       4. GAVETA SUPERIOR MODULAR M3 (TOP SHEET COM ABAS CONTEXTUAIS)
+       ========================================================================== */
+    .scrim-overlay-top {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
+      z-index: 80;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .scrim-overlay-top.aberto {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .top-sheet {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      background-color: var(--md-surface-2);
+      border-bottom: 2px solid var(--md-secondary);
+      border-bottom-left-radius: 1.5rem;
+      border-bottom-right-radius: 1.5rem;
+      box-shadow: var(--md-elevation-3);
+      padding-top: calc(0.6rem + var(--safe-top));
+      display: flex;
+      flex-direction: column;
+      max-height: 82vh;
+      transform: translateY(-100%);
+      transition: transform 0.28s cubic-bezier(0.1, 0.9, 0.2, 1);
+    }
+
+    .scrim-overlay-top.aberto .top-sheet {
+      transform: translateY(0);
+    }
+
+    /* Cabeçalho da Gaveta com Abas M3 */
+    .sheet-top-header {
+      padding: 0.5rem 1.15rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--md-border-subtle);
+    }
+
+    .sheet-nav-tabs {
+      display: flex;
+      gap: 0.4rem;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: 1px solid var(--md-border-subtle);
+      color: var(--md-on-surface-variant);
+      padding: 0.4rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .tab-btn.ativo {
+      background-color: var(--md-secondary);
+      color: #ffffff;
+      border-color: var(--md-secondary);
+    }
+
+    .btn-fechar-sheet {
+      width: 2.2rem;
+      height: 2.2rem;
+      border-radius: 50%;
+      background-color: rgba(255, 255, 255, 0.08);
+      border: none;
+      color: var(--md-on-surface);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+    }
+
+    .sheet-top-body {
+      padding: 1rem 1.15rem;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+    }
+
+    .modulo-secao {
+      display: none;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .modulo-secao.ativo {
+      display: flex;
+    }
+
+    /* Cartões Informativos Internos */
+    .sheet-card-box {
+      background-color: var(--md-surface-1);
+      border: 1px solid var(--md-border-subtle);
+      border-radius: 1rem;
+      padding: 0.9rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .sheet-card-title {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--md-secondary);
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .sheet-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.88rem;
+    }
+
+    .badge-status-nuvem {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.55rem;
+      border-radius: 6px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      background-color: rgba(21, 128, 61, 0.2);
+      color: #86efac;
+      border: 1px solid rgba(34, 197, 94, 0.4);
+    }
+
+    /* Botão de Ação na Gaveta */
+    .btn-acao-gaveta {
+      width: 100%;
+      background-color: var(--md-secondary);
+      color: #ffffff;
+      border: none;
+      padding: 0.75rem;
+      border-radius: 0.75rem;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      box-shadow: var(--md-elevation-1);
+      transition: transform 0.1s ease;
+    }
+
+    .btn-acao-gaveta:active {
+      transform: scale(0.98);
+    }
+
+    /* Switches Material Design 3 */
+    .m3-switch-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.4rem 0;
+      border-bottom: 1px solid var(--md-border-subtle);
+    }
+
+    .m3-switch-label-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .m3-switch-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--md-on-surface);
+    }
+
+    .m3-switch-desc {
+      font-size: 0.75rem;
+      color: var(--md-on-surface-variant);
+    }
+
+    .m3-switch {
+      position: relative;
+      display: inline-block;
+      width: 52px;
+      height: 32px;
+      flex-shrink: 0;
+    }
+
+    .m3-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .m3-switch-track {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: rgba(255, 255, 255, 0.15);
+      border: 2px solid rgba(255, 255, 255, 0.35);
+      border-radius: 16px;
+      transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .m3-switch-thumb {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 6px;
+      bottom: 6px;
+      background-color: #cbd5e1;
+      border-radius: 50%;
+      transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .m3-switch input:checked + .m3-switch-track {
+      background-color: var(--md-secondary);
+      border-color: var(--md-secondary);
+    }
+
+    .m3-switch input:checked + .m3-switch-track .m3-switch-thumb {
+      transform: translateX(20px);
+      background-color: #ffffff;
+      width: 20px;
+      height: 20px;
+      left: 4px;
+      bottom: 4px;
+    }
+
+    /* ==========================================================================
+       5. SISTEMA INTERATIVO DE AJUDA: "O QUE É ISSO?"
+       ========================================================================== */
+    .banner-modo-ajuda {
+      background-color: var(--md-amber);
+      color: #ffffff;
+      padding: 0.5rem 1rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      z-index: 55;
+      animation: descerBanner 0.2s ease;
+      box-shadow: var(--md-elevation-1);
+    }
+
+    .banner-modo-ajuda.visivel {
+      display: flex;
+    }
+
+    @keyframes descerBanner {
+      from { transform: translateY(-100%); }
+      to { transform: translateY(0); }
+    }
+
+    .btn-sair-ajuda {
+      background-color: #ffffff;
+      color: #000000;
+      border: none;
+      padding: 0.25rem 0.65rem;
+      border-radius: 6px;
+      font-weight: 800;
+      font-size: 0.76rem;
+      cursor: pointer;
+    }
+
+    /* Borda Interativa nos Elementos Explicáveis */
+    body.modo-ajuda-ativo .ajuda-alvo {
+      outline: 2.5px dashed var(--md-amber) !important;
+      outline-offset: 3px;
+      cursor: help !important;
+      position: relative;
+    }
+
+    body.modo-ajuda-ativo .ajuda-alvo:active {
+      outline-color: #ffffff !important;
+      transform: scale(0.98);
+    }
+
+    /* Modal / Card Explicativo "O que é isso?" */
+    .modal-ajuda-overlay {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1.25rem;
+    }
+
+    .modal-ajuda-overlay.visivel {
+      display: flex;
+    }
+
+    .modal-ajuda-card {
+      background-color: var(--md-surface-3);
+      border: 2px solid var(--md-amber);
+      border-radius: 1.25rem;
+      padding: 1.25rem;
+      width: min(100%, 22rem);
+      box-shadow: var(--md-elevation-3);
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      animation: surgirModal 0.2s ease;
+    }
+
+    @keyframes surgirModal {
+      from { opacity: 0; transform: scale(0.92); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-ajuda-header {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .modal-ajuda-icone {
+      font-size: 1.8rem;
+    }
+
+    .modal-ajuda-titulo {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    .modal-ajuda-bloco {
+      font-size: 0.88rem;
+      line-height: 1.4;
+      color: var(--md-on-surface);
+    }
+
+    .modal-ajuda-bloco strong {
+      color: var(--md-amber);
+    }
+
+    .btn-entendi-ajuda {
+      background-color: var(--md-amber);
+      color: #ffffff;
+      border: none;
+      padding: 0.65rem;
+      border-radius: 0.65rem;
+      font-weight: 800;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    /* ==========================================================================
+       6. ÁREA CENTRAL (CARDS DA VISITA E CONTROLE DE FOCO/TECLADO)
+       ========================================================================== */
+    .display-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem 0.9rem calc(5.5rem + var(--safe-bottom)) 0.9rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .md-card {
+      width: min(100%, 36rem);
+      background-color: var(--md-surface-1);
+      border: 1px solid var(--md-border-subtle);
+      border-radius: 1.25rem;
+      padding: 1.15rem;
+      box-shadow: var(--md-elevation-1);
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    /* Card Interativo com Farol de Foco */
+    .card-interativo {
+      border: 2px solid var(--md-secondary);
+      background: linear-gradient(180deg, var(--md-surface-1) 0%, rgba(0, 127, 255, 0.04) 100%);
+    }
+
+    .card-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      background-color: rgba(0, 127, 255, 0.15);
+      color: #93c5fd;
+      border: 1px solid rgba(0, 127, 255, 0.35);
+    }
+
+    .card-titulo {
+      font-size: 1.15rem;
+      font-weight: 800;
+    }
+
+    .card-detalhes {
+      font-size: 0.84rem;
+      color: var(--md-on-surface-variant);
+      line-height: 1.4;
+    }
+
+    /* Campos com Farol de Foco */
+    .grupo-campo {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      padding: 0.65rem 0.75rem;
+      border-radius: 0.9rem;
+      background-color: var(--md-surface-2);
+      border: 1.5px solid transparent;
+      transition: border-color 0.2s ease, background-color 0.2s ease;
+    }
+
+    .grupo-campo.ativo {
+      border-color: var(--md-secondary);
+      background-color: rgba(0, 127, 255, 0.08);
+      box-shadow: 0 0 12px rgba(0, 127, 255, 0.25);
+    }
+
+    .label-campo {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--md-on-surface);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .badge-foco-ativo {
+      display: none;
+      font-size: 0.7rem;
+      color: var(--md-secondary);
+      font-weight: 800;
+    }
+
+    .grupo-campo.ativo .badge-foco-ativo {
+      display: inline-block;
+    }
+
+    .campo-formulario {
+      width: 100%;
+      background-color: var(--md-surface-1);
+      border: 1.5px solid var(--md-border-strong);
+      border-radius: 0.65rem;
+      padding: 0.65rem 0.75rem;
+      color: var(--md-on-surface);
+      font-size: 1rem;
+      outline: none;
+      resize: vertical;
+      transition: border-color 0.15s ease;
+    }
+
+    .campo-formulario:focus {
+      border-color: var(--md-secondary);
+    }
+
+    .barra-acao-campo {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 0.2rem;
+    }
+
+    .btn-abrir-teclado {
+      background-color: var(--md-surface-2);
+      border: 1.5px solid var(--md-secondary);
+      color: var(--md-on-surface);
+      padding: 0.35rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: var(--md-elevation-1);
+      transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+    }
+
+    .btn-abrir-teclado.ativo {
+      background-color: var(--md-secondary);
+      color: #ffffff;
+      border-color: #60a5fa;
+      box-shadow: 0 0 10px rgba(0, 127, 255, 0.45);
+    }
+
+    .info-alvo-voz {
+      font-size: 0.72rem;
+      color: var(--md-secondary);
+      font-weight: 700;
+    }
+
+    /* Leitura em Voz Alta (Bordas Pulsantes) */
+    .falar-texto {
+      transition: transform 0.15s ease, outline 0.2s ease;
+      border-radius: 12px;
+    }
+
+    body.modo-leitura-ativo .falar-texto {
+      cursor: pointer;
+      outline: 2.5px dashed var(--md-success) !important;
+      outline-offset: 4px;
+      animation: pulsoLeitura 2s infinite ease-in-out;
+    }
+
+    @keyframes pulsoLeitura {
+      0%, 100% { outline-color: var(--md-success); transform: scale(1); }
+      50% { outline-color: #86efac; transform: scale(1.01); }
+    }
+
+    /* ==========================================================================
+       7. BARRA INFERIOR NO POLEGAR: MENU | FALAR/OUVIR (VERTICAL) | SAIR
+       ========================================================================== */
+    .app-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: var(--md-surface-2);
+      border-top: 1px solid var(--md-border-subtle);
+      padding-top: 0.45rem;
+      padding-bottom: calc(0.45rem + var(--safe-bottom));
+      padding-left: 1.25rem;
+      padding-right: 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.35);
+      z-index: 60;
+    }
+
+    /* MODO CANHOTO: INVERTE AS EXTREMIDADES DA BARRA INFERIOR */
+    body.layout-canhoto .app-footer {
+      flex-direction: row-reverse;
+    }
+
+    /* Botões Laterais: Menu e Sair (Layout Vertical: Ícone no Topo + Texto Embaixo) */
+    .btn-footer-lateral {
+      background-color: transparent;
+      border: none;
+      color: var(--md-on-surface);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.2rem;
+      min-width: 4rem;
+      padding: 0.35rem 0.5rem;
+      border-radius: 0.85rem;
+      cursor: pointer;
+      transition: background-color 0.15s ease, transform 0.1s ease;
+    }
+
+    .btn-footer-lateral:hover {
+      background-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .btn-footer-lateral:active {
+      transform: scale(0.94);
+    }
+
+    .btn-footer-lateral svg {
+      width: 1.6rem;
+      height: 1.6rem;
+      fill: currentColor;
+    }
+
+    .footer-btn-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--md-on-surface-variant);
+    }
+
+    /* Botão Sair com Destaque Sutil de Alerta */
+    .btn-sair-lateral:hover .footer-btn-label,
+    .btn-sair-lateral:hover svg {
+      color: #fca5a5;
+      fill: #fca5a5;
+    }
+
+    /* Botão Central: FALAR / OUVIR (Layout Vertical Empilhado + FAB Elevado) */
+    .btn-audio-central {
+      position: relative;
+      background: linear-gradient(135deg, var(--ssvp-blue) 0%, var(--md-secondary) 100%);
+      color: #ffffff;
+      border: 2px solid rgba(255, 255, 255, 0.25);
+      min-width: 4.6rem;
+      height: 4.6rem;
+      border-radius: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.15rem;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(0, 100, 182, 0.5);
+      margin-top: -1.2rem;
+      flex-shrink: 0;
+      transition: transform 0.15s ease, background 0.25s ease, border-color 0.25s ease;
+    }
+
+    .btn-audio-central:active {
+      transform: scale(0.94);
+    }
+
+    .btn-audio-central.modo-ouvir {
+      background: linear-gradient(135deg, #15803d 0%, #22c55e 100%);
+      box-shadow: 0 6px 16px rgba(34, 197, 94, 0.45);
+    }
+
+    .btn-audio-central svg,
+    .btn-audio-central img {
+      width: 1.7rem;
+      height: 1.7rem;
+      fill: #ffffff;
+      filter: brightness(0) invert(1);
+    }
+
+    .audio-central-label {
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    /* Anel de Progresso do Toque Longo */
+    .press-ring {
+      position: absolute;
+      inset: -4px;
+      border-radius: 1.7rem;
+      border: 3px solid #60a5fa;
+      opacity: 0;
+      transform: scale(0.85);
+      transition: opacity 0.1s ease, transform 0.7s cubic-bezier(0, 0, 0.2, 1);
+      pointer-events: none;
+    }
+
+    .btn-audio-central.pressionando .press-ring {
+      opacity: 1;
+      transform: scale(1.05);
+      border-color: #ffffff;
+    }
+
+    /* ==========================================================================
+       8. CONTROLE: MODO APENAS ÍCONES (ESCONDE RÓTULOS DE TEXTO)
+       ========================================================================== */
+    body.modo-apenas-icones .footer-btn-label,
+    body.modo-apenas-icones .audio-central-label {
+      display: none;
+    }
+
+    body.modo-apenas-icones .btn-footer-lateral {
+      min-width: 3.2rem;
+      height: 3.2rem;
+      border-radius: 50%;
+    }
+
+    body.modo-apenas-icones .btn-audio-central {
+      min-width: 4rem;
+      height: 4rem;
+      border-radius: 50%;
+      margin-top: -1rem;
+    }
+
+    /* ==========================================================================
+       9. GAVETA INFERIOR DE NAVEGAÇÃO DE PÁGINAS (BOTTOM SHEET M3)
+       ========================================================================== */
+    .scrim-overlay-bottom {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(3px);
+      z-index: 80;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .scrim-overlay-bottom.aberto {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .bottom-sheet {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: var(--md-surface-2);
+      border-top: 2px solid var(--md-secondary);
+      border-top-left-radius: 1.5rem;
+      border-top-right-radius: 1.5rem;
+      padding: 1.25rem 1.15rem calc(1.5rem + var(--safe-bottom)) 1.15rem;
+      transform: translateY(100%);
+      transition: transform 0.28s cubic-bezier(0.1, 0.9, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .scrim-overlay-bottom.aberto .bottom-sheet {
+      transform: translateY(0);
+    }
+
+    .nav-item-btn {
+      width: 100%;
+      background-color: var(--md-surface-1);
+      border: 1.5px solid var(--md-border-subtle);
+      border-radius: 1rem;
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      color: var(--md-on-surface);
+      cursor: pointer;
+      font-weight: 700;
+      text-align: left;
+    }
+
+    .nav-item-btn.ativo {
+      background-color: rgba(0, 127, 255, 0.15);
+      border-color: var(--md-secondary);
+    }
+
+    /* Toast Flutuante de Mensagem Rápida */
+    .toast-msg {
+      position: fixed;
+      bottom: calc(5.5rem + var(--safe-bottom));
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background-color: #002d62;
+      color: #ffffff;
+      border: 1.5px solid var(--md-secondary);
+      padding: 0.65rem 1.15rem;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      box-shadow: var(--md-elevation-3);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      z-index: 150;
+      white-space: nowrap;
+    }
+
+    .toast-msg.visivel {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ========================================================================
+       BARRA SUPERIOR INSTITUCIONAL (LOGO SSVP + CONFERÊNCIA + OVERFLOW ⋮)
+       ======================================================================== -->
+  <header class="app-header" id="appHeader">
+    <!-- Logo Oficial SSVP do Manual da Marca -->
+    <div class="header-logo-container ajuda-alvo" data-ajuda-titulo="Logotipo Oficial SSVP" 
+      data-ajuda-texto="Símbolo oficial da Sociedade de São Vicente de Paulo. O círculo representa a humanidade, o laço representa o peixe de Cristo e a caridade vicentina, e o ponto vermelho representa o coração e a presença divina.">
+      <img src="../../img/marca_ssvp.svg" alt="SSVP Brasil" class="header-logo-img">
+    </div>
+
+    <!-- Nome da Conferência em Largura Total -->
+    <div class="header-title-area ajuda-alvo" data-ajuda-titulo="Conferência e Conselho"
+      data-ajuda-texto="Identifica a Conferência em cujo nome você está realizando as visitas e o Conselho Particular ao qual ela está vinculada.">
+      <h1 class="header-conf-name" id="lblConfName">Conf. São Francisco de Assis</h1>
+      <div class="header-sub-row">
+        <span class="header-cp-name">CP São Vicente • SSVP Brasil</span>
+        <span class="header-version-pill">t5_barras_e_ajuda.html • v1.0</span>
+      </div>
+    </div>
+
+    <!-- Botão de 3 Pontos Verticais (Overflow Menu M3 - Alvo Tátil de 48px) -->
+    <button type="button" class="btn-header-overflow ajuda-alvo" id="btnOverflow" onclick="toggleMenuOverflow(event)"
+      title="Mais Opções (Sincronizar, Configurar, Ajuda)"
+      data-ajuda-titulo="Menu de Opções (3 Pontos)"
+      data-ajuda-texto="Abre as opções de bastidores do aplicativo: Sincronização com a nuvem, Configurações de acessibilidade e a Central de Ajuda.">
+      <svg viewBox="0 -960 960 960">
+        <path d="M480-160q-33 0-56.5-23.5T400-240q0-33 23.5-56.5T480-320q33 0 56.5 23.5T560-240q0 33-23.5 56.5T480-160Zm0-240q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm0-240q-33 0-56.5-23.5T400-720q0-33 23.5-56.5T480-800q33 0 56.5 23.5T560-720q0 33-23.5 56.5T480-640Z"/>
+      </svg>
+    </button>
+  </header>
+
+  <!-- ========================================================================
+       MENU POP-UP FLUTUANTE M3 (DISPARADO PELO BOTÃO ⋮)
+       ======================================================================== -->
+  <div class="popup-menu-overlay" id="popupOverlay" onclick="fecharMenuOverflow()">
+    <div class="popup-menu-card" id="popupCard" onclick="event.stopPropagation()">
+      <button type="button" class="menu-item-btn" onclick="abrirGavetaModulo('sincronizacao')">
+        <svg viewBox="0 -960 960 960"><path d="M480-160q-134 0-227-93t-93-227q0-134 93-227t227-93q69 0 132 28.5T720-690v-110h80v280H520v-80h168q-32-56-87.5-88T480-720q-100 0-170 70t-70 170q0 100 70 170t170 70q77 0 139-44t87-116h84q-28 106-114 173t-196 67Z"/></svg>
+        <span>Sincronização</span>
+      </button>
+
+      <button type="button" class="menu-item-btn" onclick="abrirGavetaModulo('configuracoes')">
+        <svg viewBox="0 -960 960 960"><path d="m370-80-16-128q-13-5-24.5-12T307-235l-119 50L78-375l103-78q-1-7-1-13.5v-27q0-6.5 1-13.5L78-585l110-190 119 50q11-8 23-15t24-12l16-128h220l16 128q13 5 24.5 12t22.5 15l119-50 110 190-103 78q1 7 1 13.5v27q0 6.5-1 13.5l103 78-110 190-119-50q-11 8-23 15t-24 12L590-80H370Zm112-280q50 0 85-35t35-85q0-50-35-85t-85-35q-50 0-85 35t-35 85q0 50 35 85t85 35Z"/></svg>
+        <span>Configurações</span>
+      </button>
+
+      <div class="menu-divisor"></div>
+
+      <button type="button" class="menu-item-btn" onclick="abrirGavetaModulo('ajuda')">
+        <svg viewBox="0 -960 960 960"><path d="M478-240q21 0 35.5-14.5T528-290q0-21-14.5-35.5T478-340q-21 0-35.5 14.5T428-290q0 21 14.5 35.5T478-240Zm-38-160h60q0-30 6-42t34-44q33-31 46.5-54t13.5-50q0-54-37-87t-88-33q-47 0-82.5 23.5T344-624l52 22q12-25 34.5-39.5T479-656q33 0 53 19.5t20 46.5q0 22-13 41.5T503-506q-37 32-47 51t-16 55ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Z"/></svg>
+        <span>Ajuda ("O que é isso?")</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       BANNER SUPERIOR DO MODO AJUDA ATIVO
+       ======================================================================== -->
+  <aside class="banner-modo-ajuda" id="bannerModoAjuda">
+    <span>💡 <strong>Modo Dúvidas Ativo:</strong> Toque em qualquer elemento para ver a explicação!</span>
+    <button type="button" class="btn-sair-ajuda" onclick="desativarModoAjuda()">Sair da Ajuda</button>
+  </aside>
+
+  <!-- ========================================================================
+       GAVETA SUPERIOR MODULAR M3 (TOP SHEET)
+       ======================================================================== -->
+  <div class="scrim-overlay-top" id="scrimTop" onclick="fecharGavetaTopPorOverlay(event)">
+    <div class="top-sheet" id="topSheet" onclick="event.stopPropagation()">
+      <div class="sheet-top-header">
+        <div class="sheet-nav-tabs">
+          <button type="button" class="tab-btn ativo" id="tabBtnSinc" onclick="mudarAbaGaveta('sincronizacao')">
+            🔄 Sincronização
+          </button>
+          <button type="button" class="tab-btn" id="tabBtnConfig" onclick="mudarAbaGaveta('configuracoes')">
+            ⚙️ Configurações
+          </button>
+          <button type="button" class="tab-btn" id="tabBtnAjuda" onclick="mudarAbaGaveta('ajuda')">
+            ❓ Ajuda
+          </button>
+        </div>
+        <button type="button" class="btn-fechar-sheet" onclick="fecharGavetaTop()" title="Fechar">✕</button>
+      </div>
+
+      <div class="sheet-top-body">
+        <!-- MÓDULO 1: SINCRONIZAÇÃO & REDE -->
+        <section class="modulo-secao ativo" id="moduloSincronizacao">
+          <div class="sheet-card-box">
+            <span class="sheet-card-title">📡 Estado da Conexão</span>
+            <div class="sheet-row">
+              <span>Rede Detectada:</span>
+              <span class="badge-status-nuvem" id="badgeRedeStatus">🟢 Wi-Fi Online</span>
+            </div>
+            <div class="sheet-row">
+              <span>Nuvem Google Sheets:</span>
+              <span style="color: #86efac; font-weight: 700;">Conectada</span>
+            </div>
+          </div>
+
+          <div class="sheet-card-box">
+            <span class="sheet-card-title">📦 Cofre Local (IndexedDB)</span>
+            <div class="sheet-row">
+              <span>Famílias da Conferência:</span>
+              <strong style="color: var(--md-on-surface);">14 baixadas</strong>
+            </div>
+            <div class="sheet-row">
+              <span>Anotações Pendentes:</span>
+              <span style="color: #fbbf24; font-weight: 700;">1 relato rascunhado</span>
+            </div>
+          </div>
+
+          <button type="button" class="btn-acao-gaveta" onclick="executarSincronizacaoManual()">
+            🔄 Sincronizar Agora com a Nuvem
+          </button>
+        </section>
+
+        <!-- MÓDULO 2: CONFIGURAÇÕES -->
+        <section class="modulo-secao" id="moduloConfiguracoes">
+          <div class="m3-switch-row">
+            <div class="m3-switch-label-group">
+              <span class="m3-switch-title">Formato dos Botões</span>
+              <span class="m3-switch-desc" id="lblFormatoBotoesDesc">Ícone + Texto (Oblongo)</span>
+            </div>
+            <label class="m3-switch">
+              <input type="checkbox" id="switchBotoesFormato" onchange="alternarFormatoBotoes(this.checked)" checked>
+              <span class="m3-switch-track"><span class="m3-switch-thumb"></span></span>
+            </label>
+          </div>
+
+          <div class="m3-switch-row">
+            <div class="m3-switch-label-group">
+              <span class="m3-switch-title">Fonte Grande (Idosos)</span>
+              <span class="m3-switch-desc">Aumenta todos os textos proporcionalmente</span>
+            </div>
+            <label class="m3-switch">
+              <input type="checkbox" id="switchFonteGrande" onchange="alternarFonteGrande(this.checked)">
+              <span class="m3-switch-track"><span class="m3-switch-thumb"></span></span>
+            </label>
+          </div>
+
+          <div class="m3-switch-row">
+            <div class="m3-switch-label-group">
+              <span class="m3-switch-title">Modo Canhoto</span>
+              <span class="m3-switch-desc">Inverte botões da barra inferior</span>
+            </div>
+            <label class="m3-switch">
+              <input type="checkbox" id="switchCanhoto" onchange="alternarModoCanhoto(this.checked)">
+              <span class="m3-switch-track"><span class="m3-switch-thumb"></span></span>
+            </label>
+          </div>
+
+          <div class="m3-switch-row">
+            <div class="m3-switch-label-group">
+              <span class="m3-switch-title">Tema Claro / Escuro</span>
+              <span class="m3-switch-desc">Alterna entre modo dia e modo noite</span>
+            </div>
+            <label class="m3-switch">
+              <input type="checkbox" id="switchTemaClaro" onchange="alternarTemaClaro(this.checked)">
+              <span class="m3-switch-track"><span class="m3-switch-thumb"></span></span>
+            </label>
+          </div>
+        </section>
+
+        <!-- MÓDULO 3: AJUDA ("O QUE É ISSO?") -->
+        <section class="modulo-secao" id="moduloAjuda">
+          <div class="sheet-card-box" style="border-color: var(--md-amber);">
+            <span class="sheet-card-title" style="color: var(--md-amber);">❓ Modo "O que é isso?"</span>
+            <p style="font-size: 0.84rem; line-height: 1.4; color: var(--md-on-surface);">
+              Ative o modo de dúvidas para tocar em qualquer botão, campo ou ícone da tela e ver um cartão explicativo em letras grandes.
+            </p>
+            <button type="button" class="btn-acao-gaveta" style="background-color: var(--md-amber);" onclick="iniciarModoAjudaTela()">
+              🔍 Ativar Modo "O que é isso?" na Tela
+            </button>
+          </div>
+
+          <div class="sheet-card-box">
+            <span class="sheet-card-title">📖 Guia Rápido da Visita</span>
+            <ul style="font-size: 0.82rem; padding-left: 1.15rem; line-height: 1.5; color: var(--md-on-surface-variant);">
+              <li><strong>Falar:</strong> Toque no campo e use o microfone central para ditar o relato sem digitar.</li>
+              <li><strong>Ouvir:</strong> Segure o botão central por 1s para ler textos do relatório em voz alta.</li>
+              <li><strong>Sair:</strong> Toque em Sair na barra inferior para proteger os dados da família (LGPD).</li>
+            </ul>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL EXPLICATIVO DO MODO "O QUE É ISSO?"
+       ======================================================================== -->
+  <div class="modal-ajuda-overlay" id="modalAjudaOverlay" onclick="fecharModalExplicativo()">
+    <div class="modal-ajuda-card" onclick="event.stopPropagation()">
+      <div class="modal-ajuda-header">
+        <span class="modal-ajuda-icone">💡</span>
+        <h3 class="modal-ajuda-titulo" id="lblModalAjudaTitulo">Nome do Elemento</h3>
+      </div>
+      <div class="modal-ajuda-bloco" id="lblModalAjudaCorpo">
+        Explicação clara de para que serve e como usar este elemento na prática.
+      </div>
+      <button type="button" class="btn-entendi-ajuda" onclick="fecharModalExplicativo()">
+        Entendi
+      </button>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       ÁREA CENTRAL DE TRABALHO (CARD DA VISITA + CAMPOS DE TEXTO)
+       ======================================================================== -->
+  <main class="display-area" id="areaConteudo">
+
+    <!-- Card Interativo de Visita com Farol de Foco -->
+    <article class="md-card card-interativo ajuda-alvo" data-ajuda-titulo="Card da Visita Domiciliar"
+      data-ajuda-texto="Espaço principal para você registrar as necessidades da família durante a visita. Você pode falar no microfone para preencher ou abrir o teclado.">
+      <div class="card-header-row">
+        <span class="card-chip">🎙️ Anotação de Campo</span>
+        <span style="font-size: 0.74rem; color: var(--md-secondary); font-weight: 700;">3 Campos Ativos</span>
+      </div>
+      <h2 class="card-titulo">Visita em Andamento</h2>
+      <p class="card-detalhes">
+        Selecione o campo. Ele acenderá a <strong>borda azul de foco</strong>. Use o botão <strong>Falar</strong> abaixo ou toque em <strong>[ Teclado ]</strong> para digitar:
+      </p>
+
+      <!-- Campo 1: Família / Assistido -->
+      <div class="grupo-campo ajuda-alvo" id="grupoFamilia" data-ajuda-titulo="Campo Família / Assistido"
+        data-ajuda-texto="Identifica a pessoa de referência ou o nome da família que está recebendo a visita dos vicentinos.">
+        <label class="label-campo" for="campoFamilia">
+          <span>1. Família / Assistido:</span>
+          <span class="badge-foco-ativo">● Alvo da Fala</span>
+        </label>
+        <div class="campo-wrapper">
+          <input type="text" id="campoFamilia" class="campo-formulario" placeholder="Ex: Família Silva (Dona Neuza)"
+            onfocus="registrarFocoCampo(this, 'grupoFamilia')"
+            onclick="lidarCliqueCampo(this, 'grupoFamilia')"
+            onblur="lidarBlurCampo(this)">
+        </div>
+        <div class="barra-acao-campo">
+          <span class="info-alvo-voz">🎯 Fala direcionada aqui</span>
+          <button type="button" class="btn-abrir-teclado ajuda-alvo" id="btnTecladoFamilia" onclick="alternarTeclado('campoFamilia', 'btnTecladoFamilia')"
+            data-ajuda-titulo="Botão Teclado"
+            data-ajuda-texto="Mostra ou recolhe o teclado do celular. Toque nele se quiser digitar com os dedos em vez de usar o microfone.">
+            Teclado
+          </button>
+        </div>
+      </div>
+
+      <!-- Campo 2: Relato / Observações da Visita -->
+      <div class="grupo-campo ativo ajuda-alvo" id="grupoRelato" data-ajuda-titulo="Campo Relato da Visita"
+        data-ajuda-texto="Espaço para descrever como foi a conversa, situação espiritual, moradia e necessidades imediatas da família.">
+        <label class="label-campo" for="campoRelato">
+          <span>2. Relato da Visita:</span>
+          <span class="badge-foco-ativo">● Alvo da Fala</span>
+        </label>
+        <div class="campo-wrapper">
+          <textarea id="campoRelato" class="campo-formulario" rows="3" placeholder="Ex: Conversamos sobre a saúde do idoso e necessidades da família..."
+            onfocus="registrarFocoCampo(this, 'grupoRelato')"
+            onclick="lidarCliqueCampo(this, 'grupoRelato')"
+            onblur="lidarBlurCampo(this)"></textarea>
+        </div>
+        <div class="barra-acao-campo">
+          <span class="info-alvo-voz">🎯 Fala direcionada aqui</span>
+          <button type="button" class="btn-abrir-teclado ajuda-alvo" id="btnTecladoRelato" onclick="alternarTeclado('campoRelato', 'btnTecladoRelato')"
+            data-ajuda-titulo="Botão Teclado"
+            data-ajuda-texto="Mostra ou recolhe o teclado virtual para digitação com os dedos.">
+            Teclado
+          </button>
+        </div>
+      </div>
+
+      <!-- Campo 3: Encaminhamentos / Demandas -->
+      <div class="grupo-campo ajuda-alvo" id="grupoDemandas" data-ajuda-titulo="Campo Encaminhamentos e Demandas"
+        data-ajuda-texto="Anote aqui as providências da conferência: cesta básica, remédios, encaminhamento ao médico ou apoio social.">
+        <label class="label-campo" for="campoDemandas">
+          <span>3. Encaminhamentos / Demandas:</span>
+          <span class="badge-foco-ativo">● Alvo da Fala</span>
+        </label>
+        <div class="campo-wrapper">
+          <input type="text" id="campoDemandas" class="campo-formulario" placeholder="Ex: Cesta básica, fraldas G, remédio contínuo"
+            onfocus="registrarFocoCampo(this, 'grupoDemandas')"
+            onclick="lidarCliqueCampo(this, 'grupoDemandas')"
+            onblur="lidarBlurCampo(this)">
+        </div>
+        <div class="barra-acao-campo">
+          <span class="info-alvo-voz">🎯 Fala direcionada aqui</span>
+          <button type="button" class="btn-abrir-teclado ajuda-alvo" id="btnTecladoDemandas" onclick="alternarTeclado('campoDemandas', 'btnTecladoDemandas')"
+            data-ajuda-titulo="Botão Teclado"
+            data-ajuda-texto="Alterna o teclado na tela para preenchimento manual.">
+            Teclado
+          </button>
+        </div>
+      </div>
+    </article>
+
+    <!-- Card 2: Leitura em Voz Alta e Metas -->
+    <article class="md-card falar-texto ajuda-alvo" onclick="lidarToqueCardTexto(this)"
+      data-ajuda-titulo="Card com Leitura em Áudio"
+      data-ajuda-texto="Quando o modo Ouvir estiver ativo no botão central, tocar neste cartão faz o celular ler todas as informações em voz alta para você.">
+      <div class="card-header-row">
+        <span class="card-chip" style="background-color: rgba(21, 128, 61, 0.15); color: #86efac; border-color: rgba(34, 197, 94, 0.3);">
+          🔊 Texto Legível por Voz
+        </span>
+        <span style="font-size: 0.72rem; color: var(--md-on-surface-variant);">Meta em Andamento</span>
+      </div>
+      <h3 class="card-titulo">Meta: Consulta Médica de Oftalmologia</h3>
+      <p class="card-detalhes" id="txtMetaCorpo">
+        Agendamento de consulta de vista para Dona Neuza na UBS Central. A conferência apoiará com o transporte solidário no dia da consulta.
+      </p>
+    </article>
+  </main>
+
+  <!-- ========================================================================
+       BARRA INFERIOR NO POLEGAR: MENU | FALAR/OUVIR (VERTICAL) | SAIR
+       ======================================================================== -->
+  <footer class="app-footer" id="appFooter">
+
+    <!-- 1. Botão Menu (Navegação de Telas) -->
+    <button type="button" class="btn-footer-lateral ajuda-alvo" id="btnFooterMenu" onclick="abrirSeletorPagina()"
+      title="Navegar entre Páginas (Menu)"
+      data-ajuda-titulo="Botão Menu"
+      data-ajuda-texto="Abre a lista de telas do aplicativo: Visitas, Famílias Cadastradas, Relatórios e Metas da Conferência.">
+      <svg viewBox="0 -960 960 960">
+        <path d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z"/>
+      </svg>
+      <span class="footer-btn-label">Menu</span>
+    </button>
+
+    <!-- 2. Botão Central: FALAR / OUVIR (Ícone Vertical + Texto Embaixo) -->
+    <button type="button" class="btn-audio-central ajuda-alvo" id="btnAudioHub"
+      title="Falar / Ouvir: Toque para ação; Segure para alternar"
+      data-ajuda-titulo="Botão Falar / Ouvir"
+      data-ajuda-texto="O botão principal de voz: dê um toque rápido para ditar no campo azul, ou toque e segure por 1 segundo para alternar para o modo Ouvir (leitura em voz alta).">
+      <div class="press-ring" id="pressRing"></div>
+      
+      <!-- Ícone Vertical mic.svg -->
+      <span id="audioIconBox">
+        <img src="../../img/mic.svg" id="imgMicSvg" alt="Falar" style="width: 1.7rem; height: 1.7rem; display: block;">
+        <svg id="svgSpeaker" style="display: none; width: 1.7rem; height: 1.7rem; fill: #ffffff;" viewBox="0 -960 960 960">
+          <path d="M560-131v-82q90-26 145-100t55-167q0-93-55-167T560-747v-82q124 28 202 125.5T840-480q0 127-78 224.5T560-131ZM120-360v-240h160l200-200v640L280-360H120Zm440 40v-320q46 17 73 57.5t27 92.5q0 52-27 92.5T560-320ZM400-606l-86 86H200v80h114l86 86v-252ZM300-480Z"/>
+        </svg>
+      </span>
+
+      <!-- Texto Embaixo do Ícone -->
+      <span class="audio-central-label" id="lblAudioTexto">Falar</span>
+    </button>
+
+    <!-- 3. Botão Sair (Proteção Rápida de Dados LGPD no Polegar) -->
+    <button type="button" class="btn-footer-lateral btn-sair-lateral ajuda-alvo" id="btnFooterSair" onclick="executarLogoutRapido()"
+      title="Sair e Proteger Dados (LGPD)"
+      data-ajuda-titulo="Botão Sair (Proteção de Dados)"
+      data-ajuda-texto="Ao alcance do seu polegar para segurança: encerra a sessão imediatamente para proteger a privacidade da família visitada, salvando seu rascunho em segurança.">
+      <svg viewBox="0 -960 960 960">
+        <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z"/>
+      </svg>
+      <span class="footer-btn-label">Sair</span>
+    </button>
+  </footer>
+
+  <!-- ========================================================================
+       GAVETA INFERIOR DE TELAS (BOTTOM SHEET M3)
+       ======================================================================== -->
+  <div class="scrim-overlay-bottom" id="scrimBottom" onclick="fecharSeletorPorOverlay(event)">
+    <div class="bottom-sheet" id="bottomSheet" onclick="event.stopPropagation()">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h3 style="font-size: 1.1rem; font-weight: 800;">🧭 Navegar para Página</h3>
+        <button type="button" class="btn-fechar-sheet" onclick="fecharSeletorPagina()">✕</button>
+      </div>
+
+      <button type="button" class="nav-item-btn ativo" onclick="selecionarPagina('Visitas')">
+        <span>📋 Visitas Domiciliares</span>
+      </button>
+      <button type="button" class="nav-item-btn" onclick="selecionarPagina('Famílias')">
+        <span>👥 Famílias Assistidas</span>
+      </button>
+      <button type="button" class="nav-item-btn" onclick="selecionarPagina('Metas')">
+        <span>🎯 Metas & Promoção Social</span>
+      </button>
+      <button type="button" class="nav-item-btn" onclick="selecionarPagina('Pastoral')">
+        <span>🤝 Pastoral de Rua</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast Flutuante de Alerta -->
+  <div class="toast-msg" id="toastMsg">Sessão protegida e rascunho salvo!</div>
+
+  <!-- ========================================================================
+       SCRIPTS: LÓGICA COMPLETA DE INTERAÇÃO, AJUDA E VOZ
+       ======================================================================== -->
+  <script>
+    // Estado Global da Aplicação
+    const configAtual = {
+      botoesComTexto: true,
+      fonteGrande: false,
+      modoCanhoto: false,
+      temaClaro: false,
+      modoAudio: "falar", // "falar" ou "ouvir"
+      campoAtivoId: "campoRelato",
+      modoAjudaAtivo: false
+    };
+
+    let permitindoTecladoManual = false;
+    let pressTimer = null;
+    let sinteseVozAtiva = false;
+
+    // Referências DOM
+    const body = document.body;
+    const popupOverlay = document.getElementById("popupOverlay");
+    const scrimTop = document.getElementById("scrimTop");
+    const scrimBottom = document.getElementById("scrimBottom");
+    const bannerModoAjuda = document.getElementById("bannerModoAjuda");
+    const modalAjudaOverlay = document.getElementById("modalAjudaOverlay");
+    const toastMsg = document.getElementById("toastMsg");
+
+    const btnAudioHub = document.getElementById("btnAudioHub");
+    const imgMicSvg = document.getElementById("imgMicSvg");
+    const svgSpeaker = document.getElementById("svgSpeaker");
+    const lblAudioTexto = document.getElementById("lblAudioTexto");
+
+    const campoFamilia = document.getElementById("campoFamilia");
+    const campoRelato = document.getElementById("campoRelato");
+    const campoDemandas = document.getElementById("campoDemandas");
+
+    // ==========================================================================
+    // 1. GESTÃO DO MENU OVERFLOW (3 PONTOS ⋮) E GAVETA SUPERIOR
+    // ==========================================================================
+    function toggleMenuOverflow(event) {
+      if (configAtual.modoAjudaAtivo) return;
+      if (event) event.stopPropagation();
+      dispararFeedbackTabil(25);
+      popupOverlay.classList.toggle("visivel");
+    }
+
+    function fecharMenuOverflow() {
+      popupOverlay.classList.remove("visivel");
+    }
+
+    function abrirGavetaModulo(idModulo) {
+      fecharMenuOverflow();
+      mudarAbaGaveta(idModulo);
+      scrimTop.classList.add("aberto");
+      dispararFeedbackTabil(30);
+    }
+
+    function fecharGavetaTop() {
+      scrimTop.classList.remove("aberto");
+    }
+
+    function fecharGavetaTopPorOverlay(event) {
+      if (event.target === scrimTop) fecharGavetaTop();
+    }
+
+    function mudarAbaGaveta(idAba) {
+      const tabs = {
+        sincronizacao: { btn: "tabBtnSinc", sec: "moduloSincronizacao" },
+        configuracoes: { btn: "tabBtnConfig", sec: "moduloConfiguracoes" },
+        ajuda: { btn: "tabBtnAjuda", sec: "moduloAjuda" }
+      };
+
+      Object.values(tabs).forEach(t => {
+        const b = document.getElementById(t.btn);
+        const s = document.getElementById(t.sec);
+        if (b) b.classList.remove("ativo");
+        if (s) s.classList.remove("ativo");
+      });
+
+      if (tabs[idAba]) {
+        const bAtivo = document.getElementById(tabs[idAba].btn);
+        const sAtivo = document.getElementById(tabs[idAba].sec);
+        if (bAtivo) bAtivo.classList.add("ativo");
+        if (sAtivo) sAtivo.classList.add("ativo");
+      }
+    }
+
+    // ==========================================================================
+    // 2. SISTEMA INTERATIVO "O QUE É ISSO?"
+    // ==========================================================================
+    function iniciarModoAjudaTela() {
+      fecharGavetaTop();
+      configAtual.modoAjudaAtivo = true;
+      body.classList.add("modo-ajuda-ativo");
+      bannerModoAjuda.classList.add("visivel");
+      dispararFeedbackSonoro(659.25);
+      exibirToast("Toque em qualquer botão ou texto para ver a explicação!");
+    }
+
+    function desativarModoAjuda() {
+      configAtual.modoAjudaAtivo = false;
+      body.classList.remove("modo-ajuda-ativo");
+      bannerModoAjuda.classList.remove("visivel");
+      dispararFeedbackTabil(25);
+    }
+
+    // Intercepta cliques no modo ajuda para elementos marcados com .ajuda-alvo
+    document.addEventListener("click", (event) => {
+      if (!configAtual.modoAjudaAtivo) return;
+
+      const alvo = event.target.closest(".ajuda-alvo");
+      if (alvo) {
+        event.preventDefault();
+        event.stopPropagation();
+        const titulo = alvo.getAttribute("data-ajuda-titulo") || "Elemento da Tela";
+        const texto = alvo.getAttribute("data-ajuda-texto") || "Este elemento faz parte do fluxo do aplicativo.";
+        abrirModalExplicativo(titulo, texto);
+      }
+    }, true);
+
+    function abrirModalExplicativo(titulo, texto) {
+      document.getElementById("lblModalAjudaTitulo").textContent = titulo;
+      document.getElementById("lblModalAjudaCorpo").innerHTML = texto;
+      modalAjudaOverlay.classList.add("visivel");
+      dispararFeedbackTabil(40);
+      dispararFeedbackSonoro(784);
+    }
+
+    function fecharModalExplicativo() {
+      modalAjudaOverlay.classList.remove("visivel");
+    }
+
+    // ==========================================================================
+    // 3. GESTÃO DOS CAMPOS, FAROL DE FOCO E TOGGLE DE TECLADO
+    // ==========================================================================
+    function configurarCampoFocoVisual(idCampo) {
+      ["grupoFamilia", "grupoRelato", "grupoDemandas"].forEach(id => {
+        const g = document.getElementById(id);
+        if (g) g.classList.remove("ativo");
+      });
+      [campoFamilia, campoRelato, campoDemandas].forEach(c => c && c.classList.remove("em-foco"));
+
+      const campo = document.getElementById(idCampo);
+      if (!campo) return;
+
+      campo.classList.add("em-foco");
+      const idGrupo = idCampo === "campoFamilia" ? "grupoFamilia" : (idCampo === "campoDemandas" ? "grupoDemandas" : "grupoRelato");
+      const g = document.getElementById(idGrupo);
+      if (g) g.classList.add("ativo");
+
+      configAtual.campoAtivoId = idCampo;
+    }
+
+    function registrarFocoCampo(campo, idGrupo) {
+      if (configAtual.modoAjudaAtivo) return;
+      dispararFeedbackTabil(20);
+      configurarCampoFocoVisual(campo.id);
+
+      if (permitindoTecladoManual) {
+        campo.setAttribute("inputmode", "text");
+        return;
+      }
+
+      if (configAtual.modoAudio === "falar") {
+        campo.setAttribute("inputmode", "none");
+      } else {
+        campo.removeAttribute("inputmode");
+      }
+    }
+
+    function lidarCliqueCampo(campo, idGrupo) {
+      if (configAtual.modoAjudaAtivo) return;
+      registrarFocoCampo(campo, idGrupo);
+    }
+
+    function alternarTeclado(idCampo, idBtn) {
+      if (configAtual.modoAjudaAtivo) return;
+      const campo = document.getElementById(idCampo);
+      const btn = document.getElementById(idBtn);
+      if (!campo) return;
+
+      const tecladoAberto = campo.dataset.tecladoAberto === "true";
+
+      if (tecladoAberto) {
+        // Ocultar Teclado
+        dispararFeedbackTabil(25);
+        dispararFeedbackSonoro(523.25);
+        campo.dataset.tecladoAberto = "false";
+        campo.setAttribute("inputmode", "none");
+        campo.blur();
+        if (btn) btn.classList.remove("ativo");
+        configurarCampoFocoVisual(idCampo);
+      } else {
+        // Mostrar Teclado
+        dispararFeedbackTabil(40);
+        dispararFeedbackSonoro(784);
+        permitindoTecladoManual = true;
+
+        [campoFamilia, campoRelato, campoDemandas].forEach(c => {
+          if (c && c !== campo) c.dataset.tecladoAberto = "false";
+        });
+        document.querySelectorAll(".btn-abrir-teclado").forEach(b => {
+          if (b !== btn) b.classList.remove("ativo");
+        });
+
+        campo.dataset.tecladoAberto = "true";
+        campo.removeAttribute("inputmode");
+        campo.setAttribute("inputmode", "text");
+
+        if (document.activeElement === campo) campo.blur();
+        campo.focus();
+
+        const len = campo.value ? campo.value.length : 0;
+        if (campo.setSelectionRange) campo.setSelectionRange(len, len);
+        if (btn) btn.classList.add("ativo");
+
+        configurarCampoFocoVisual(idCampo);
+
+        setTimeout(() => { permitindoTecladoManual = false; }, 300);
+      }
+    }
+
+    function lidarBlurCampo(campo) {
+      if (configAtual.modoAudio === "falar" && !permitindoTecladoManual) {
+        campo.setAttribute("inputmode", "none");
+        campo.dataset.tecladoAberto = "false";
+        const btn = campo.closest(".grupo-campo")?.querySelector(".btn-abrir-teclado");
+        if (btn) btn.classList.remove("ativo");
+      }
+    }
+
+    // ==========================================================================
+    // 4. BOTÃO CENTRAL: FALAR / OUVIR (LAYOUT VERTICAL + PRESS & HOLD)
+    // ==========================================================================
+    btnAudioHub.addEventListener("pointerdown", iniciarPressAudio);
+    btnAudioHub.addEventListener("pointerup", finalizarPressAudio);
+    btnAudioHub.addEventListener("pointerleave", cancelarPressAudio);
+    btnAudioHub.addEventListener("pointercancel", cancelarPressAudio);
+
+    let foiToqueLongo = false;
+
+    function iniciarPressAudio(e) {
+      if (configAtual.modoAjudaAtivo) return;
+      foiToqueLongo = false;
+      btnAudioHub.classList.add("pressionando");
+      dispararFeedbackTabil(15);
+
+      pressTimer = setTimeout(() => {
+        foiToqueLongo = true;
+        alternarModoFalarOuvir();
+      }, 700);
+    }
+
+    function finalizarPressAudio(e) {
+      if (configAtual.modoAjudaAtivo) return;
+      btnAudioHub.classList.remove("pressionando");
+      clearTimeout(pressTimer);
+
+      if (!foiToqueLongo) {
+        executarAcaoAudioModoAtual();
+      }
+    }
+
+    function cancelarPressAudio() {
+      btnAudioHub.classList.remove("pressionando");
+      clearTimeout(pressTimer);
+    }
+
+    function alternarModoFalarOuvir() {
+      dispararFeedbackTabil(60);
+      dispararFeedbackSonoro(880);
+
+      configAtual.modoAudio = configAtual.modoAudio === "falar" ? "ouvir" : "falar";
+
+      if (configAtual.modoAudio === "ouvir") {
+        btnAudioHub.classList.add("modo-ouvir");
+        imgMicSvg.style.display = "none";
+        svgSpeaker.style.display = "block";
+        lblAudioTexto.textContent = "Ouvir";
+        body.classList.add("modo-leitura-ativo");
+        exibirToast("Modo Ouvir ativo: toque nos cards verdes para escutar");
+      } else {
+        btnAudioHub.classList.remove("modo-ouvir");
+        imgMicSvg.style.display = "block";
+        svgSpeaker.style.display = "none";
+        lblAudioTexto.textContent = "Falar";
+        body.classList.remove("modo-leitura-ativo");
+        pararLeituraVoz();
+        exibirToast("Modo Falar ativo: dite pelo microfone");
+      }
+    }
+
+    function executarAcaoAudioModoAtual() {
+      dispararFeedbackTabil(35);
+
+      if (configAtual.modoAudio === "falar") {
+        iniciarDitadoVozNoCampoFocado();
+      } else {
+        const textoMeta = document.getElementById("txtMetaCorpo")?.textContent || "";
+        falarTextoSintetizado(textoMeta);
+      }
+    }
+
+    function iniciarDitadoVozNoCampoFocado() {
+      const campo = document.getElementById(configAtual.campoAtivoId) || campoRelato;
+      dispararFeedbackSonoro(700);
+
+      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRec) {
+        alert("O reconhecimento de voz nativo não é suportado pelo seu navegador neste dispositivo. Use o botão [Teclado]!");
+        return;
+      }
+
+      try {
+        const rec = new SpeechRec();
+        rec.lang = "pt-BR";
+        rec.continuous = false;
+        rec.interimResults = false;
+
+        exibirToast("Gravando voz... Fale agora!");
+        rec.onresult = (e) => {
+          const resultado = e.results[0][0].transcript;
+          if (campo) {
+            campo.value = (campo.value ? campo.value + " " : "") + resultado;
+            exibirToast("Texto adicionado com sucesso!");
+            dispararFeedbackSonoro(1046.5);
+          }
+        };
+        rec.onerror = () => {
+          exibirToast("Não foi possível capturar a voz. Tente novamente.");
+        };
+        rec.start();
+      } catch (err) {
+        exibirToast("Permissão de microfone necessária.");
+      }
+    }
+
+    function lidarToqueCardTexto(card) {
+      if (configAtual.modoAjudaAtivo) return;
+      if (configAtual.modoAudio !== "ouvir") return;
+
+      const texto = card.querySelector(".card-detalhes")?.textContent || card.textContent;
+      falarTextoSintetizado(texto);
+    }
+
+    function falarTextoSintetizado(texto) {
+      if (!("speechSynthesis" in window)) {
+        alert("Sintetizador de voz não suportado neste aparelho.");
+        return;
+      }
+
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(texto);
+      utterance.lang = "pt-BR";
+      utterance.rate = 0.95; // Velocidade agradável para idosos
+      utterance.pitch = 1.0;
+
+      utterance.onstart = () => {
+        exibirToast("Lendo texto em voz alta...");
+      };
+      utterance.onend = () => {
+        pararLeituraVoz();
+      };
+
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function pararLeituraVoz() {
+      if ("speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+    }
+
+    // ==========================================================================
+    // 5. BOTÃO SAIR: LOGOUT IMEDIATO COM AUTO-SAVE DE EMERGÊNCIA (LGPD)
+    // ==========================================================================
+    function executarLogoutRapido() {
+      if (configAtual.modoAjudaAtivo) return;
+      dispararFeedbackTabil(50);
+      dispararFeedbackSonoro(440);
+
+      // SALVAMENTO SILENCIOSO DE RASCUNHO (Auto-Save de Emergência no LocalStorage/IndexedDB)
+      const rascunho = {
+        familia: campoFamilia.value,
+        relato: campoRelato.value,
+        demandas: campoDemandas.value,
+        dataHora: new Date().toISOString()
+      };
+      localStorage.setItem("ssvp_rascunho_emergencia", JSON.stringify(rascunho));
+
+      // Limpa dados voláteis da memória
+      campoFamilia.value = "";
+      campoRelato.value = "";
+      campoDemandas.value = "";
+
+      exibirToast("🔒 Sessão encerrada! Rascunho salvo em segurança.");
+
+      setTimeout(() => {
+        alert("🔒 SESSÃO ENCERRADA PARA PROTEÇÃO DE DADOS (LGPD)\n\nO aplicativo foi bloqueado imediatamente e o rascunho da visita foi gravado no cofre local seguro do dispositivo.");
+        // Restaura rascunho para teste prático no protótipo
+        campoFamilia.value = rascunho.familia;
+        campoRelato.value = rascunho.relato;
+        campoDemandas.value = rascunho.demandas;
+      }, 350);
+    }
+
+    // ==========================================================================
+    // 6. GESTÃO DA NAVEGAÇÃO DE TELAS (BOTTOM SHEET M3)
+    // ==========================================================================
+    function abrirSeletorPagina() {
+      if (configAtual.modoAjudaAtivo) return;
+      dispararFeedbackTabil(25);
+      scrimBottom.classList.add("aberto");
+    }
+
+    function fecharSeletorPagina() {
+      scrimBottom.classList.remove("aberto");
+    }
+
+    function fecharSeletorPorOverlay(e) {
+      if (e.target === scrimBottom) fecharSeletorPagina();
+    }
+
+    function selecionarPagina(nome) {
+      fecharSeletorPagina();
+      exibirToast(`Navegando para: ${nome}`);
+    }
+
+    // ==========================================================================
+    // 7. PREFERÊNCIAS E CONFIGURAÇÕES
+    // ==========================================================================
+    function alternarFormatoBotoes(comTexto) {
+      configAtual.botoesComTexto = comTexto;
+      body.classList.toggle("modo-apenas-icones", !comTexto);
+      document.getElementById("lblFormatoBotoesDesc").textContent = comTexto ? "Ícone + Texto (Oblongo)" : "Apenas Ícones (Compacto)";
+      dispararFeedbackTabil(25);
+    }
+
+    function alternarFonteGrande(ativar) {
+      configAtual.fonteGrande = ativar;
+      document.documentElement.classList.toggle("fonte-grande", ativar);
+      dispararFeedbackTabil(25);
+    }
+
+    function alternarModoCanhoto(ativar) {
+      configAtual.modoCanhoto = ativar;
+      body.classList.toggle("layout-canhoto", ativar);
+      dispararFeedbackTabil(25);
+    }
+
+    function alternarTemaClaro(ativar) {
+      configAtual.temaClaro = ativar;
+      body.classList.toggle("tema-claro", ativar);
+      dispararFeedbackTabil(25);
+    }
+
+    function executarSincronizacaoManual() {
+      dispararFeedbackTabil(35);
+      dispararFeedbackSonoro(800);
+      exibirToast("Conectando à planilha do Google Sheets...");
+      setTimeout(() => {
+        exibirToast("✅ 14 famílias e 8 metas sincronizadas com sucesso!");
+      }, 1000);
+    }
+
+    // Feedback Tátil e Sonoro
+    function dispararFeedbackTabil(ms = 25) {
+      if ("vibrate" in navigator) {
+        try { navigator.vibrate(ms); } catch (e) {}
+      }
+    }
+
+    function dispararFeedbackSonoro(freq = 600) {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        gain.gain.setValueAtTime(0.04, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.1);
+      } catch (e) {}
+    }
+
+    function exibirToast(msg) {
+      toastMsg.textContent = msg;
+      toastMsg.classList.add("visivel");
+      setTimeout(() => {
+        toastMsg.classList.remove("visivel");
+      }, 2600);
+    }
+
+    // Sincronização automática com redimensionamento de teclado (Android/iOS)
+    if (window.visualViewport) {
+      let alturaAnterior = window.visualViewport.height;
+      window.visualViewport.addEventListener("resize", () => {
+        const alturaAtual = window.visualViewport.height;
+        if (alturaAtual - alturaAnterior > 140) {
+          [campoFamilia, campoRelato, campoDemandas].forEach(c => {
+            if (c) {
+              c.dataset.tecladoAberto = "false";
+              if (configAtual.modoAudio === "falar") c.setAttribute("inputmode", "none");
+            }
+          });
+          document.querySelectorAll(".btn-abrir-teclado").forEach(b => b.classList.remove("ativo"));
+        }
+        alturaAnterior = alturaAtual;
+      });
+    }
+
+    // Inicialização
+    window.addEventListener("DOMContentLoaded", () => {
+      configurarCampoFocoVisual("campoRelato");
+    });
+  </script>
+</body>
+
+</html>
